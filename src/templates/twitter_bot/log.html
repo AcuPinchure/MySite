@@ -1,0 +1,31 @@
+{% extends 'twitter_bot/base.html' %}
+
+{% block title %}Twitter Bot{% endblock title %}
+
+{% block content %}
+<div class="ui container">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Log File Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log_name in log_list %}
+            <tr>
+                <td>{{ log_name }}</td>
+                <td>
+                    <form action={% url 'log_content' log_name %} method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="view" class="ui primary compact button">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock content %}

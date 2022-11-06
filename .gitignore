@@ -1,0 +1,15 @@
+# DB and files
+data/
+crontabLog/
+
+# django
+*.log
+*.pot
+*.pyc
+__pycache__
+
+# python
+venv/
+
+# vs code
+.vscode/

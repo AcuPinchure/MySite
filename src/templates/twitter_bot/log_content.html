@@ -1,0 +1,18 @@
+{% extends 'twitter_bot/base.html' %}
+
+{% block title %}Twitter Bot{% endblock title %}
+
+{% block content %}
+<div class="ui container">
+    <div class="ui segment">
+        <h2 class="ui header">
+            {{log_name}}
+        </h2>
+        {% for line in log_content %}
+        <p>{{line}}</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}

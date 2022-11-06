@@ -1,0 +1,131 @@
+{% extends 'twitter_bot/base.html' %}
+
+{% block content %}
+<div class="ui text container">
+    <div class="ui three item menu">
+        <a href={% url 'stats' name="kaorin" %} class="item">
+            Kaorin
+        </a>
+        <a href={% url 'stats' name="chemi" %} class="active item">
+            Chemi
+        </a>
+        <a href={% url 'stats' name="akarin" %} class="item">
+            Akarin
+        </a>
+    </div>
+    <h2 class="ui header">
+        <img class="ui circular image" src="https://pbs.twimg.com/profile_images/1529343537174564864/74B97kWd_400x400.jpg">
+        Statistics of Chemi Bot
+    </h2>
+    
+    
+    <h3 class="ui top attached header">
+        Stats of the Week: 00/00 ~ 00/00
+    </h3>
+    <div class="ui attached segment">
+        <div class="ui small one statistics">
+            <div class="ui small statistic">
+                <div class="value">
+                    <i class="twitter icon"></i> 85
+                </div>
+                <div class="label">
+                    Total Posts
+                </div>
+            </div>
+        </div>
+        <h5 class="ui horizontal divider header">
+            Received
+        </h5>
+        <div class="ui small two statistics">
+            <div class="ui red statistic">
+                <div class="value">
+                    <i class="heart icon"></i> 35
+                </div>
+                <div class="label">
+                    Likes
+                </div>
+            </div>
+            <div class="ui green statistic">
+                <div class="value">
+                    <i class="retweet icon"></i> 12
+                </div>
+                <div class="label">
+                    Retweets
+                </div>
+            </div>
+        </div>
+        <h5 class="ui horizontal divider header">
+            Brought
+        </h5>
+        <div class="ui one small statistics">
+            <div class="ui blue statistic">
+                <div class="value">
+                    <i class="user plus icon"></i> 1
+                </div>
+                <div class="label">
+                    New Followers
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="ui bottom attached secondary mini message">
+        *Stats last updated: XX/XX/XX XX:XX:XX
+    </div>
+
+    <h3 class="ui top attached header">
+        Stats of All Time: 00/00/2019 ~ 00/00/2022
+    </h3>
+    <div class="ui attached segment">
+        <div class="ui small one statistics">
+            <div class="ui small statistic">
+                <div class="value">
+                    <i class="twitter icon"></i> 12307
+                </div>
+                <div class="label">
+                    Total Posts
+                </div>
+            </div>
+        </div>
+        <h5 class="ui horizontal divider header">
+            Received
+        </h5>
+        <div class="ui small two statistics">
+            <div class="ui red statistic">
+                <div class="value">
+                    <i class="heart icon"></i> 253
+                </div>
+                <div class="label">
+                    Likes
+                </div>
+            </div>
+            <div class="ui green statistic">
+                <div class="value">
+                    <i class="retweet icon"></i> 102
+                </div>
+                <div class="label">
+                    Retweets
+                </div>
+            </div>
+        </div>
+        <h5 class="ui horizontal divider header">
+            In Total
+        </h5>
+        <div class="ui one small statistics">
+            <div class="ui blue statistic">
+                <div class="value">
+                    <i class="user icon"></i> 148
+                </div>
+                <div class="label">
+                    Followers
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="ui bottom attached secondary mini message">
+        *Stats last updated: XX/XX/XX XX:XX:XX
+    </div>
+    
+</div>
+{% endblock content %}
