@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'twitter_bot',
     'main',
+    'logistics',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
