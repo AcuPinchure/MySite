@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 import os
 import json
+from . import settings_local
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -27,23 +28,23 @@ with open(BASE_DIR / "data" / "django_keys.json") as keys_in:
 SECRET_KEY = the_secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = settings_local.DEBUG
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'twitter_bot',
-    'main',
-    'logistics',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'twitter_bot',
+    'main',
+    'logistics',
 ]
 
 
@@ -77,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-MEDIA_ROOT = BASE_DIR
+MEDIA_ROOT = BASE_DIR / "data" / "media"
 MEDIA_URL = '/media/'
 
 WSGI_APPLICATION = 'MySite.wsgi.application'
@@ -129,7 +130,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / "src" / "static"
+if settings_local.USE_STATICFILES_DIRS:    
+    STATICFILES_DIRS = [BASE_DIR / "src" / "static"]
+else:
+    STATIC_ROOT = BASE_DIR / "src" / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
