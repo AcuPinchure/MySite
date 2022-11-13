@@ -1,0 +1,102 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>首頁 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block navi %}
+{% endblock navi %}
+
+{% block header %}
+<h1>聖品萱物流管理系統</h1>
+{% endblock header %}
+
+
+{% block content_container %}
+<h1>Welcome: XXXXX</h1>
+
+<div class="ui stackable three column grid">
+    <div class="center aligned column">
+        <div class="ui segment">
+            <div class="ui header">
+                訂單
+            </div>
+            <div class="ui two statistics">
+                <div class="orange statistic">
+                    <div class="value">
+                        2
+                    </div>
+                    <div class="label">
+                        <i class="cube icon"></i>
+                        未出貨
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        3
+                    </div>
+                    <div class="label">
+                        <i class="truck icon"></i>
+                        運送中
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="center aligned column">
+        <div class="ui segment">
+            <div class="ui header">
+                倉庫
+            </div>
+            <div class="ui two statistics">
+                <div class="red statistic">
+                    <div class="value">
+                        5
+                    </div>
+                    <div class="label">
+                        <i class="warehouse icon"></i>
+                        未處理
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        1
+                    </div>
+                    <div class="label">
+                        <i class="pallet icon"></i>
+                        安排出貨
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="center aligned column">
+        <div class="ui segment">
+            <div class="ui header">
+                出貨
+            </div>
+            <div class="ui two statistics">
+                <div class="blue statistic">
+                    <div class="value">
+                        1
+                    </div>
+                    <div class="label">
+                        <i class="warehouse icon"></i>
+                        出貨中
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        0
+                    </div>
+                    <div class="label">
+                        <i class="pallet icon"></i>
+                        待結清
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content_container %}

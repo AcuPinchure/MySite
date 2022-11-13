@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('main/',include('main.urls')),
     path('bot/',include('twitter_bot.urls')),
+    path('logistics/',include('logistics.urls')),
     #re_path(r'',RedirectView.as_view(url='bot/index/'))
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
