@@ -1,0 +1,44 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>個人資料 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block navi %}
+{% endblock navi %}
+
+{% block header %}
+<h1>個人資料</h1>
+{% endblock header %}
+
+{% block content_text_container %}
+{% load static %}
+<img src="{% static 'logistics/img/demo_account_img.jpg' %}" class="ui small circular centered image">
+<h2 class="ui center aligned header">
+    A certain name
+</h2>
+<div class="ui segment">
+    <div class="ui header">匯款資訊</div>
+    <div class="ui divider"></div>
+    <div class="ui grid">
+        <div class="middle aligned row">
+            <div class="right aligned six wide column">
+                銀行代碼
+            </div>
+            <div class="left aligned ten wide column">
+                XXX
+            </div>
+        </div>
+        <div class="middle aligned row">
+            <div class="right aligned six wide column">
+                帳號
+            </div>
+            <div class="left aligned ten wide column">
+                XXXXXX-XXXXXXXXXXXX
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content_text_container %}
