@@ -18,11 +18,88 @@
 <h2>編輯訂單: {{order_id}}</h2>
 <div class="ui one column grid">
     <div class="computer tablet only column">
-
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <div class="ui header">編輯品項</div>
+                <form action="" method="post" class="ui form">
+                    <div class="field">
+                        <label for="">品名</label>
+                        <input type="text" name="item_name" id="">
+                    </div>
+                    <div class="field">
+                        <label for="">數量</label>
+                        <input type="number" name="item_count" id="">
+                    </div>
+                    <div class="field">
+                        <label for="">合計金額</label>
+                        <input type="number" name="item_price" id="">
+                    </div>
+                    <div class="field">
+                        <label for="">委託人</label>
+                        <div class="ui fluid search selection dropdown">
+                            <input type="hidden" name="item_contractor">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">選擇委託人</div>
+                            <div class="menu">
+                                <div class="item" data-value="Maeda Kaori"><i class="user icon"></i>Maeda Kaori</div>
+                                <div class="item" data-value="Sagara Mayu"><i class="user icon"></i>Sagara Mayu</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="submit" value="儲存" class="ui primary button">
+                </form>
+                <div class="ui active dimmer" id="item_dimmer">
+                    <div class="content">
+                        <h2 class="ui inverted header">
+                            請先選擇品項
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="ui segment">
+                <div class="ui header">品項列表</div>
+                <table class="ui table">
+                    <thead>
+                        <tr>
+                            <th>編號</th>
+                            <th>品項</th>
+                            <th>數量</th>
+                            <th>金額</th>
+                            <th>委託人</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>織織織織織織織織織</td>
+                            <td>2</td>
+                            <td>1500</td>
+                            <td>
+                                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                                A contractor
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>雞寫真</td>
+                            <td>1</td>
+                            <td>1200</td>
+                            <td>
+                                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                                A contractor
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="mobile only column">
         
     </div>
 </div>
+<script>
+    $('.ui.dropdown').dropdown();
+</script>
 
 {% endblock content_container %}
