@@ -4,6 +4,12 @@
 <title>首頁 | 聖品萱物流</title>
 {% endblock title %}
 
+{% block avatar %}
+{% load static %}
+<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+<span>A certain name</span>
+{% endblock avatar %}
+
 {% block navi %}
 {% endblock navi %}
 

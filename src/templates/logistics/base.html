@@ -11,9 +11,13 @@
     {% endblock title %}
 </head>
 <body>
-    <div class="ui right sidebar vertical menu" id="sidebar_menu">
+    <div class="ui left sidebar vertical huge menu" id="sidebar_menu">
         <a href="{% url 'logistics:account' %}" class="item" id="menu_account">
-            個人資料
+            {% block avatar %}
+            {% endblock avatar %}
+        </a>
+        <a href="{% url 'logistics:home' %}" class="item" id="menu_home">
+            總覽
         </a>
         <a href="{% url 'logistics:warehouse' %}" class="item" id="menu_warehouse">
             倉庫管理
@@ -32,24 +36,28 @@
                 <div class="ui grid">
                     <div class="middle aligned row">
                         <div class="four wide left aligned column">
-                            <a href="{% url 'logistics:home' %}" style="color: black;">
-                                <i class="big home link icon"></i>
-                            </a>
-                            {% block navi %}
-                            {% endblock navi %}
+                            <i class="big bars icon" id="menu_icon"></i>
+                            
                         </div>
                         <div class="eight wide center aligned column">
                             {% block header %}
                             {% endblock header %}
                         </div>
-                        <div class="four wide right aligned column">
-                            <i class="big bars icon" id="menu_icon"></i>
+                        <div class="four wide right aligned computer tablet only column">
+                            {% block navi_pc %}
+                            {% endblock navi_pc %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+        <div style="z-index: 1; position: fixed; bottom: 30px; right: 20px;">
+            <ui class="ui mobile only grid">
+                {% block navi_mobile %}
+                {% endblock navi_mobile %}
+            </ui>
+        </div>
         
         <div class="ui container" style="margin: 120px;">
             {% block content_container %}

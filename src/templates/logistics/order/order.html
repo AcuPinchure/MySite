@@ -1,0 +1,197 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>訂單管理 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% load static %}
+<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+<span>A certain name</span>
+{% endblock avatar %}
+
+{% block navi_pc %}
+{% block navi_mobile %}
+<form action="" method="post" class="ui form">
+    {% csrf_token %}
+    <input type="submit" name="new_order" value="新增訂單" class="ui positive button">
+</form>
+{% endblock navi_mobile %}
+{% endblock navi_pc %}
+
+
+
+{% block header %}
+<h1>訂單管理</h1>
+{% endblock header %}
+
+{% block content_container %}
+<div class="ui text menu">
+    <div class="header item">篩選</div>
+    <div class="active item">全部</div>
+    <div class="item">運送中</div>
+    <div class="item">倉庫</div>
+    <div class="item">出貨</div>
+    <div class="item">結案</div>
+</div>
+
+
+
+<div class="ui top attached header">
+    Amazon | 訂單編號249-0236645-7893047
+</div>
+<div class="ui attached segment">
+    <div class="ui grid">
+        <!--PC only-->
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide column">
+                <h4>編號</h4>
+            </div>
+            <div class="four wide column">
+                <h4>品項</h4>
+            </div>
+            <div class="two wide column">
+                <h4>數量</h4>
+            </div>
+            <div class="two wide column">
+                <h4>金額</h4>
+            </div>
+            <div class="four wide column">
+                <h4>委託人</h4>
+            </div>
+            <div class="two wide column">
+                <h4>狀態</h4>
+            </div>
+        </div>
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide column">1</div>
+            <div class="four wide column">織織織織織織織織織</div>
+            <div class="two wide column">2</div>
+            <div class="two wide column">1500</div>
+            <div class="four wide column">
+                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                <span>A contractor</span>
+            </div>
+            <div class="two wide column">未結清</div>
+        </div>
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide column">2</div>
+            <div class="four wide column">雞寫真</div>
+            <div class="two wide column">1</div>
+            <div class="two wide column">1200</div>
+            <div class="four wide column">
+                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                <span>A contractor</span>
+            </div>
+            <div class="two wide column">未結清</div>
+        </div>
+
+        <!--mobile only-->
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">
+                <h4>編號</h4>
+            </div>
+            <div class="twelve wide column">
+                <h4>內容</h4>
+            </div>
+        </div>
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">1</div>
+            <div class="twelve wide column">
+                <table class="ui celled unstackable table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">織織織織織織織織織</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="six wide">數量</td>
+                            <td class="ten wide">2</td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">金額</td>
+                            <td class="ten wide">1500</td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">委託人</td>
+                            <td class="ten wide">
+                                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                                <span>A contractor</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">狀態</td>
+                            <td class="twetenlve wide">未結清</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">2</div>
+            <div class="twelve wide column">
+                <table class="ui celled unstackable table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">雞寫真</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="six wide">數量</td>
+                            <td class="ten wide">1</td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">金額</td>
+                            <td class="ten wide">1200</td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">委託人</td>
+                            <td class="ten wide">
+                                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+                                <span>A contractor</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">狀態</td>
+                            <td class="twetenlve wide">未結清</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <!--PC only-->
+        <div class="middle aligned computer tablet only row">
+            <div class="eight wide right aligned column">小計(已結清)</div>
+            <div class="six wide column">0</div>
+            <div class="two wide column"></div>
+        </div>
+        <div class="middle aligned computer tablet only row">
+            <div class="eight wide right aligned column">小計(未結清)</div>
+            <div class="six wide column">2700</div>
+            <div class="two wide column"></div>
+        </div>
+        <!--mobile only-->
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">小計</div>
+            <div class="twelve wide column">
+                <table class="ui celled unstackable table">
+                    <tbody>
+                        <tr>
+                            <td class="six wide">已結清</td>
+                            <td class="ten wide">0</td>
+                        </tr>
+                        <tr>
+                            <td class="six wide">未結清</td>
+                            <td class="ten wide">2700</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content_container %}

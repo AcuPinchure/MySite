@@ -1,0 +1,28 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>訂單管理 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% load static %}
+<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+<span>A certain name</span>
+{% endblock avatar %}
+
+{% block header %}
+<h1>訂單管理</h1>
+{% endblock header %}
+
+{% block content_container %}
+<h2>編輯訂單: {{order_id}}</h2>
+<div class="ui one column grid">
+    <div class="computer tablet only column">
+
+    </div>
+    <div class="mobile only column">
+        
+    </div>
+</div>
+
+{% endblock content_container %}
