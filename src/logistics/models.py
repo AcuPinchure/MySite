@@ -85,10 +85,10 @@ class Delivery(models.Model):
 class Order(models.Model):
     class Meta:
         db_table = 'logi_order'
-        ordering = []
+        ordering = ["-create_time"]
 
     def __str__(self):
-        return ""
+        return self.delivery_id
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -118,10 +118,10 @@ class Order(models.Model):
 class Item(models.Model):
     class Meta:
         db_table = 'logi_item'
-        ordering = []
+        ordering = ["-create_time", "name"]
 
     def __str__(self):
-        return ""
+        return self.name
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)

@@ -12,7 +12,7 @@ def account(request):
 
 
 def warehouse(request):
-    return render(request, 'logistics/warehouse.html')
+    return render(request, 'logistics/warehouse/warehouse.html')
 
 
 def order(request):

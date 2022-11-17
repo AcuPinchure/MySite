@@ -44,8 +44,7 @@
                             {% endblock header %}
                         </div>
                         <div class="four wide right aligned computer tablet only column">
-                            {% block navi_pc %}
-                            {% endblock navi_pc %}
+                            
                         </div>
                     </div>
                 </div>
@@ -53,22 +52,21 @@
         </div>
 
         <div style="z-index: 1; position: fixed; bottom: 30px; right: 20px;">
-            <ui class="ui mobile only grid">
-                {% block navi_mobile %}
-                {% endblock navi_mobile %}
-            </ui>
+            {% block navi %}
+            {% endblock navi %}
         </div>
         
-        <div class="ui container" style="margin: 120px;">
+        <div class="ui container" style="margin-top: 120px;">
             {% block content_container %}
             {% endblock content_container %}
         </div>
-        <div class="ui text container" style="margin: 120px;">
+        <div class="ui text container" style="">
             {% block content_text_container %}
             {% endblock content_text_container %}
         </div>
         {% block content_basic %}
         {% endblock content_basic %}
+        <div style="padding: 60px;"></div>
     </div>
     <script>
         $('#menu_icon').on('click', function () {
