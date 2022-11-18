@@ -21,10 +21,15 @@
 {% endblock header %}
 
 {% block content_container %}
-
+<div class="ui text menu">
+    <div class="header item">分類方式</div>
+    <div class="item">訂單</div>
+    <div class="active item">委託人</div>
+</div>
 
 <div class="ui top attached header">
-    Amazon | 訂單編號249-0236645-7893047
+    <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+    A contractor
 </div>
 <div class="ui attached segment">
     <div class="ui grid">
@@ -44,7 +49,7 @@
                 <h4>金額</h4>
             </div>
             <div class="four wide column">
-                <h4>委託人</h4>
+                <h4>來源</h4>
             </div>
             <div class="two wide column">
                 <h4>狀態</h4>
@@ -56,8 +61,8 @@
             <div class="two wide column">2</div>
             <div class="two wide column">1500</div>
             <div class="four wide column">
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                <span>A contractor</span>
+                Amazon <br>
+                訂單編號249-0236645-7893047
             </div>
             <div class="two wide column">未結清</div>
         </div>
@@ -67,8 +72,8 @@
             <div class="two wide column">1</div>
             <div class="two wide column">1200</div>
             <div class="four wide column">
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                <span>A contractor</span>
+                Amazon <br>
+                訂單編號249-0236645-7893047
             </div>
             <div class="two wide column">未結清</div>
         </div>
@@ -88,9 +93,7 @@
                 <b>織織織織織織織織織</b><br>
                 數量: 2<br>
                 金額: 1500<br>
-                委託人:<br>
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                A contractor
+                來源: Amazon <br>
                 狀態: 未結清
             </div>
         </div>
@@ -100,9 +103,7 @@
                 <b>雞寫真</b><br>
                 數量: 1<br>
                 金額: 1200<br>
-                委託人:<br>
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                A contractor
+                來源: Amazon <br>
                 狀態: 未結清
             </div>
         </div>
@@ -137,8 +138,8 @@
         編輯
     </button>
     <button class="ui primary labeled icon button">
-        <i class="warehouse icon"></i>
-        已到貨
+        <i class="box icon"></i>
+        安排出貨
     </button>
     
 </div>

@@ -1,10 +1,42 @@
 from django.shortcuts import render, redirect
+from django.contrib import auth
+
+from .models import Account, Order
 
 # Create your views here.
 
 
+def login(request):
+
+    return render(request, 'logistics/login.html')
+
+
 def home(request):
-    return render(request, 'logistics/home.html')
+    curr_user = auth.get_user(request)
+
+    # if account exists
+    if Account.objects.filter(user=curr_user).exists():
+        the_account = Account.objects.get(user=curr_user)
+    else:
+        the_account = Account.objects.create(
+            user=curr_user,
+            name="未命名"
+        )
+        the_account.save()
+
+    # render html
+    # get order info
+    order_unsend = len(Order.objects.filter(
+        owner=the_account, delivery_status="未出貨"))
+    order_sending = len(Order.objects.filter(
+        owner=the_account, delivery_status="已出貨"))
+
+    return render(
+        request, 'logistics/home.html',
+        {
+            "order_unsend": order_unsend,
+            "order_sending": order_sending
+        })
 
 
 def account(request):

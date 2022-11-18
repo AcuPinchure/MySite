@@ -1,0 +1,39 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>登入 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% load static %}
+<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+<span>A certain name</span>
+{% endblock avatar %}
+
+{% block navi %}
+<form action="" method="post" class="ui form">
+    {% csrf_token %}
+    <input type="submit" name="new_order" value="新增訂單" class="ui positive big circular button">
+</form>
+{% endblock navi %}
+
+{% block header %}
+<h1>聖品萱物流管理系統</h1>
+{% endblock header %}
+
+{% block content_text_container %}
+
+<form action="" method="post" class="ui form segment">
+    {% csrf_token %}
+    <div class="field">
+        <label for="">帳號</label>
+        <input type="text" name="user_id" id="">
+    </div>
+    <div class="field">
+        <label for="">密碼</label>
+        <input type="password" name="user_pwd" id="">
+    </div>
+    <input type="submit" value="登入" class="ui primary button">
+</form>
+
+{% endblock content_text_container %}

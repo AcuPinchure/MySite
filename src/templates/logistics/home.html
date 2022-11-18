@@ -23,31 +23,33 @@
 
 <div class="ui stackable three column grid">
     <div class="center aligned column">
-        <div class="ui segment">
-            <div class="ui header">
-                訂單
-            </div>
-            <div class="ui two statistics">
-                <div class="orange statistic">
-                    <div class="value">
-                        2
+        <a href="{% url 'logistics:order' %}">
+            <div class="ui segment">
+                <div class="ui header">
+                    訂單
+                </div>
+                <div class="ui two statistics">
+                    <div class="orange statistic">
+                        <div class="value">
+                            {{order_unsend}}
+                        </div>
+                        <div class="label">
+                            <i class="cube icon"></i>
+                            未出貨
+                        </div>
                     </div>
-                    <div class="label">
-                        <i class="cube icon"></i>
-                        未出貨
+                    <div class="statistic">
+                        <div class="value">
+                            {{order_sending}}
+                        </div>
+                        <div class="label">
+                            <i class="truck icon"></i>
+                            運送中
+                        </div>
                     </div>
                 </div>
-                <div class="statistic">
-                    <div class="value">
-                        3
-                    </div>
-                    <div class="label">
-                        <i class="truck icon"></i>
-                        運送中
-                    </div>
-                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="center aligned column">
         <div class="ui segment">
@@ -72,6 +74,14 @@
                         <i class="pallet icon"></i>
                         安排出貨
                     </div>
+                </div>
+            </div>
+            <div class="ui active inverted dimmer">
+                <div class="content">
+                    <h2 class="ui red icon header">
+                        <i class="ban icon"></i>
+                            維修中
+                    </h2>
                 </div>
             </div>
         </div>
@@ -101,6 +111,14 @@
                     </div>
                 </div>
             </div>
+            <div class="ui active inverted dimmer">
+                <div class="content">
+                    <h2 class="ui red icon header">
+                        <i class="ban icon"></i>
+                            維修中
+                    </h2>
+                </div>
+            </div>
         </div>
     </div>
     <div class="center aligned sixteen wide column">
@@ -126,6 +144,14 @@
                         <i class="dollar sign icon"></i>
                         待付總額
                     </div>
+                </div>
+            </div>
+            <div class="ui active inverted dimmer">
+                <div class="content">
+                    <h2 class="ui red icon header">
+                        <i class="ban icon"></i>
+                            維修中
+                    </h2>
                 </div>
             </div>
         </div>

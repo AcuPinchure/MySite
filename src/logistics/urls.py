@@ -10,11 +10,12 @@ order_patterns = [
 ]
 
 urlpatterns = [
+    path('login/', views.login, name='login'),
     path('home/', views.home, name='home'),
     path('account/', views.account, name='account'),
     path('warehouse/', views.warehouse, name='warehouse'),
     path('order/', include(order_patterns)),
     path('delivery/', views.delivery, name='delivery'),
     re_path(r'^.?', RedirectView.as_view(
-        pattern_name='logistics:home', permanent=False))
+        pattern_name='logistics:login', permanent=False))
 ]
