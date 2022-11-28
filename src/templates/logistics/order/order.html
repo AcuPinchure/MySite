@@ -5,9 +5,13 @@
 {% endblock title %}
 
 {% block avatar %}
+{% if the_account.profile_image %}
+<img class="ui avatar image" src="{{the_account.profile_image.url}}">
+{% else %}
 {% load static %}
-<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-<span>A certain name</span>
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+{% endif %}
+{{the_account.name}}
 {% endblock avatar %}
 
 {% block navi %}
@@ -21,67 +25,70 @@
 
 {% block header %}
 <h1>訂單管理</h1>
+<script>
+    document.getElementById('menu_order').classList.add("active");
+</script>
 {% endblock header %}
 
 {% block content_container %}
-<div class="ui text menu">
-    <div class="active item">全部</div>
-    <div class="item">未寄送</div>
-    <div class="item">寄送中</div>
+<div class="ui secondary pointing menu">
+    <div class="{% if order_filter == 'all' %}active {% endif %}item" id="filter_all" onclick="setFilter('all')">全部</div>
+    <div class="{% if order_filter == 'not_depart' %}active {% endif %}item" id="filter_not_depart" onclick="setFilter('not_depart')">未出貨</div>
+    <div class="{% if order_filter == 'depart' %}active {% endif %}item" id="filter_depart" onclick="setFilter('depart')">已出貨</div>
 </div>
+<form action="" method="post" id="filter_form">
+    {% csrf_token %}
+    <input type="hidden" name="filter_order" value="" id="filter_input">
+</form>
+<script>
+    function setFilter(filter) {
+        filter_form = document.getElementById('filter_form');
+        filter_input = document.getElementById('filter_input');
+        filter_input.value = filter;
+        filter_form.submit();
+    }
+</script>
 
-
-
+{% for order in order_list %}
 <div class="ui top attached header">
-    Amazon | 訂單編號249-0236645-7893047
+    {% if order.order.delivery_status == '已出貨' %}
+    <div class="ui black horizontal label">
+        <i class="truck icon"></i>
+        已出貨
+    </div>
+    {% else %}
+    <div class="ui orange horizontal label">
+        <i class="box icon"></i>
+        未出貨
+    </div>
+    {% endif %}
+    
+    {{order.order.source}} | {{order.order.order_id}}
 </div>
 <div class="ui attached segment">
     <div class="ui grid">
 
         <!--PC only-->
         <div class="middle aligned computer tablet only row">
-            <div class="two wide column">
+            <div class="two wide center aligned column">
                 <h4>編號</h4>
             </div>
-            <div class="four wide column">
+            <div class="four wide center aligned column">
                 <h4>品項</h4>
             </div>
-            <div class="two wide column">
+            <div class="two wide center aligned column">
                 <h4>數量</h4>
             </div>
-            <div class="two wide column">
+            <div class="two wide center aligned column">
                 <h4>金額</h4>
             </div>
-            <div class="four wide column">
+            <div class="four wide center aligned column">
                 <h4>委託人</h4>
             </div>
-            <div class="two wide column">
+            <div class="two wide center aligned column">
                 <h4>狀態</h4>
             </div>
         </div>
-        <div class="middle aligned computer tablet only row">
-            <div class="two wide column">1</div>
-            <div class="four wide column">織織織織織織織織織</div>
-            <div class="two wide column">2</div>
-            <div class="two wide column">1500</div>
-            <div class="four wide column">
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                <span>A contractor</span>
-            </div>
-            <div class="two wide column">未結清</div>
-        </div>
-        <div class="middle aligned computer tablet only row">
-            <div class="two wide column">2</div>
-            <div class="four wide column">雞寫真</div>
-            <div class="two wide column">1</div>
-            <div class="two wide column">1200</div>
-            <div class="four wide column">
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                <span>A contractor</span>
-            </div>
-            <div class="two wide column">未結清</div>
-        </div>
-
         <!--mobile only-->
         <div class="middle aligned mobile only row">
             <div class="four wide column">
@@ -91,65 +98,96 @@
                 <h4>內容</h4>
             </div>
         </div>
-        <div class="middle aligned mobile only row">
-            <div class="four wide column">1</div>
-            <div class="twelve wide column">
-                <b>織織織織織織織織織</b><br>
-                數量: 2<br>
-                金額: 1500<br>
-                委託人:<br>
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                A contractor
-                狀態: 未結清
+
+        {% for item in order.items %}
+        <!--PC only-->
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide right aligned column">{{forloop.counter}}</div>
+            <div class="four wide column">{{item.name}}</div>
+            <div class="two wide right aligned column">{{item.count}}</div>
+            <div class="two wide right aligned column">{{item.price}}</div>
+            <div class="four wide column">
+                {% if item.contractor %}
+                <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                {{item.contractor.name}}
+                {% else %}
+                -未指定-
+                {% endif %}
+            </div>
+            <div class="two wide column">
+                {% if item.is_paid %}
+                已結清
+                {% else %}
+                未結清
+                {% endif %}
             </div>
         </div>
+        <!--mobile only-->
         <div class="middle aligned mobile only row">
-            <div class="four wide column">2</div>
+            <div class="four wide column">{{forloop.counter}}</div>
             <div class="twelve wide column">
-                <b>雞寫真</b><br>
-                數量: 1<br>
-                金額: 1200<br>
+                <b>{{item.name}}</b><br>
+                數量: {{item.count}}<br>
+                金額: {{item.price}}<br>
                 委託人:<br>
-                <img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-                A contractor
-                狀態: 未結清
+                {% if item.contractor %}
+                <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                {{item.contractor.name}}
+                {% else %}
+                -未指定-
+                {% endif %}
+                狀態: {% if item.is_paid %}已結清{% else %}未結清{% endif %}
             </div>
         </div>
+        {% endfor %}
+
         <div class="ui divider"></div>
 
         <!--PC only-->
         <div class="middle aligned computer tablet only row">
             <div class="eight wide right aligned column">小計(已結清)</div>
-            <div class="six wide column">0</div>
-            <div class="two wide column"></div>
+            <div class="two wide right aligned column">{{order.paid}}</div>
+            <div class="six wide column"></div>
         </div>
         <div class="middle aligned computer tablet only row">
             <div class="eight wide right aligned column">小計(未結清)</div>
-            <div class="six wide column">2700</div>
-            <div class="two wide column"></div>
+            <div class="two wide right aligned column">{{order.not_paid}}</div>
+            <div class="six wide column"></div>
         </div>
 
         <!--mobile only-->
         <div class="middle aligned mobile only row">
             <div class="four wide column">小計</div>
             <div class="twelve wide column">
-                已結清: 0 <br>
-                未結清: 2700
+                已結清: {{order.paid}} <br>
+                未結清: {{order.not_paid}}
             </div>
         </div>
     </div>
 </div>
-
 <div class="ui bottom attached secondary right aligned segment">
-    <button class="ui labeled icon button">
-        <i class="edit icon"></i>
-        編輯
-    </button>
-    <button class="ui primary labeled icon button">
-        <i class="warehouse icon"></i>
-        已到貨
-    </button>
+    <form action="" method="post" class="ui form">
+        <a href="{% url 'logistics:order_edit' order_uuid=order.order.uuid %}" class="ui labeled icon button">
+            <i class="edit icon"></i>
+            編輯
+        </a>
+        {% csrf_token %}
+        <input type="hidden" name="order_uuid" value="{{order.order.uuid}}">
+        {% if order.order.delivery_status == '未出貨' %}
+        <button type="submit" name="departure_order" class="ui positive labeled icon button">
+            <i class="truck icon"></i>
+            已出貨
+        </button>
+        {% else %}
+        <button type="submit" name="arrive_order" class="ui primary labeled icon button">
+            <i class="warehouse icon"></i>
+            已到貨
+        </button>
+        {% endif %}
+        
+    </form>
     
 </div>
+{% endfor %}
 
 {% endblock content_container %}

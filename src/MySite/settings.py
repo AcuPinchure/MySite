@@ -48,7 +48,6 @@ INSTALLED_APPS = [
 ]
 
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,7 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-if settings_local.USE_STATICFILES_DIRS:    
+if settings_local.USE_STATICFILES_DIRS:
     STATICFILES_DIRS = [BASE_DIR / "src" / "static"]
 else:
     STATIC_ROOT = BASE_DIR / "src" / "static"
@@ -139,3 +138,5 @@ else:
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/logistics/login/'

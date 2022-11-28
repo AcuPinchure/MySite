@@ -5,12 +5,17 @@
 {% endblock title %}
 
 {% block avatar %}
+{% if the_account.profile_image %}
+<img class="ui avatar image" src="{{the_account.profile_image.url}}">
+{% else %}
 {% load static %}
-<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-<span>A certain name</span>
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+{% endif %}
+{{the_account.name}}
 {% endblock avatar %}
 
 {% block navi %}
+<button class="ui positive big circular button" onclick="openItem()">編輯</button>
 {% endblock navi %}
 
 {% block header %}
@@ -18,11 +23,17 @@
 {% endblock header %}
 
 {% block content_text_container %}
+{% if the_account.profile_image %}
+<img src="{{the_account.profile_image.url}}" class="ui small circular centered image">
+{% else %}
 {% load static %}
-<img src="{% static 'logistics/img/demo_account_img.jpg' %}" class="ui small circular centered image">
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui small circular centered image">
+{% endif %}
+
 <h2 class="ui center aligned header">
-    A certain name
+    {{the_account.name}}
 </h2>
+
 <div class="ui segment">
     <div class="ui header">匯款資訊</div>
     <div class="ui divider"></div>
@@ -32,7 +43,11 @@
                 銀行代碼
             </div>
             <div class="left aligned ten wide column">
-                XXX
+                {% if the_account.bank_id %}
+                {{the_account.bank_id}}
+                {% else %}
+                (未填寫)
+                {% endif %}
             </div>
         </div>
         <div class="middle aligned row">
@@ -40,11 +55,251 @@
                 帳號
             </div>
             <div class="left aligned ten wide column">
-                XXXXXX-XXXXXXXXXXXX
+                {% if the_account.account_id %}
+                {{the_account.account_id}}
+                {% else %}
+                (未填寫)
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
+<div class="ui modal" id="edit_account">
+    <div class="header">編輯個人資料</div>
+    <div class="content">
+        <form action="" method="post" class="ui clearing form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="field">
+                <label for="account_name">暱稱</label>
+                <input type="text" name="account_name" id="account_name" required value="{% if not the_account.name == '未命名' %}{{the_account.name}}{% endif %}">
+            </div>
+            <div class="field">
+                <label for="profile_image">上傳新的大頭貼</label>
+                <input type="file" name="profile_image" id="profile_image">
+                *請自行裁切大頭貼
+            </div>
+            <div class="ui horizontal divider">匯款資料</div>
+            <div class="field">
+                <label for="bank_id">銀行代碼</label>
+                <div class="ui fluid search selection dropdown">
+                    <input type="hidden" name="bank_id" id="bank_id" value="{{the_account.bank_id}}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">選擇銀行代碼</div>
+                    <div class="menu">
+                        <div class='item' data-value='001-中央信託'>001-中央信託</div>
+                        <div class='item' data-value='003-交通銀行'>003-交通銀行</div>
+                        <div class='item' data-value='004-台灣銀行'>004-台灣銀行</div>
+                        <div class='item' data-value='005-土地銀行'>005-土地銀行</div>
+                        <div class='item' data-value='006-合庫商銀'>006-合庫商銀</div>
+                        <div class='item' data-value='007-第一銀行'>007-第一銀行</div>
+                        <div class='item' data-value='008-華南銀行'>008-華南銀行</div>
+                        <div class='item' data-value='009-彰化銀行'>009-彰化銀行</div>
+                        <div class='item' data-value='010-華僑銀行'>010-華僑銀行</div>
+                        <div class='item' data-value='011-上海銀行'>011-上海銀行</div>
+                        <div class='item' data-value='012-台北富邦'>012-台北富邦</div>
+                        <div class='item' data-value='013-國泰世華'>013-國泰世華</div>
+                        <div class='item' data-value='016-高雄銀行'>016-高雄銀行</div>
+                        <div class='item' data-value='017-兆豐商銀'>017-兆豐商銀</div>
+                        <div class='item' data-value='018-農業金庫'>018-農業金庫</div>
+                        <div class='item' data-value='021-花旗銀行'>021-花旗銀行</div>
+                        <div class='item' data-value='024-運通銀行'>024-運通銀行</div>
+                        <div class='item' data-value='025-首都銀行'>025-首都銀行</div>
+                        <div class='item' data-value='039-荷蘭銀行'>039-荷蘭銀行</div>
+                        <div class='item' data-value='040-中華開發'>040-中華開發</div>
+                        <div class='item' data-value='050-臺灣企銀'>050-臺灣企銀</div>
+                        <div class='item' data-value='051-台北商銀'>051-台北商銀</div>
+                        <div class='item' data-value='052-新竹商銀'>052-新竹商銀</div>
+                        <div class='item' data-value='053-台中商銀'>053-台中商銀</div>
+                        <div class='item' data-value='054-京城商銀'>054-京城商銀</div>
+                        <div class='item' data-value='056-花蓮企銀'>056-花蓮企銀</div>
+                        <div class='item' data-value='057-台東企銀'>057-台東企銀</div>
+                        <div class='item' data-value='075-東亞銀行'>075-東亞銀行</div>
+                        <div class='item' data-value='081-匯豐銀行'>081-匯豐銀行</div>
+                        <div class='item' data-value='083-渣打銀行'>083-渣打銀行</div>
+                        <div class='item' data-value='087-標旗銀行'>087-標旗銀行</div>
+                        <div class='item' data-value='101-台北一信'>101-台北一信</div>
+                        <div class='item' data-value='102-華泰銀行'>102-華泰銀行</div>
+                        <div class='item' data-value='103-臺灣新光商銀'>103-臺灣新光商銀</div>
+                        <div class='item' data-value='104-台北五信'>104-台北五信</div>
+                        <div class='item' data-value='106-台北九信'>106-台北九信</div>
+                        <div class='item' data-value='108-陽信銀行'>108-陽信銀行</div>
+                        <div class='item' data-value='114-基隆一信'>114-基隆一信</div>
+                        <div class='item' data-value='115-基隆二信'>115-基隆二信</div>
+                        <div class='item' data-value='118-板信銀行'>118-板信銀行</div>
+                        <div class='item' data-value='119-淡水一信'>119-淡水一信</div>
+                        <div class='item' data-value='120-淡水信合社'>120-淡水信合社</div>
+                        <div class='item' data-value='124-宜蘭信合社'>124-宜蘭信合社</div>
+                        <div class='item' data-value='127-桃園信合社'>127-桃園信合社</div>
+                        <div class='item' data-value='130-新竹一信'>130-新竹一信</div>
+                        <div class='item' data-value='132-新竹三信'>132-新竹三信</div>
+                        <div class='item' data-value='139-竹南信合社'>139-竹南信合社</div>
+                        <div class='item' data-value='146-台中二信'>146-台中二信</div>
+                        <div class='item' data-value='147-三信銀行'>147-三信銀行</div>
+                        <div class='item' data-value='151-第七商銀'>151-第七商銀</div>
+                        <div class='item' data-value='158-彰化一信'>158-彰化一信</div>
+                        <div class='item' data-value='161-彰化五信'>161-彰化五信</div>
+                        <div class='item' data-value='162-彰化六信'>162-彰化六信</div>
+                        <div class='item' data-value='163-彰化十信'>163-彰化十信</div>
+                        <div class='item' data-value='165-鹿港信合社'>165-鹿港信合社</div>
+                        <div class='item' data-value='178-嘉義三信'>178-嘉義三信</div>
+                        <div class='item' data-value='179-嘉義四信'>179-嘉義四信</div>
+                        <div class='item' data-value='188-台南三信'>188-台南三信</div>
+                        <div class='item' data-value='203-高雄二信'>203-高雄二信</div>
+                        <div class='item' data-value='204-高雄三信'>204-高雄三信</div>
+                        <div class='item' data-value='215-花蓮一信'>215-花蓮一信</div>
+                        <div class='item' data-value='216-花蓮二信'>216-花蓮二信</div>
+                        <div class='item' data-value='222-澎湖一信'>222-澎湖一信</div>
+                        <div class='item' data-value='223-澎湖二信'>223-澎湖二信</div>
+                        <div class='item' data-value='224-金門信合社'>224-金門信合社</div>
+                        <div class='item' data-value='512-雲林漁會'>512-雲林漁會</div>
+                        <div class='item' data-value='515-嘉義漁會'>515-嘉義漁會</div>
+                        <div class='item' data-value='517-南市區漁會'>517-南市區漁會</div>
+                        <div class='item' data-value='518-南縣漁會'>518-南縣漁會</div>
+                        <div class='item' data-value='521-永安漁會'>521-永安漁會</div>
+                        <div class='item' data-value='521-興達港漁會'>521-興達港漁會</div>
+                        <div class='item' data-value='521-林園區漁會'>521-林園區漁會</div>
+                        <div class='item' data-value='521-彌陀漁會'>521-彌陀漁會</div>
+                        <div class='item' data-value='523-東港漁會'>523-東港漁會</div>
+                        <div class='item' data-value='523-琉球區漁會'>523-琉球區漁會</div>
+                        <div class='item' data-value='523-林邊區漁會'>523-林邊區漁會</div>
+                        <div class='item' data-value='524-新港漁會'>524-新港漁會</div>
+                        <div class='item' data-value='525-澎湖區漁會'>525-澎湖區漁會</div>
+                        <div class='item' data-value='605-高雄市農會'>605-高雄市農會</div>
+                        <div class='item' data-value='613-名間農會'>613-名間農會</div>
+                        <div class='item' data-value='614-永靖農會'>614-永靖農會</div>
+                        <div class='item' data-value='614-二林農會'>614-二林農會</div>
+                        <div class='item' data-value='614-員林農會'>614-員林農會</div>
+                        <div class='item' data-value='614-竹塘農會'>614-竹塘農會</div>
+                        <div class='item' data-value='614-秀水農會'>614-秀水農會</div>
+                        <div class='item' data-value='614-埔心農會'>614-埔心農會</div>
+                        <div class='item' data-value='614-埤頭鄉農會'>614-埤頭鄉農會</div>
+                        <div class='item' data-value='616-崙背鄉農會'>616-崙背鄉農會</div>
+                        <div class='item' data-value='616-四湖農會'>616-四湖農會</div>
+                        <div class='item' data-value='616-口湖農會'>616-口湖農會</div>
+                        <div class='item' data-value='616-斗六農會'>616-斗六農會</div>
+                        <div class='item' data-value='616-台西農會'>616-台西農會</div>
+                        <div class='item' data-value='616-大埤農會'>616-大埤農會</div>
+                        <div class='item' data-value='616-莿桐農會'>616-莿桐農會</div>
+                        <div class='item' data-value='616-西螺農會'>616-西螺農會</div>
+                        <div class='item' data-value='616-古坑農會'>616-古坑農會</div>
+                        <div class='item' data-value='616-二崙農會'>616-二崙農會</div>
+                        <div class='item' data-value='616-褒忠農會'>616-褒忠農會</div>
+                        <div class='item' data-value='616-虎尾農會'>616-虎尾農會</div>
+                        <div class='item' data-value='616-斗南農會'>616-斗南農會</div>
+                        <div class='item' data-value='617-六腳農會'>617-六腳農會</div>
+                        <div class='item' data-value='617-水上鄉農會'>617-水上鄉農會</div>
+                        <div class='item' data-value='617-布袋鎮農會'>617-布袋鎮農會</div>
+                        <div class='item' data-value='617-梅山農會'>617-梅山農會</div>
+                        <div class='item' data-value='617-朴子農會'>617-朴子農會</div>
+                        <div class='item' data-value='617-民雄農會'>617-民雄農會</div>
+                        <div class='item' data-value='617-東石農會'>617-東石農會</div>
+                        <div class='item' data-value='617-嘉義農會'>617-嘉義農會</div>
+                        <div class='item' data-value='617-太保農會'>617-太保農會</div>
+                        <div class='item' data-value='617-溪口農會'>617-溪口農會</div>
+                        <div class='item' data-value='617-新港農會'>617-新港農會</div>
+                        <div class='item' data-value='617-番路農會'>617-番路農會</div>
+                        <div class='item' data-value='617-鹿草農會'>617-鹿草農會</div>
+                        <div class='item' data-value='617-竹崎農會'>617-竹崎農會</div>
+                        <div class='item' data-value='617-大林農會'>617-大林農會</div>
+                        <div class='item' data-value='617-義竹農會'>617-義竹農會</div>
+                        <div class='item' data-value='617-大埔農會'>617-大埔農會</div>
+                        <div class='item' data-value='618-善化鎮農會'>618-善化鎮農會</div>
+                        <div class='item' data-value='618-佳里鎮農會'>618-佳里鎮農會</div>
+                        <div class='item' data-value='618-新營農會'>618-新營農會</div>
+                        <div class='item' data-value='618-歸仁農會'>618-歸仁農會</div>
+                        <div class='item' data-value='618-西港農會'>618-西港農會</div>
+                        <div class='item' data-value='618-永康農會'>618-永康農會</div>
+                        <div class='item' data-value='618-將軍農會'>618-將軍農會</div>
+                        <div class='item' data-value='618-六甲農會'>618-六甲農會</div>
+                        <div class='item' data-value='618-北門農會'>618-北門農會</div>
+                        <div class='item' data-value='618-鹽水農會'>618-鹽水農會</div>
+                        <div class='item' data-value='618-玉井農會'>618-玉井農會</div>
+                        <div class='item' data-value='619-鳳山市農會'>619-鳳山市農會</div>
+                        <div class='item' data-value='619-梓官農會'>619-梓官農會</div>
+                        <div class='item' data-value='619-永安農會'>619-永安農會</div>
+                        <div class='item' data-value='619-杉林農會'>619-杉林農會</div>
+                        <div class='item' data-value='619-阿蓮農會'>619-阿蓮農會</div>
+                        <div class='item' data-value='619-林園農會'>619-林園農會</div>
+                        <div class='item' data-value='619-湖內農會'>619-湖內農會</div>
+                        <div class='item' data-value='619-旗山農會'>619-旗山農會</div>
+                        <div class='item' data-value='619-仁武農會'>619-仁武農會</div>
+                        <div class='item' data-value='619-大寮農會'>619-大寮農會</div>
+                        <div class='item' data-value='619-路竹農會'>619-路竹農會</div>
+                        <div class='item' data-value='619-岡山農會'>619-岡山農會</div>
+                        <div class='item' data-value='619-大社農會'>619-大社農會</div>
+                        <div class='item' data-value='619-橋頭農會'>619-橋頭農會</div>
+                        <div class='item' data-value='619-彌陀農會'>619-彌陀農會</div>
+                        <div class='item' data-value='619-茄萣農會'>619-茄萣農會</div>
+                        <div class='item' data-value='619-田寮農會'>619-田寮農會</div>
+                        <div class='item' data-value='619-燕巢農會'>619-燕巢農會</div>
+                        <div class='item' data-value='619-甲仙農會'>619-甲仙農會</div>
+                        <div class='item' data-value='619-美濃農會'>619-美濃農會</div>
+                        <div class='item' data-value='619-鳥松農會'>619-鳥松農會</div>
+                        <div class='item' data-value='620-新埤農會'>620-新埤農會</div>
+                        <div class='item' data-value='620-里港鄉農會'>620-里港鄉農會</div>
+                        <div class='item' data-value='620-麟洛農會'>620-麟洛農會</div>
+                        <div class='item' data-value='620-恒春農會'>620-恒春農會</div>
+                        <div class='item' data-value='620-枋山農會'>620-枋山農會</div>
+                        <div class='item' data-value='620-南州農會'>620-南州農會</div>
+                        <div class='item' data-value='620-琉球農會'>620-琉球農會</div>
+                        <div class='item' data-value='620-滿州農會'>620-滿州農會</div>
+                        <div class='item' data-value='620-東港鎮農會'>620-東港鎮農會</div>
+                        <div class='item' data-value='620-崁頂鄉農會'>620-崁頂鄉農會</div>
+                        <div class='item' data-value='620-九如鄉農會'>620-九如鄉農會</div>
+                        <div class='item' data-value='621-富里鄉農會'>621-富里鄉農會</div>
+                        <div class='item' data-value='621-壽豐農會'>621-壽豐農會</div>
+                        <div class='item' data-value='621-吉安農會'>621-吉安農會</div>
+                        <div class='item' data-value='621-新秀農會'>621-新秀農會</div>
+                        <div class='item' data-value='622-太麻里農會'>622-太麻里農會</div>
+                        <div class='item' data-value='622-台東農會'>622-台東農會</div>
+                        <div class='item' data-value='622-關山農會'>622-關山農會</div>
+                        <div class='item' data-value='622-鹿野農會'>622-鹿野農會</div>
+                        <div class='item' data-value='622-東河農會'>622-東河農會</div>
+                        <div class='item' data-value='622-成功農會'>622-成功農會</div>
+                        <div class='item' data-value='622-池上農會'>622-池上農會</div>
+                        <div class='item' data-value='622-長濱農會'>622-長濱農會</div>
+                        <div class='item' data-value='624-澎湖農會'>624-澎湖農會</div>
+                        <div class='item' data-value='625-台中市農會'>625-台中市農會</div>
+                        <div class='item' data-value='627-連江縣農會'>627-連江縣農會</div>
+                        <div class='item' data-value='700-中華郵政'>700-中華郵政</div>
+                        <div class='item' data-value='803-聯邦銀行'>803-聯邦銀行</div>
+                        <div class='item' data-value='804-中華銀行'>804-中華銀行</div>
+                        <div class='item' data-value='805-遠東銀行'>805-遠東銀行</div>
+                        <div class='item' data-value='806-復華銀行'>806-復華銀行</div>
+                        <div class='item' data-value='807-建華銀行'>807-建華銀行</div>
+                        <div class='item' data-value='808-玉山銀行'>808-玉山銀行</div>
+                        <div class='item' data-value='809-萬泰銀行'>809-萬泰銀行</div>
+                        <div class='item' data-value='810-寶華銀行'>810-寶華銀行</div>
+                        <div class='item' data-value='812-台新銀行'>812-台新銀行</div>
+                        <div class='item' data-value='814-大眾銀行'>814-大眾銀行</div>
+                        <div class='item' data-value='815-日盛銀行'>815-日盛銀行</div>
+                        <div class='item' data-value='816-安泰銀行'>816-安泰銀行</div>
+                        <div class='item' data-value='822-中國信託'>822-中國信託</div>
+                        <div class='item' data-value='825-慶豐銀行'>825-慶豐銀行</div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="bank_account_id">匯款帳號</label>
+                <input type="text" name="bank_account_id" id="bank_account_id" value="{{the_account.account_id}}">
+            </div>
+            
+            <input type="submit" name="account_edit" value="儲存" class="ui primary button">
+            <button class="ui button" onclick="closeItem()">取消</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openItem() {
+        $('#edit_account').modal('setting', 'closable', false).modal('show');
+    }
+    function closeItem() {
+        $('#edit_account').modal('setting', 'closable', false).modal('hide');
+    }
+    
+    $('.ui.dropdown').dropdown();
+</script>
 
 {% endblock content_text_container %}

@@ -8,17 +8,19 @@ import uuid
 class Account(models.Model):
     class Meta:
         db_table = 'logi_account'
-        ordering = []
+        ordering = ['name']
 
     def __str__(self):
-        return ""
+        return "[{}]Name: {}".format(self.user.username, self.name)
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(
         max_length=50, blank=True, null=True)
     user = models.OneToOneField(
-        User, blank=True, null=True, help_text="Which user", on_delete=models.PROTECT)
+        User, blank=True, null=True, help_text="Which user", on_delete=models.CASCADE)
+    profile_image = models.FileField(
+        upload_to="avatar", blank=True, null=True, help_text="大頭貼")
     bank_id = models.CharField(
         max_length=10, blank=True, null=True, help_text="銀行代碼")
     account_id = models.CharField(
@@ -29,10 +31,10 @@ class Account(models.Model):
 class Storage(models.Model):
     class Meta:
         db_table = 'logi_storage'
-        ordering = []
+        ordering = ['owner__name', 'name']
 
     def __str__(self):
-        return ""
+        return "[{}]{}".format(self.owner.name, self.name)
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -52,10 +54,10 @@ class Storage(models.Model):
 class Delivery(models.Model):
     class Meta:
         db_table = 'logi_delivery'
-        ordering = []
+        ordering = ['time', 'create_time']
 
     def __str__(self):
-        return ""
+        return "[{}->{}]{}".format(self.owner, self.contractor, self.time)
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -85,10 +87,10 @@ class Delivery(models.Model):
 class Order(models.Model):
     class Meta:
         db_table = 'logi_order'
-        ordering = ["-create_time"]
+        ordering = ['expect_arrival', 'create_time']
 
     def __str__(self):
-        return self.delivery_id
+        return "[{}]{}: {}".format(self.owner.name, self.source, self.order_id)
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -97,6 +99,10 @@ class Order(models.Model):
 
     owner = models.ForeignKey(
         Account, blank=True, null=True, help_text="下單者", on_delete=models.PROTECT)
+    source = models.CharField(
+        max_length=50, blank=True, null=True, help_text="購買來源(amazon, gamers, etc.)")
+    order_id = models.CharField(
+        max_length=50, blank=True, null=True, help_text="訂單編號")
     delivery_cost = models.PositiveIntegerField(
         blank=True, null=True, help_text="運費")
     delivery_id = models.CharField(
@@ -118,10 +124,10 @@ class Order(models.Model):
 class Item(models.Model):
     class Meta:
         db_table = 'logi_item'
-        ordering = ["-create_time", "name"]
+        ordering = ['order__expect_arrival', 'create_time', 'name']
 
     def __str__(self):
-        return self.name
+        return "[{}]{}".format(self.order.source, self.name)
 
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -138,9 +144,9 @@ class Item(models.Model):
         default=False, help_text="委託人是否已繳錢")
 
     order = models.ForeignKey(
-        Order, blank=True, null=True, help_text="隸屬訂單", on_delete=models.PROTECT)
+        Order, related_name="items", blank=True, null=True, help_text="隸屬訂單", on_delete=models.PROTECT)
 
     contractor = models.ForeignKey(Account, blank=True, null=True,
                                    related_name="item_contractor", help_text="委託人", on_delete=models.PROTECT)
     delivery = models.ForeignKey(
-        Delivery, blank=True, null=True, help_text="交貨安排", on_delete=models.PROTECT)
+        Delivery, related_name="items", blank=True, null=True, help_text="交貨安排", on_delete=models.PROTECT)

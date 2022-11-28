@@ -5,9 +5,13 @@
 {% endblock title %}
 
 {% block avatar %}
+{% if the_account.profile_image %}
+<img class="ui avatar image" src="{{the_account.profile_image.url}}">
+{% else %}
 {% load static %}
-<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
-<span>A certain name</span>
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+{% endif %}
+{{the_account.name}}
 {% endblock avatar %}
 
 {% block navi %}

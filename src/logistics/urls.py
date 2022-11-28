@@ -4,13 +4,19 @@ from django.views.generic import RedirectView
 
 app_name = "logistics"
 
+login_patterns = [
+    path('', views.welcome, name='login'),
+    path('checkExists/', views.checkUserExists, name="check_user_exists")
+]
+
 order_patterns = [
     path('', views.order, name='order'),
     path('edit/<str:order_uuid>/', views.orderEdit, name='order_edit'),
 ]
 
 urlpatterns = [
-    path('login/', views.login, name='login'),
+    path('login/', include(login_patterns)),
+    path('logout/', views.toWelcome, name="logout"),
     path('home/', views.home, name='home'),
     path('account/', views.account, name='account'),
     path('warehouse/', views.warehouse, name='warehouse'),

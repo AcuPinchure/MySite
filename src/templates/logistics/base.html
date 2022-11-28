@@ -12,18 +12,25 @@
 </head>
 <body>
     <div class="ui left sidebar vertical huge menu" id="sidebar_menu">
-        <a href="{% url 'logistics:account' %}" class="item" id="menu_account">
-            {% block avatar %}
-            {% endblock avatar %}
-        </a>
+        <div class="item" id="menu_account">
+            <a href="{% url 'logistics:account' %}">
+                {% block avatar %}
+                {% endblock avatar %}
+            </a>
+            <div class="ui secondary menu">
+                <a href="{% url 'logistics:account' %}" class="item">編輯個人資料</a>
+                <a href="{% url 'logistics:logout' %}" class="item">登出</a>
+            </div>
+            
+        </div>
         <a href="{% url 'logistics:home' %}" class="item" id="menu_home">
             總覽
         </a>
-        <a href="{% url 'logistics:warehouse' %}" class="item" id="menu_warehouse">
-            倉庫管理
-        </a>
         <a href="{% url 'logistics:order' %}" class="item" id="menu_order">
             訂單管理
+        </a>
+        <a href="{% url 'logistics:warehouse' %}" class="item" id="menu_warehouse">
+            倉庫管理
         </a>
         <a href="{% url 'logistics:delivery' %}" class="item" id="menu_delivery">
             出貨管理
