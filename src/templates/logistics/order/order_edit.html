@@ -22,7 +22,7 @@
 {% endblock header %}
 
 {% block navi %}
-<a href="{% url 'logistics:order' %}" class="ui labeled icon big circular button">
+<a href="{% url 'logistics:order' order_filter='all' %}" class="ui labeled icon big circular button">
     <i class="left chevron icon"></i>
     返回訂單列表
 </a>
@@ -86,7 +86,7 @@
                         <h4>訂單狀態</h4>
                     </div>
                     <div class="five wide column">
-                        {{the_order.delivery_status}}
+                        {{the_order.status}}
                     </div>
                     <div class="three wide column">
                         <h4>預估到貨時間</h4>
@@ -128,7 +128,7 @@
                         <h4>訂單狀態</h4>
                     </div>
                     <div class="ten wide column">
-                        {{the_order.delivery_status}}
+                        {{the_order.status}}
                     </div>
                     <div class="six wide column">
                         <h4>運費</h4>
@@ -284,16 +284,14 @@
             </div>
             <div class="field">
                 <label for="">訂單狀態</label>
-                <div class="ui fluid search selection dropdown">
-                    <input type="hidden" name="order_status" id="order_status" value="{{the_order.delivery_status}}">
+                <div class="ui fluid selection dropdown">
+                    <input type="hidden" name="order_status" id="order_status" value="{{the_order.status}}">
                     <i class="dropdown icon"></i>
                     <div class="default text">訂單狀態</div>
                     <div class="menu">
                         <div class="item" data-value="未出貨">未出貨</div>
                         <div class="item" data-value="已出貨">已出貨</div>
                         <div class="item" data-value="到達倉庫">到達倉庫</div>
-                        <div class="item" data-value="已寄出">已寄出</div>
-                        <div class="item" data-value="已交貨">已交貨</div>
                     </div>
                 </div>
             </div>

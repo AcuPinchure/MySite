@@ -71,11 +71,6 @@ class Delivery(models.Model):
     time = models.DateTimeField(
         blank=True, null=True, help_text="交貨時間")  # 面交時間/寄出時間/轉交託付時間
 
-    price = models.PositiveIntegerField(
-        blank=True, null=True, help_text="交貨金額")
-    is_paid = models.BooleanField(
-        default=False, help_text="委託人是否已繳錢")
-
     owner = models.ForeignKey(Account, blank=True, null=True,
                               related_name="delivery_owner", help_text="下單者", on_delete=models.PROTECT)
     proxy = models.ForeignKey(Account, blank=True, null=True,
@@ -109,10 +104,12 @@ class Order(models.Model):
         max_length=50, blank=True, null=True, help_text="運輸單號")
     delivery_name = models.CharField(
         max_length=50, blank=True, null=True, help_text="運輸業者")
-    delivery_status = models.CharField(
-        max_length=10, blank=True, null=True, help_text="運輸狀態")  # 未出貨/已出貨/到達倉庫/已寄出/已交貨
+
     expect_arrival = models.DateField(
         blank=True, null=True, help_text="預定到貨日期")
+
+    status = models.CharField(
+        max_length=10, blank=True, null=True, help_text="狀態，統計管理用")  # 未出貨/已出貨/到達倉庫/寄出中/已交貨
 
     storage = models.ForeignKey(
         Storage, blank=True, null=True, help_text="隸屬倉庫", on_delete=models.PROTECT)
@@ -139,9 +136,14 @@ class Item(models.Model):
     count = models.PositiveIntegerField(
         blank=True, null=True, help_text="數量")
 
+    delivery_cost = models.PositiveIntegerField(
+        blank=True, null=True, help_text="運費")  # 若運費選擇均攤
     price = models.PositiveIntegerField(blank=True, null=True, help_text="金額")
     is_paid = models.BooleanField(
         default=False, help_text="委託人是否已繳錢")
+
+    status = models.CharField(
+        max_length=10, blank=True, null=True, help_text="狀態")  # 未出貨/已出貨/到達倉庫/已寄出/已交貨
 
     order = models.ForeignKey(
         Order, related_name="items", blank=True, null=True, help_text="隸屬訂單", on_delete=models.PROTECT)

@@ -15,6 +15,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 # models
 from .models import Account, Order, Item, Storage, Delivery
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -95,9 +96,9 @@ def home(request):
     # render html
     # get order info
     order_unsend = len(Order.objects.filter(
-        owner=the_account, delivery_status="未出貨"))
+        owner=the_account, status="未出貨"))
     order_sending = len(Order.objects.filter(
-        owner=the_account, delivery_status="已出貨"))
+        owner=the_account, status="已出貨"))
 
     return render(
         request, 'logistics/home.html',
@@ -131,7 +132,7 @@ def account(request):
     else:
         the_account = Account.objects.create(
             user=curr_user,
-            name="未命名"
+            name="未命名({})".format(curr_user.username)
         )
         the_account.save()
     return render(
@@ -142,12 +143,9 @@ def account(request):
 
 
 @login_required
-def warehouse(request):
-    return render(request, 'logistics/warehouse/warehouse.html')
-
-
-@login_required
-def order(request):
+def warehouse(request, item_sort):
+    if not item_sort in ["order", "contractor"]:
+        return redirect("logistics:warehouse", item_sort="contractor")
     curr_user = auth.get_user(request)
     # if account exists
     if Account.objects.filter(user=curr_user).exists():
@@ -155,7 +153,78 @@ def order(request):
     else:
         return redirect("logistics:account")
 
-    order_filter = "all"
+    if request.method == "POST":
+        post = request.POST
+        print(post)
+        action = post['action']
+        if action == "save_delivery" and 'select_item' in post.keys():
+            the_delivery = Delivery.objects.create(
+                owner=the_account,
+                type=post['delivery_type'],
+                location=post['delivery_location']
+            )
+            if post['delivery_proxy']:
+                the_delivery.proxy = Account.objects.get(
+                    pk=post['delivery_proxy'])
+            if post['delivery_time']:
+                the_delivery.time = datetime.strptime(
+                    post['delivery_time'], "%Y-%m-%dT%H:%M")
+            the_delivery.save()
+            for item_uuid in post.getlist('select_item'):
+                the_item = Item.objects.get(pk=item_uuid)
+                the_item.delivery = the_delivery
+                the_item.status = "寄出中"
+                the_item.save()
+        elif action == "undo_arrive":
+            the_order = Order.objects.get(pk=post['order_uuid'])
+            for item in Item.objects.filter(order=the_order):
+                item.status = "已出貨"
+                if item.delivery:
+                    the_delivery = item.delivery
+                    item.delivery = None
+                    if not Item.objects.filter(delivery=the_delivery):
+                        the_delivery.delete()
+            the_order.status = "已出貨"
+            the_order.save()
+
+    # render
+    item_list = []
+    if item_sort == "order":
+        for order in Order.objects.filter(owner=the_account, status="到達倉庫"):
+            item_list.append({
+                "category": order,
+                "items": list(Item.objects.filter(order=order, status="到達倉庫")),
+                "paid": Item.objects.filter(order=order, status="到達倉庫", is_paid=True).aggregate(Sum('price'))['price__sum'],
+                "not_paid": Item.objects.filter(order=order, status="到達倉庫", is_paid=False).aggregate(Sum('price'))['price__sum']
+            })
+    else:
+        for contractor in Account.objects.all():
+            item_list.append({
+                "category": contractor,
+                "items": list(Item.objects.filter(contractor=contractor, order__owner=the_account, status="到達倉庫")),
+                "paid": Item.objects.filter(contractor=contractor, order__owner=the_account, status="到達倉庫", is_paid=True).aggregate(Sum('price'))['price__sum'],
+                "not_paid": Item.objects.filter(contractor=contractor, order__owner=the_account, status="到達倉庫", is_paid=False).aggregate(Sum('price'))['price__sum']
+            })
+    accounts = list(Account.objects.all().exclude(user=curr_user))
+
+    return render(
+        request, 'logistics/warehouse/warehouse.html',
+        {
+            "the_account": the_account,
+            "item_list": item_list,
+            "item_sort": item_sort,
+            "accounts": accounts
+        })
+
+
+@login_required
+def order(request, order_filter):
+    curr_user = auth.get_user(request)
+    # if account exists
+    if Account.objects.filter(user=curr_user).exists():
+        the_account = Account.objects.get(user=curr_user)
+    else:
+        return redirect("logistics:account")
 
     if request.method == "POST":
         post = request.POST
@@ -169,24 +238,30 @@ def order(request):
             return redirect("logistics:order_edit", order_uuid=new_order.uuid)
         elif action == "arrive_order":
             the_order = Order.objects.get(pk=post['order_uuid'])
-            the_order.delivery_status = "到達倉庫"
+            the_order.status = "到達倉庫"
+            for item in Item.objects.filter(order=the_order):
+                item.status = "到達倉庫"
+                item.save()
             the_order.save()
         elif action == "departure_order":
             the_order = Order.objects.get(pk=post['order_uuid'])
-            the_order.delivery_status = "已出貨"
+            the_order.status = "已出貨"
+            for item in Item.objects.filter(order=the_order):
+                item.status = "已出貨"
+                item.save()
             the_order.save()
         elif action == "filter_order":
-            order_filter = post['filter_order']
+            return redirect('logistics:order', order_filter=post['filter_order'])
 
     # render
     order_list = []
     if order_filter == "all":
-        orders = Order.objects.filter(owner=the_account, delivery_status="未出貨") | Order.objects.filter(
-            owner=the_account, delivery_status="已出貨")
+        orders = Order.objects.filter(owner=the_account, status="未出貨") | Order.objects.filter(
+            owner=the_account, status="已出貨")
     elif order_filter == "not_depart":
-        orders = Order.objects.filter(owner=the_account, delivery_status="未出貨")
+        orders = Order.objects.filter(owner=the_account, status="未出貨")
     elif order_filter == "depart":
-        orders = Order.objects.filter(owner=the_account, delivery_status="已出貨")
+        orders = Order.objects.filter(owner=the_account, status="已出貨")
 
     for order in orders:
         items = []
@@ -231,7 +306,7 @@ def orderEdit(request, order_uuid):
             the_order = Order.objects.get(pk=order_uuid)
             the_order.source = post['order_source']
             the_order.order_id = post['order_id']
-            the_order.delivery_status = post['order_status']
+            the_order.status = post['order_status']
             the_order.delivery_cost = post['delivery_cost']
             the_order.delivery_name = post['delivery_name']
             the_order.delivery_id = post['delivery_id']
@@ -267,8 +342,11 @@ def orderEdit(request, order_uuid):
                 is_paid=False,
                 order=Order.objects.get(pk=order_uuid),
                 contractor=Account.objects.get(
-                    pk=post['item_contractor'])
+                    pk=post['item_contractor']),
+                status=Order.objects.get(pk=order_uuid).status
             )
+            if the_item.contractor == the_account:
+                the_item.is_paid = True
             the_item.save()
 
         elif action == "del_order":

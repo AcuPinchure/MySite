@@ -26,10 +26,10 @@
         <a href="{% url 'logistics:home' %}" class="item" id="menu_home">
             總覽
         </a>
-        <a href="{% url 'logistics:order' %}" class="item" id="menu_order">
+        <a href="{% url 'logistics:order' order_filter='all' %}" class="item" id="menu_order">
             訂單管理
         </a>
-        <a href="{% url 'logistics:warehouse' %}" class="item" id="menu_warehouse">
+        <a href="{% url 'logistics:warehouse' item_sort='contractor' %}" class="item" id="menu_warehouse">
             倉庫管理
         </a>
         <a href="{% url 'logistics:delivery' %}" class="item" id="menu_delivery">
