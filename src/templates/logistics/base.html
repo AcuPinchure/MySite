@@ -4,22 +4,33 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js" defer integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     {% block title %}
     {% endblock title %}
 </head>
 <body>
-    <div class="ui right sidebar vertical menu" id="sidebar_menu">
-        <a href="{% url 'logistics:account' %}" class="item" id="menu_account">
-            個人資料
+    <div class="ui left sidebar vertical huge menu" id="sidebar_menu">
+        <div class="item" id="menu_account">
+            <a href="{% url 'logistics:account' %}">
+                {% block avatar %}
+                {% endblock avatar %}
+            </a>
+            <div class="ui secondary menu">
+                <a href="{% url 'logistics:account' %}" class="item">編輯個人資料</a>
+                <a href="{% url 'logistics:logout' %}" class="item">登出</a>
+            </div>
+            
+        </div>
+        <a href="{% url 'logistics:home' %}" class="item" id="menu_home">
+            總覽
         </a>
-        <a href="{% url 'logistics:warehouse' %}" class="item" id="menu_warehouse">
-            倉庫管理
-        </a>
-        <a href="{% url 'logistics:order' %}" class="item" id="menu_order">
+        <a href="{% url 'logistics:order' order_filter='all' %}" class="item" id="menu_order">
             訂單管理
+        </a>
+        <a href="{% url 'logistics:warehouse' item_sort='contractor' %}" class="item" id="menu_warehouse">
+            倉庫管理
         </a>
         <a href="{% url 'logistics:delivery' %}" class="item" id="menu_delivery">
             出貨管理
@@ -32,35 +43,37 @@
                 <div class="ui grid">
                     <div class="middle aligned row">
                         <div class="four wide left aligned column">
-                            <a href="{% url 'logistics:home' %}" style="color: black;">
-                                <i class="big home link icon"></i>
-                            </a>
-                            {% block navi %}
-                            {% endblock navi %}
+                            <i class="big bars icon" id="menu_icon"></i>
+                            
                         </div>
                         <div class="eight wide center aligned column">
                             {% block header %}
                             {% endblock header %}
                         </div>
-                        <div class="four wide right aligned column">
-                            <i class="big bars icon" id="menu_icon"></i>
+                        <div class="four wide right aligned computer tablet only column">
+                            
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div style="z-index: 1; position: fixed; bottom: 30px; right: 20px;">
+            {% block navi %}
+            {% endblock navi %}
+        </div>
         
-        
-        <div class="ui container" style="margin: 120px;">
+        <div class="ui container" style="margin-top: 120px;">
             {% block content_container %}
             {% endblock content_container %}
         </div>
-        <div class="ui text container" style="margin: 120px;">
+        <div class="ui text container" style="">
             {% block content_text_container %}
             {% endblock content_text_container %}
         </div>
         {% block content_basic %}
         {% endblock content_basic %}
+        <div style="padding: 60px;"></div>
     </div>
     <script>
         $('#menu_icon').on('click', function () {

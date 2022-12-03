@@ -1,0 +1,327 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>倉庫管理 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% if the_account.profile_image %}
+<img class="ui avatar image" src="{{the_account.profile_image.url}}">
+{% else %}
+{% load static %}
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+{% endif %}
+{{the_account.name}}
+{% endblock avatar %}
+
+{% block navi %}
+
+{% endblock navi %}
+
+
+
+{% block header %}
+<h1>倉庫管理</h1>
+{% endblock header %}
+
+{% block content_container %}
+<div class="ui secondary pointing menu">
+    <div class="header item">分類方式</div>
+    <a href="{% url 'logistics:warehouse' item_sort='order' %}" class="{% if item_sort == 'order' %}active {% endif %}item">訂單</a>
+    <a href="{% url 'logistics:warehouse' item_sort='contractor' %}" class="{% if not item_sort == 'order' %}active {% endif %}item">委託人</a>
+</div>
+
+{% load static %}
+<div class="ui placeholder center aligned segment" id="empty_message">
+    <h3>空空如也...</h3>
+    <img src="{% static 'logistics/img/kanata.png' %}" class="ui medium centered image">
+</div>
+
+{% for items in item_list %}
+{% if items.items %}
+<div class="ui top attached header">
+    {% if item_sort == "order" %}
+    {{items.category.source}} | {{items.category.order_id}}
+    {% else %}
+    {% if items.category.profile_image %}
+    <img class="ui avatar image" src="{{items.category.profile_image.url}}">
+    {% else %}
+    {% load static %}
+    <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+    {% endif %}
+    {{items.category.name}}
+    {% endif %}
+</div>
+<div class="ui attached segment">
+    <div class="ui grid">
+
+        <!--PC only-->
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide column">
+                <h4>編號</h4>
+            </div>
+            <div class="four wide column">
+                <h4>品項</h4>
+            </div>
+            <div class="two wide column">
+                <h4>數量</h4>
+            </div>
+            <div class="two wide column">
+                <h4>金額</h4>
+            </div>
+            <div class="four wide column">
+                <h4>
+                    {% if item_sort == "order" %}
+                    委託人
+                    {% else %}
+                    來源
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="two wide column">
+                <h4>狀態</h4>
+            </div>
+        </div>
+        {% for item in items.items %}
+        <div class="middle aligned computer tablet only row">
+            <div class="two wide column">{{forloop.counter}}</div>
+            <div class="four wide column">{{item.name}}</div>
+            <div class="two wide column">{{item.count}}</div>
+            <div class="two wide column">{{item.price}}</div>
+            <div class="four wide column">
+                {% if item_sort == "order" %}
+                {% if item.contractor.profile_image %}
+                <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                {% else %}
+                {% load static %}
+                <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                {% endif %}
+                {{item.contractor.name}}
+                {% else %}
+                {{item.order.source}} | {{item.order.order_id}}
+                {% endif %}
+            </div>
+            <div class="two wide column">{% if item.is_paid %}已結清{% else %}未結清{% endif %}</div>
+        </div>
+        {% endfor %}
+
+        <!--mobile only-->
+        {% for item in items.items %}
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">
+                <h4>編號</h4>
+            </div>
+            <div class="twelve wide column">
+                <h4>內容</h4>
+            </div>
+        </div>
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">{{forloop.counter}}</div>
+            <div class="twelve wide column">
+                <b>{{item.name}}</b><br>
+                數量: {{item.count}}<br>
+                金額: {{item.price}}<br>
+                {% if item_sort == "order" %}委託人{% else %}來源{% endif %}: <br>{% if item_sort == "order" %}
+                {% if item.contractor.profile_image %}
+                <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                {% else %}
+                {% load static %}
+                <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                {% endif %}
+                {{item.contractor.name}}
+                {% else %}
+                {{item.order.source}} | {{item.order.order_id}}
+                {% endif %}<br>
+                狀態: {% if item.is_paid %}已結清{% else %}未結清{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="ui divider"></div>
+
+        <!--PC only-->
+        <div class="middle aligned computer tablet only row">
+            <div class="eight wide right aligned column">小計(已結清)</div>
+            <div class="six wide column">{% if items.paid %}{{items.paid}}{% else %}0{% endif %}</div>
+            <div class="two wide column"></div>
+        </div>
+        <div class="middle aligned computer tablet only row">
+            <div class="eight wide right aligned column">小計(未結清)</div>
+            <div class="six wide column">{% if items.not_paid %}{{items.not_paid}}{% else %}0{% endif %}</div>
+            <div class="two wide column"></div>
+        </div>
+
+        <!--mobile only-->
+        <div class="middle aligned mobile only row">
+            <div class="four wide column">小計</div>
+            <div class="twelve wide column">
+                已結清: {% if items.paid %}{{items.paid}}{% else %}0{% endif %}<br>
+                未結清: {% if items.not_paid %}{{items.not_paid}}{% else %}0{% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui bottom attached secondary right aligned segment">
+    
+    <form action="" method="post">
+        {% if item_sort == "order" %}
+        {% csrf_token %}
+        <input type="hidden" name="order_uuid" value="{{items.category.uuid}}">
+        <input type="hidden" name="action" value="undo_arrive">
+        <button type="submit" class="ui labeled icon button">
+            <i class="truck icon"></i>
+            設為未到貨
+        </button>
+        {% endif %}
+        <button type="button" class="ui primary labeled icon button" onclick="openDelivery('{{items.category.uuid}}')">
+            <i class="box icon"></i>
+            安排交貨
+        </button>
+    </form>
+</div>
+<script>
+    $('#empty_message').children().hide();
+    $('#empty_message').hide();
+</script>
+<div class="ui modal" id="select_delivery_{{items.category.uuid}}">
+    <div class="header">安排出貨</div>
+    <div class="content">
+        <form action="" method="post" class="ui form" id="new_delivery_form_{{items.category.uuid}}">
+            {% csrf_token %}
+            <h4>選擇物品出貨</h4>
+            <div class="ui divider"></div>
+            <div class="ui grid">
+                <div class="row">
+                    <div class="sixteen wide column">
+                        <input type="checkbox" name="select_all" id="select_all" onchange="checkAll(this)">
+                        <label for="select_all">全選</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="four wide column">
+                        <h4>選擇</h4>
+                    </div>
+                    <div class="twelve wide column">
+                        <h4>內容</h4>
+                    </div>
+                </div>
+                {% for item in items.items %}
+                <div class="row">
+                    <div class="four wide column"><input type="checkbox" name="select_item" id="select_item" value="{{item.uuid}}"></div>
+                    <div class="twelve wide column">
+                        <b>{{item.name}}</b><br>
+                        數量: {{item.count}}<br>
+                        金額: {{item.price}}<br>
+                        {% if item_sort == "order" %}委託人{% else %}來源{% endif %}: <br>{% if item_sort == "order" %}
+                        {% if item.contractor.profile_image %}
+                        <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                        {% else %}
+                        {% load static %}
+                        <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                        {% endif %}
+                        {{item.contractor.name}}
+                        {% else %}
+                        {{item.order.source}} | {{item.order.order_id}}
+                        {% endif %}<br>
+                        狀態: {% if item.is_paid %}已結清{% else %}未結清{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="ui divider"></div>
+            <div class="field">
+                <label for="">交貨方式</label>
+                <div class="ui fluid selection dropdown">
+                    <input type="hidden" name="delivery_type" id="delivery_type" value="">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">選擇交貨方式</div>
+                    <div class="menu">
+                        <div class="item" data-value="面交">面交</div>
+                        <div class="item" data-value="郵寄">郵寄</div>
+                        <div class="item" data-value="店到店">店到店</div>
+                        <div class="item" data-value="轉交">轉交</div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="">交貨地點</label>
+                <input type="text" name="delivery_location" id="delivery_location" placeholder="面交地點/郵寄地址/店到店店名/轉交地點">
+            </div>
+            <div class="field">
+                <label for="">交貨時間</label>
+                <input type="datetime-local" name="delivery_time" id="delivery_time">
+            </div>
+            <div class="field" name="delivery_proxy_field" style="display: none;">
+                <label for="">轉交人</label>
+                <div class="ui fluid search selection dropdown">
+                    <input type="hidden" name="delivery_proxy" id="delivery_proxy" value="">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">選擇轉交人</div>
+                    <div class="menu">
+                        {% for account in accounts %}
+                        <div class="item" data-value="{{account.uuid}}">
+                            {% if account.profile_image %}
+                            <img class="ui avatar image" src="{{account.profile_image.url}}">
+                            {% else %}
+                            {% load static %}
+                            <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                            {% endif %}
+                            {{account.name}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="action" value="save_delivery">
+        </form>
+    </div>
+    <div class="actions">
+        <button class="ui primary button" onclick="saveDelivery('{{items.category.uuid}}')">出貨</button>
+        <button type="button" class="ui button" onclick="closeDelivery('{{items.category.uuid}}')">取消</button>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+
+<script>
+    function openDelivery(uuid) {
+        $(`#select_delivery_${uuid}`).modal('setting', 'closable', false).modal('show');
+    }
+
+    function closeDelivery(uuid) {
+        $(`#select_delivery_${uuid}`).modal('setting', 'closable', false).modal('hide');
+    }
+    
+    function saveDelivery(uuid) {
+        document.getElementById(`new_delivery_form_${uuid}`).submit();
+    }
+
+    function checkAll(element) {
+        var form = element.parentNode.parentNode.parentNode.parentNode;
+        checkboxes = form.querySelectorAll('input[name=select_item]');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            checkboxes[i].checked = element.checked;
+        }
+    }
+
+    $('.ui.dropdown').dropdown();
+</script>
+
+<script>
+    var delivery_type = document.getElementById('delivery_type');
+    delivery_type.onchange = function () {
+        let delivery_proxy = document.getElementsByName('delivery_proxy_field');
+        for (let i=0, n=delivery_proxy.length;i<n;i++) {
+            if (delivery_type.value=="轉交") {
+                delivery_proxy[i].style = ""
+            }
+            else {
+                delivery_proxy[i].style = "display: none;"
+            }
+        }
+    }
+</script>
+
+{% endblock content_container %}

@@ -1,0 +1,519 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>訂單管理 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% if the_account.profile_image %}
+<img class="ui avatar image" src="{{the_account.profile_image.url}}">
+{% else %}
+{% load static %}
+<img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+{% endif %}
+{{the_account.name}}
+{% endblock avatar %}
+
+{% block header %}
+<h1>訂單管理</h1>
+<script>
+    document.getElementById('menu_order').classList.add("active");
+</script>
+{% endblock header %}
+
+{% block navi %}
+<a href="{% url 'logistics:order' order_filter='all' %}" class="ui labeled icon big circular button">
+    <i class="left chevron icon"></i>
+    返回訂單列表
+</a>
+{% endblock navi %}
+
+{% block content_container %}
+
+<h2>編輯訂單: {{the_order.source}} | 訂單編號{{the_order.order_id}}</h2>
+
+<div class="ui segment">
+    <div class="ui header">訂單資訊</div>
+    <div class="ui divider"></div>
+    <div class="ui one column grid">
+        <div class="row">
+            <!--PC only-->
+            <div class="computer tablet only column">
+                <div class="ui unstackable grid">
+                    <div class="three wide column">
+                        <h4>採購人</h4>
+                    </div>
+                    <div class="five wide column">
+                        {% if the_order.owner.profile_image %}
+                        <img class="ui avatar image" src="{{the_order.owner.profile_image.url}}">
+                        {% else %}
+                        {% load static %}
+                        <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                        {% endif %}
+                        {{the_order.owner.name}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>運費</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.delivery_cost}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>來源</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.source}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>運送業者</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.delivery_name}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>訂單編號</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.order_id}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>運送單號</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.delivery_id}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>訂單狀態</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.status}}
+                    </div>
+                    <div class="three wide column">
+                        <h4>預估到貨時間</h4>
+                    </div>
+                    <div class="five wide column">
+                        {{the_order.expect_arrival}}
+                    </div>
+                </div>
+            </div>
+
+            <!--mobile only-->
+            <div class="mobile only column">
+                <div class="ui unstackable grid">
+                    <div class="six wide column">
+                        <h4>採購人</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {% if the_order.owner.profile_image %}
+                        <img class="ui avatar image" src="{{the_order.owner.profile_image.url}}">
+                        {% else %}
+                        {% load static %}
+                        <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                        {% endif %}
+                        {{the_order.owner.name}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>來源</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.source}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>訂單編號</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.order_id}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>訂單狀態</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.status}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>運費</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.delivery_cost}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>運送業者</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.delivery_name}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>運送單號</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.delivery_id}}
+                    </div>
+                    <div class="six wide column">
+                        <h4>預估到貨時間</h4>
+                    </div>
+                    <div class="ten wide column">
+                        {{the_order.expect_arrival}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="right aligned column">
+                <button class="ui primary button" onclick="openInfo()">編輯資訊</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui divider"></div>
+    <div class="ui header">品項列表</div>
+    <div class="ui one column grid">
+        <div class="row">
+            <!--PC only-->
+            <div class="computer tablet only column">
+                <table class="ui table">
+                    <thead>
+                        <tr>
+                            <th>品項</th>
+                            <th>數量</th>
+                            <th>金額</th>
+                            <th>委託人</th>
+                            <th>編輯</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{item.name}}</td>
+                            <td>{{item.count}}</td>
+                            <td>{{item.price}}</td>
+                            <td>
+                                {% if item.contractor %}
+                                <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                                {{item.contractor.name}}
+                                {% else %}
+                                -未指定-
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="ui basic button" onclick="openItem('{{item.uuid}}')">編輯</button>
+                                {% if item.is_paid %}
+                                <button class="ui basic negative button" onclick="setPaid('{{item.uuid}}',false)">設為未結清</button>
+                                {% else %}
+                                <button class="ui basic positive button" onclick="setPaid('{{item.uuid}}',true)">設為已結清</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!--Mobile only-->
+            <div class="mobile only column">
+                <div class="ui unstackable grid">
+                    {% for item in items %}
+                    <div class="middle aligned mobile only row">
+                        <div class="two wide column">{{forloop.counter}}</div>
+                        <div class="fourteen wide column">
+                            <table class="ui celled unstackable table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">{{item.name}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="six wide">數量</td>
+                                        <td class="ten wide">{{item.count}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="six wide">金額</td>
+                                        <td class="ten wide">{{item.price}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="six wide">委託人</td>
+                                        <td class="ten wide">
+                                            {% if item.contractor %}
+                                            <img class="ui avatar image" src="{{item.contractor.profile_image.url}}">
+                                            {{item.contractor.name}}
+                                            {% else %}
+                                            -未指定-
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="right aligned" colspan="2">
+                                            <button class="ui basic button" onclick="openItem('{{item.uuid}}')">編輯</button>
+                                            {% if item.is_paid %}
+                                            <button class="ui basic negative button" onclick="setPaid('{{item.uuid}}',false)">設為未結清</button>
+                                            {% else %}
+                                            <button class="ui basic positive button" onclick="setPaid('{{item.uuid}}',true)">設為已結清</button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="right aligned column">
+                <button class="ui negative button" onclick="openDelOrder()">刪除訂單</button>
+                <button class="ui positive button" onclick="openItem('new')">新增品項</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="ui modal" id="edit_info">
+    <div class="header">編輯訂單資訊</div>
+    <div class="ui content form">
+        <form method="post" action="" id="edit_info_form">
+            {% csrf_token %}
+            <div class="field">
+                <label for="">來源</label>
+                <input type="text" name="order_source" id="order_source" value="{{the_order.source}}">
+            </div>
+            <div class="field">
+                <label for="">訂單編號</label>
+                <input type="text" name="order_id" id="order_id" value="{{the_order.order_id}}">
+            </div>
+            <div class="field">
+                <label for="">訂單狀態</label>
+                <div class="ui fluid selection dropdown">
+                    <input type="hidden" name="order_status" id="order_status" value="{{the_order.status}}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">訂單狀態</div>
+                    <div class="menu">
+                        <div class="item" data-value="未出貨">未出貨</div>
+                        <div class="item" data-value="已出貨">已出貨</div>
+                        <div class="item" data-value="到達倉庫">到達倉庫</div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label for="">運費</label>
+                <input type="text" name="delivery_cost" id="delivery_cost" value="{{the_order.delivery_cost}}">
+            </div>
+            <div class="field">
+                <label for="">運送業者</label>
+                <input type="text" name="delivery_name" id="delivery_name" value="{{the_order.delivery_name}}">
+            </div>
+            <div class="field">
+                <label for="">運送單號</label>
+                <input type="text" name="delivery_id" id="delivery_id" value="{{the_order.delivery_id}}">
+            </div>
+            <div class="field">
+                <label for="">預估到貨時間</label>
+                <input type="date" name="expect_arrival" id="expect_arrival" value="{{the_order.expect_arrival.year}}-{{the_order.expect_arrival.month}}-{{the_order.expect_arrival.day}}">
+            </div>
+            <input type="hidden" name="action" value="save_info">
+        </form>
+    </div>
+    <div class="actions">
+        <button class="ui primary button" onclick="submitInfo()">儲存</button>
+        <button class="ui button" onclick="closeInfo()">取消</button>
+    </div>
+</div>
+    
+{% for item in items %}
+<div class="ui modal" id="edit_item_{{item.uuid}}">
+    <div class="header">編輯品項</div>
+    <div class="ui content form">
+        <form method="post" action="" id="edit_item_form_{{item.uuid}}">
+            {% csrf_token %}
+            <input type="hidden" name="item_uuid" value="{{item.uuid}}">
+            <div class="field">
+                <label for="">品名</label>
+                <input type="text" name="item_name" id="item_name" value="{{item.name}}">
+            </div>
+            <div class="field">
+                <label for="">數量</label>
+                <input type="number" name="item_count" id="item_count" value="{{item.count}}">
+            </div>
+            <div class="field">
+                <label for="">合計金額</label>
+                <input type="number" name="item_price" id="item_price" value="{{item.price}}">
+            </div>
+            <div class="field">
+                <label for="">委託人</label>
+                <div class="ui fluid search selection dropdown">
+                    <input type="hidden" name="item_contractor" id="item_contractor" value="{{item.contractor.uuid}}">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">選擇委託人</div>
+                    <div class="menu">
+                        <div class="item" data-value="{{the_account.uuid}}">
+                            -給自己-
+                        </div>
+                        {% for account in accounts %}
+                        <div class="item" data-value="{{account.uuid}}">
+                            {% if account.profile_image %}
+                            <img class="ui avatar image" src="{{account.profile_image.url}}">
+                            {% else %}
+                            {% load static %}
+                            <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                            {% endif %}
+                            {{account.name}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="action" id="action_item_{{item.uuid}}">
+        </form>
+    </div>
+    <div class="actions">
+        <button class="ui primary button" onclick="submitItem('{{item.uuid}}')">儲存</button>
+        <button class="ui button" onclick="closeItem('{{item.uuid}}')">取消</button>
+        <button class="ui negative button" onclick="delItem('{{item.uuid}}')">刪除</button>
+    </div>
+</div>
+{% endfor %}
+
+<div class="ui modal" id="edit_item_new">
+    
+    <div class="header">編輯品項</div>
+    <div class="content">
+        <form method="post" action="" class="ui form" id="edit_item_form_new">
+            {% csrf_token %}
+            <div class="field">
+                <label for="">品名</label>
+                <input type="text" name="item_name" id="item_name" placeholder="若同品項有不同委託人請分兩項">
+            </div>
+            <div class="field">
+                <label for="">數量</label>
+                <input type="number" name="item_count" id="item_count" placeholder="此委託人的需求數量">
+            </div>
+            <div class="field">
+                <label for="">合計金額</label>
+                <input type="number" name="item_price" id="item_price" placeholder="單價乘上數量後的總價">
+            </div>
+            <div class="field">
+                <label for="">委託人</label>
+                <div class="ui fluid search selection dropdown">
+                    <input type="hidden" name="item_contractor" id="item_contractor" value="">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">選擇委託人</div>
+                    <div class="menu">
+                        <div class="item" data-value="{{the_account.uuid}}">
+                            -給自己-
+                        </div>
+                        {% for account in accounts %}
+                        <div class="item" data-value="{{account.uuid}}">
+                            {% if account.profile_image %}
+                            <img class="ui avatar image" src="{{account.profile_image.url}}">
+                            {% else %}
+                            {% load static %}
+                            <img src="{% static 'logistics/img/user_empty.png' %}" class="ui avatar image">
+                            {% endif %}
+                            {{account.name}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="action" value="save_item_new">
+        </form>
+    </div>
+    <div class="actions">
+        <button class="ui primary button" onclick="saveItemNew()">儲存</button>
+        <button type="button" class="ui button" onclick="closeItemNew()">取消</button>
+    </div>
+</div>
+
+<div class="ui modal" id="del_order">
+    <div class="header">刪除訂單</div>
+    <div class="content">
+        你確定要刪除這筆訂單嗎? 本訂單包含的所有品項都將跟著刪除，你無法再復原。
+    </div>
+    <div class="actions">
+        <form method="post" action="" class="ui right aligned basic segment">
+            {% csrf_token %}
+            <input type="submit" name="del_order" class="ui negative button" value="確定刪除">
+            <button type="button" class="ui button" onclick="closeDelOrder()">取消</button>
+        </form>
+    </div>
+</div>
+
+<form action="" method="post" id="item_paid_form">
+    {% csrf_token %}
+    <input type="hidden" name="item_uuid" id="item_paid_uuid">
+    <input type="hidden" name="is_paid" id="item_paid_is_paid">
+    <input type="hidden" name="action" value="set_paid">
+</form>
+
+
+<script>
+    function openInfo() {
+        $('#edit_info').modal('setting', 'closable', false).modal('show');
+    }
+
+    function closeInfo() {
+        $('#edit_info').modal('setting', 'closable', false).modal('hide');
+    }
+
+    function submitInfo() {
+        let form = document.getElementById('edit_info_form');
+        form.submit();
+    }
+
+    function setPaid(uuid, is_paid) {
+        let form = document.getElementById("item_paid_form");
+        let uuid_input = document.getElementById("item_paid_uuid");
+        let is_paid_input = document.getElementById("item_paid_is_paid");
+        uuid_input.value = uuid;
+        if (is_paid === true) {
+            is_paid_input.value = "true"
+        }
+        else {
+            is_paid_input.value = "false"
+        }
+        form.submit();
+    }
+
+    function openItem(uuid) {
+        $(`#edit_item_${uuid}`).modal('setting', 'closable', false).modal('show');
+    }
+    function closeItem(uuid) {
+        $(`#edit_item_${uuid}`).modal('setting', 'closable', false).modal('hide');
+    }
+    function openItemNew() {
+        $('#edit_item_new').modal('setting', 'closable', false).modal('show');
+    }
+    function closeItemNew() {
+        $('#edit_item_new').modal('setting', 'closable', false).modal('hide');
+    }
+    function openDelOrder() {
+        $('#del_order').modal('setting', 'closable', false).modal('show');
+    }
+    function closeDelOrder() {
+        $('#del_order').modal('setting', 'closable', false).modal('hide');
+    }
+
+    function submitItem(uuid) {
+        let form = document.getElementById(`edit_item_form_${uuid}`);
+        let action = document.getElementById(`action_item_${uuid}`);
+        action.value = "save_item";
+        form.submit();
+    }
+
+    function delItem(uuid) {
+        let form = document.getElementById(`edit_item_form_${uuid}`);
+        let action = document.getElementById(`action_item_${uuid}`);
+        action.value = "delete_item";
+        form.submit();
+    }
+
+    function saveItemNew() {
+        let form = document.getElementById('edit_item_form_new');
+        form.submit();
+    }
+    
+    $('.ui.dropdown').dropdown();
+</script>
+
+{% endblock content_container %}

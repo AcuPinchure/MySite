@@ -1,0 +1,150 @@
+{% extends 'logistics/base.html' %}
+
+{% block title %}
+<title>登入 | 聖品萱物流</title>
+{% endblock title %}
+
+{% block avatar %}
+{% load static %}
+<img class="ui avatar image" src="{% static 'logistics/img/demo_account_img.jpg' %}">
+<span>A certain name</span>
+{% endblock avatar %}
+
+{% block navi %}
+<button type="button" class="ui positive big circular button" onclick="openItem()">註冊帳號</button>
+{% endblock navi %}
+
+{% block header %}
+<h1>聖品萱物流管理系統</h1>
+{% endblock header %}
+
+{% block content_text_container %}
+
+<form action="" method="post" class="ui form segment">
+    <div class="ui negative {% if error_msg %}{% else %}hidden {% endif %}message">
+        <div class="header">
+            登入失敗
+        </div>
+        <p>{{error_msg}}</p>
+    </div>
+    {% csrf_token %}
+    <div class="field">
+        <label for="">帳號</label>
+        <input type="text" required name="user_id" id="">
+    </div>
+    <div class="field">
+        <label for="">密碼</label>
+        <input type="password" required name="user_pwd" id="">
+    </div>
+    <input type="submit" name="login" value="登入" class="ui primary button">
+</form>
+
+<div class="ui modal" id="edit_item">
+    <div class="header">註冊帳號</div>
+    <div class="content">
+        <form action="" method="post" class="ui clearing form" id="reg_form">
+            {% csrf_token %}
+            <div class="field">
+                <label for="id_username">使用者名稱</label>
+                <input type="text" required name="username" id="id_username" maxlength="150">
+            </div>
+            <div class="field">
+                <label for="id_password1">密碼</label>
+                <input type="password" required name="password1" id="id_password1" maxlength="20">
+            </div>
+            <div class="field">
+                <label for="id_password2">確認密碼</label>
+                <input type="password" required name="password2" id="id_password2" maxlength="20">
+            </div>
+            <input type="hidden" name="register">
+            <button type="button" class="ui primary button" id="reg_button">註冊</button>
+            <button class="ui button" onclick="closeItem()">取消</button>
+        </form>
+        <div class="ui negative hidden message" id="reg_error_msg">
+            <ul class="ui list" id="reg_error_list"></ul>
+        </div>
+    </div>
+</div>
+<script>
+    function openItem() {
+        $('#edit_item').modal('setting', 'closable', false).modal('show');
+    }
+    function closeItem() {
+        $('#edit_item').modal('setting', 'closable', false).modal('hide');
+    }
+    
+    $('.ui.dropdown').dropdown();
+</script>
+<script>
+    
+    function checkReg(try_name) {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                url: "{% url 'logistics:check_user_exists' %}",
+                method: "POST",
+                dataType: "json",
+                data: {
+                    "csrfmiddlewaretoken": "{{csrf_token}}",
+                    "try_name": try_name
+                },
+                success: function (res) {
+                    res.exists === true ? resolve(true) : resolve(false)
+                },
+                fail: function (xhr, ajaxOptions, thrownError) {
+                    reject(false)
+                },
+            });
+        })
+    }
+
+    document.getElementById('reg_button').onclick = async function () {
+        console.log("start");
+        try {
+            var try_name = document.getElementById('id_username').value;
+
+            var check_exists = await checkReg(try_name);
+            console.log(check_exists);
+
+            var pwd_1 = document.getElementById('id_password1');
+            var pwd_2 = document.getElementById('id_password2');
+            var reg_error_list = document.getElementById('reg_error_list');
+            var reg_error_msg = document.getElementById('reg_error_msg');
+
+            reg_error_list.innerHTML = ""
+
+            var valid = true;
+            
+            // test user exists
+            if (check_exists === true) {
+                console.log("User exists");
+                reg_error_list.innerHTML += "<li>使用者名稱已存在</li>"
+                valid = false;
+            }
+            // test pwd match
+            if (!(pwd_1.value == pwd_2.value)) {
+                console.log("Password does not match");
+                reg_error_list.innerHTML += "<li>密碼前後不一致</li>"
+                valid = false;
+            }
+            
+            console.log(valid);
+            if (valid) {
+                document.getElementById('reg_form').submit();
+            }
+            else {
+                reg_error_msg.classList.remove("hidden");
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    
+    
+    
+    
+    
+</script>
+
+{% endblock content_text_container %}
