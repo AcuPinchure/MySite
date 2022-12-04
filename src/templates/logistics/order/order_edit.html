@@ -434,6 +434,7 @@
         <form method="post" action="" class="ui right aligned basic segment">
             {% csrf_token %}
             <input type="submit" name="del_order" class="ui negative button" value="確定刪除">
+            <input type="hidden" name="action" value="del_order">
             <button type="button" class="ui button" onclick="closeDelOrder()">取消</button>
         </form>
     </div>
