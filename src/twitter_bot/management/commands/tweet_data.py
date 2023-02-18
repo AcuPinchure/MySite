@@ -36,7 +36,7 @@ def data_once(name):
         tweet_data = api.get_status(tweet_id)
         tweet.like = tweet_data.favorite_count
         tweet.rt = tweet_data.retweet_count
-        tweet.follower = api.get_user(screen_name=name).followers_count
+        tweet.follower = api.get_user(screen_name=bot_id).followers_count
 
         spread_count = 0
 
