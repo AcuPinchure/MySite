@@ -92,6 +92,8 @@ class Tweet(models.Model):
 
     media = models.ForeignKey(Media,on_delete=models.PROTECT)
 
+    analyzed = models.BooleanField(help_text='Whether the tweet has been analyzed', default=False)
+
     def __str__(self):
         return "[{}]-{}-{}".format(self.media.seiyuu.name,self.post_time, self.id)
 
@@ -126,3 +128,40 @@ class RtToUser(models.Model):
         return "Tweet: {}, RT user: {}".format(self.tweet.id,self.user.id)
 
 # RtToUser.objects = RtToUser.objects.using('bot_data')
+
+
+# stats
+class WeeklyStats(models.Model):
+    class Meta:
+        # managed = False
+        db_table = 'weekly_stats'
+
+    start_date = models.DateField(help_text='Start date of the week', blank=True, null=True)
+    end_date = models.DateField(help_text='End date of the week', blank=True, null=True)
+
+    avg_likes = models.FloatField(help_text='Average number of likes of all tweets this week', blank=True, null=True)
+    avg_retweets = models.FloatField(help_text='Average number of retweets of all tweets this week', blank=True, null=True)
+
+    max_likes = models.ForeignKey(
+        Tweet, on_delete=models.CASCADE, related_name='max_likes_stats',
+        help_text='Tweet instance with the highest number of likes this week', blank=True, null=True)
+    max_rts = models.ForeignKey(
+        Tweet, on_delete=models.CASCADE, related_name='max_rt_stats',
+        help_text='Tweet instance with the highest number of retweets this week', blank=True, null=True)
+
+    max_likes_all = models.ForeignKey(
+        Tweet, on_delete=models.CASCADE, related_name='max_likes_stats_all',
+        help_text='Tweet instance with the highest number of likes of all time', blank=True, null=True)
+    max_rt_all = models.ForeignKey(
+        Tweet, on_delete=models.CASCADE, related_name='max_rt_stats_all',
+        help_text='Tweet instance with the highest number of retweets of all time', blank=True, null=True)
+
+    most_active_user = models.ForeignKey(
+        UserAccount, on_delete=models.CASCADE, related_name='weekly_stats',
+        help_text='The most active user this week, who appears most frequently in the field rt_user of all tweets', blank=True, null=True)
+    follower = models.IntegerField(help_text='Followers', blank=True, null=True)
+
+    seiyuu = models.ForeignKey(Seiyuu,on_delete=models.PROTECT,blank=True,null=True)
+
+    def __str__(self):
+        return f"WeeklyStats from {self.start_date} to {self.end_date}"
