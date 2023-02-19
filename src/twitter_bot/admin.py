@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Seiyuu, Media, Tweet, UserAccount, LikeToUser, RtToUser
+from .models import Seiyuu, Media, Tweet, UserAccount, LikeToUser, RtToUser, WeeklyStats
 
 # Register your models here.
 
@@ -9,3 +9,4 @@ admin.site.register(Tweet)
 admin.site.register(UserAccount)
 admin.site.register(LikeToUser)
 admin.site.register(RtToUser)
+admin.site.register(WeeklyStats)
