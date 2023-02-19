@@ -139,6 +139,10 @@ class WeeklyStats(models.Model):
     start_date = models.DateField(help_text='Start date of the week', blank=True, null=True)
     end_date = models.DateField(help_text='End date of the week', blank=True, null=True)
 
+    posts = models.PositiveIntegerField(help_text='Total number of posts this week', blank=True, null=True)
+    likes = models.PositiveIntegerField(help_text='Total number of liks this week', blank=True, null=True)
+    rts = models.PositiveIntegerField(help_text='Total number of rts this week', blank=True, null=True)
+
     avg_likes = models.FloatField(help_text='Average number of likes of all tweets this week', blank=True, null=True)
     avg_retweets = models.FloatField(help_text='Average number of retweets of all tweets this week', blank=True, null=True)
 
@@ -148,6 +152,10 @@ class WeeklyStats(models.Model):
     max_rts = models.ForeignKey(
         Tweet, on_delete=models.CASCADE, related_name='max_rt_stats',
         help_text='Tweet instance with the highest number of retweets this week', blank=True, null=True)
+
+    posts_all = models.PositiveIntegerField(help_text='Total number of posts of all time', blank=True, null=True)
+    likes_all = models.PositiveIntegerField(help_text='Total number of liks of all time', blank=True, null=True)
+    rts_all = models.PositiveIntegerField(help_text='Total number of rts of all time', blank=True, null=True)
 
     max_likes_all = models.ForeignKey(
         Tweet, on_delete=models.CASCADE, related_name='max_likes_stats_all',
