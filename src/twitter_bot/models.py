@@ -9,7 +9,10 @@ class Seiyuu(models.Model):
         db_table = 'bot_seiyuu'
 
     name = models.CharField(help_text='Seiyuu Name', max_length=20,blank=False)
-        
+    screen_name = models.CharField(help_text='Bot account screen name', max_length=20,blank=True,null=True)
+    id_name = models.CharField(help_text='Seiyuu short name', max_length=20,blank=True,null=True)
+    
+
     def __str__(self):
         return self.name
 
