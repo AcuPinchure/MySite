@@ -51,5 +51,5 @@ class Command(BaseCommand):
                     i.save()
                     ret = 'Success'
                     
-                print("Now at: {}/{} - {} - {}".format(idx+1, import_len, img, ret))
+                self.stdout.write(self.style.SUCCESS("[{}] Now at: {}/{} - {} - {}".format(name, idx+1, import_len, img, ret)))
             
