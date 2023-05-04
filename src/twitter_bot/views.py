@@ -1,8 +1,19 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from pathlib import Path
 import os
+
+# models and query
 from .models import Seiyuu, WeeklyStats, Tweet, UserAccount
+from django.db.models import Avg, Count, Sum
+
+# rest framework
+from .serializer import TweetSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from datetime import datetime
 
 # Create your views here.
 root_path = Path(__file__).resolve().parent.parent.parent
@@ -61,3 +72,64 @@ def stats(request, name):
 
 
     return render(request, 'twitter_bot/stats/stats_base.html', render_data)
+
+
+# rest framework
+
+@api_view(['GET'])
+def getStats(request):
+    if request.method == 'GET':
+
+        seiyuu = request.GET.get("seiyuu")
+        if not seiyuu in ["Kaorin","Akarin","Chemi"]:
+            return Response({'status':False, 'message': 'Requested Seiyuu does not match any'},status=status.HTTP_400_BAD_REQUEST)
+
+        start_date_str = request.GET.get("start_date")
+        end_date_str = request.GET.get("end_date")
+        if not (start_date_str and end_date_str):
+            return Response({'status':False, 'message': 'Requested time interval missing'},status=status.HTTP_400_BAD_REQUEST)
+
+        tweet_q = None
+        try:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").replace(hour=23, minute=59, second=59, microsecond=999999)
+            tweet_q = Tweet.objects.filter(post_time__gte=start_date,post_time__lte=end_date,data_time__isnull=False).order_by("data_time")
+        except TypeError:
+            return Response({'status':False, 'message': 'Requested time interval has incorrect format'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'status':False, 'message': 'Unknown exception: {}'.format(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if not tweet_q:
+            return Response({'status':False, 'message': 'No Tweets found in the given interval'}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = {
+            "status": True,
+            "start_date": start_date_str,
+            "end_date": end_date_str,
+            "posts": tweet_q.count(),
+            "likes": tweet_q.aggregate(sum_likes=Sum('like'))['sum_likes'] or 0,
+            "rts": tweet_q.aggregate(sum_rts=Sum('rt'))['sum_rts'] or 0,
+            "avg_likes": tweet_q.aggregate(avg_likes=Avg('like'))['avg_likes'] or 0,
+            "avg_retweets": tweet_q.aggregate(avg_rts=Avg('rt'))['avg_rts'] or 0,
+            "max_likes": tweet_q.order_by('-like').first().id,
+            "max_rts": tweet_q.order_by('-rt').first().id,
+            "seiyuu": seiyuu,
+        }
+
+        followers = []
+
+        for date, follower in tweet_q.values_list("data_time","follower"):
+            followers.append({
+                "date": date.strftime("%Y-%m-%d"),
+                "followers": follower
+            })
+
+        data["followers"] = followers
+
+
+
+
+        return Response(data,status=status.HTTP_200_OK)
+
+            
+        
