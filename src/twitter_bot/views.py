@@ -13,7 +13,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from datetime import datetime
+from datetime import datetime, timedelta
+import pytz
 
 # Create your views here.
 root_path = Path(__file__).resolve().parent.parent.parent
@@ -37,99 +38,90 @@ def log_content(request, log_name):
         'log_content': log_content
     })
 
-def stats(request, name):
-    the_seiyuu = Seiyuu.objects.get(id_name=name)
-
-    the_week_data = WeeklyStats.objects.filter(seiyuu=the_seiyuu).latest("end_date")
-    the_last_week_data = WeeklyStats.objects.filter(seiyuu=the_seiyuu).order_by("-end_date")[1]
-    the_earliest_data = WeeklyStats.objects.filter(seiyuu=the_seiyuu).earliest("end_date")
-
-    # render
-    render_data = {
-        "screen_name": the_seiyuu.screen_name,
-        "name": the_seiyuu.name,
-        "week_data": {
-            "earliest_date": the_earliest_data.start_date.strftime("%Y/%m/%d"),
-            "start_date": the_week_data.start_date.strftime("%Y/%m/%d"),
-            "end_date": the_week_data.end_date.strftime("%Y/%m/%d"),
-            "posts": the_week_data.posts,
-            "likes": the_week_data.likes,
-            "rts": the_week_data.rts,
-            "avg_likes": the_week_data.avg_likes,
-            "avg_retweets": the_week_data.avg_retweets,
-            "max_likes_id": the_week_data.max_likes.id,
-            "max_rts_id": the_week_data.max_rts.id,
-            "posts_all": the_week_data.posts_all,
-            "likes_all": the_week_data.likes_all,
-            "rts_all": the_week_data.rts_all,
-            "max_likes_all_id": the_week_data.max_likes_all.id,
-            "max_rt_all_id": the_week_data.max_rt_all.id,
-            "follower_diff": the_week_data.follower - the_last_week_data.follower,
-            "total_follower": the_week_data.follower
-        }
-    }
-
-
-
-    return render(request, 'twitter_bot/stats/stats_base.html', render_data)
+def stats(request):
+    return render(request, 'twitter_bot/stats/stats.html')
 
 
 # rest framework
 
 @api_view(['GET'])
-def getStats(request):
-    if request.method == 'GET':
+def loadDefaultStats(request):
+    seiyuu_list = Seiyuu.objects.all().order_by("id")
+    default_seiyuu = seiyuu_list.first()
+    latest_post = Tweet.objects.filter(media__seiyuu=default_seiyuu,data_time__isnull=False).latest("post_time")
 
-        seiyuu = request.GET.get("seiyuu")
-        if not seiyuu in ["Kaorin","Akarin","Chemi"]:
-            return Response({'status':False, 'message': 'Requested Seiyuu does not match any'},status=status.HTTP_400_BAD_REQUEST)
+    default_data = {
+        "seiyuus": {},
+        "default_seiyuu": default_seiyuu.id_name,
+        "latest_post_time": latest_post.post_time.strftime("%Y-%m-%d")
+    }
 
-        start_date_str = request.GET.get("start_date")
-        end_date_str = request.GET.get("end_date")
-        if not (start_date_str and end_date_str):
-            return Response({'status':False, 'message': 'Requested time interval missing'},status=status.HTTP_400_BAD_REQUEST)
-
-        tweet_q = None
-        try:
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").replace(hour=0, minute=0, second=0, microsecond=0)
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").replace(hour=23, minute=59, second=59, microsecond=999999)
-            tweet_q = Tweet.objects.filter(post_time__gte=start_date,post_time__lte=end_date,data_time__isnull=False).order_by("data_time")
-        except TypeError:
-            return Response({'status':False, 'message': 'Requested time interval has incorrect format'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'status':False, 'message': 'Unknown exception: {}'.format(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        if not tweet_q:
-            return Response({'status':False, 'message': 'No Tweets found in the given interval'}, status=status.HTTP_404_NOT_FOUND)
-        
-        data = {
-            "status": True,
-            "start_date": start_date_str,
-            "end_date": end_date_str,
-            "posts": tweet_q.count(),
-            "likes": tweet_q.aggregate(sum_likes=Sum('like'))['sum_likes'] or 0,
-            "rts": tweet_q.aggregate(sum_rts=Sum('rt'))['sum_rts'] or 0,
-            "avg_likes": tweet_q.aggregate(avg_likes=Avg('like'))['avg_likes'] or 0,
-            "avg_retweets": tweet_q.aggregate(avg_rts=Avg('rt'))['avg_rts'] or 0,
-            "max_likes": tweet_q.order_by('-like').first().id,
-            "max_rts": tweet_q.order_by('-rt').first().id,
-            "seiyuu": seiyuu,
+    for name, id_name, screen_name in seiyuu_list.values_list("name", "id_name", "screen_name"):
+        default_data["seiyuus"][id_name] = {
+            "name": name,
+            "screen_name": screen_name,
         }
 
-        followers = []
-
-        for date, follower in tweet_q.values_list("data_time","follower"):
-            followers.append({
-                "date": date.strftime("%Y-%m-%d"),
-                "followers": follower
-            })
-
-        data["followers"] = followers
+    return Response({"status": True, "data": default_data},status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def getStats(request):
+    seiyuu = request.GET.get("seiyuu")
+    if not seiyuu in ["kaorin","akarin","chemi"]:
+        return Response({'status':False, 'message': 'Requested Seiyuu does not match any'},status=status.HTTP_400_BAD_REQUEST)
+
+    timezone_name = request.META.get('TIME_ZONE', 'Asia/Taipei')
+
+    start_date_str = request.GET.get("start_date")
+    end_date_str = request.GET.get("end_date")
+    if not (start_date_str and end_date_str):
+        return Response({'status':False, 'message': 'Requested time interval missing'},status=status.HTTP_400_BAD_REQUEST)
 
 
-        return Response(data,status=status.HTTP_200_OK)
+    tweet_q = None
+    try:
+        the_timezone = pytz.timezone(timezone_name)
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        start_date = the_timezone.localize(start_date).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+        end_date = the_timezone.localize(end_date).replace(hour=23, minute=59, second=59, microsecond=999999)
+        tweet_q = Tweet.objects.filter(media__seiyuu__id_name=seiyuu,post_time__gte=start_date,post_time__lte=end_date,data_time__isnull=False).order_by("data_time")
+    except TypeError:
+        return Response({'status':False, 'message': 'Requested time interval has incorrect format'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'status':False, 'message': 'Unknown exception: {}'.format(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    if not tweet_q:
+        return Response({'status':False, 'message': 'No Tweets found in the given interval'}, status=status.HTTP_404_NOT_FOUND)
+    
+    data = {
+        "status": True,
+        "start_date": tweet_q.first().post_time.strftime("%Y-%m-%d %H:%M"),
+        "end_date": tweet_q.last().post_time.strftime("%Y-%m-%d %H:%M"),
+        "interval": (tweet_q.last().post_time - tweet_q.first().post_time) / timedelta(hours=1),
+        "posts": tweet_q.count(),
+        "likes": tweet_q.aggregate(sum_likes=Sum('like'))['sum_likes'] or 0,
+        "rts": tweet_q.aggregate(sum_rts=Sum('rt'))['sum_rts'] or 0,
+        "max_likes": str(tweet_q.order_by('-like').first().id),
+        "max_rts": str(tweet_q.order_by('-rt').first().id),
+        "seiyuu": seiyuu,
+    }
+
+    followers = []
+
+    for date, follower in tweet_q.values_list("data_time","follower"):
+        followers.append({
+            "date": date.strftime("%Y-%m-%d %H:%M:%S"),
+            "followers": follower
+        })
+
+    data["followers"] = followers
+
+
+
+
+    return Response(data,status=status.HTTP_200_OK)
 
             
         
