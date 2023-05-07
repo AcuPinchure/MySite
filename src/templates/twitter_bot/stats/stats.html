@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Twitter Bot</title>
+    <!--Semantic ui-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- chartjs-adapter-date-fns library -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- date-fns en-US locale -->
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.27.0/locale/en-US/index.js"></script>
+    <style>
+        .bot.stats.sidebar,
+        .bot.stats.sidebar.active {
+            z-index: 1500;
+            box-sizing: border-box;
+            position: fixed;
+            width: 15rem;
+            top: 0;
+            left: 0;
+            padding: 1rem;
+            padding-top: 0rem;
+            height: 100svh;
+            background-color: rgb(63, 110, 191);
+        }
+
+        .bot.stats.sidebar_close {
+            display: none;
+        }
+
+        .bot.stats.content {
+            
+            margin-left: 15rem;
+            padding-top: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: rgb(240, 240, 240);
+            min-height: 100svh;
+        }
+
+        .bot.stats.subinfo {
+            color: grey;
+        }
+        .bot.stats.subinfo>.value {
+            display: inline-block;
+            margin-right: 0.4rem;
+            margin-left: 0.4rem;
+            font-size: 1.5rem;
+        }
+
+        .bot.stats.follower.trend.wrapper {
+            overflow: auto;
+        }
+
+        .bot.stats.follower.trend.wrapper .canvas.wrapper {
+            min-width: 600px;
+        }
+
+
+        .bot.stats.title.bar {
+            display: none;
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 0.7rem;
+            background-color: white;
+            width: 100svw;
+            box-shadow: 0px 0px 5px lightgrey;
+        }
+
+        .ui.vertical.text.inverted.menu .item:hover {
+            cursor: pointer;
+        }
+
+
+        @media screen and (max-width: 600px) {
+            .bot.stats.sidebar {
+                padding-top: 1rem;
+                width: 100svw;
+                left: -100svw;
+                transition: left ease 0.5s;
+            }
+            .bot.stats.sidebar.active {
+                padding-top: 1rem;
+                width: 100svw;
+                left: 0;
+            }
+
+            .bot.stats.sidebar_close {
+                display: block;
+            }
+
+            .bot.stats.content {
+                margin-left: 0;
+                padding-top: 4.2rem;
+                background-color: rgb(240, 240, 240);
+                min-height: 100svh;
+            }
+            
+
+            .bot.stats.title.bar {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bot stats title bar">
+        <div class="ui grid">
+            <div class="middle aligned row">
+                <div class="four wide column">
+                    <i class="bars large icon" onclick="toggleSidebar();"></i>
+                </div>
+                <div class="eight wide center aligned column">
+                    <h2>Stats Overview</h2>
+                </div>
+                <div class="four wide column"></div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="bot stats sidebar" id="sidebar">
+        <i class="angle left inverted large icon bot stats sidebar_close" onclick="toggleSidebar();"></i>
+        <div class="ui inverted divider bot stats sidebar_close"></div>
+        <h3 class="ui inverted header">Account</h3>
+        <div class="ui vertical text inverted menu" id="seiyuu_menu"></div>
+        <input type="hidden" id="curr_seiyuu">
+        <div class="ui inverted divider"></div>
+        <h3 class="ui inverted header">Data Interval</h3>
+        <div class="ui inverted form">
+            <div class="field">
+                <label for="start_date_input">Start Date</label>
+                <input type="date" name="" id="start_date_input">
+            </div>
+            <div class="field">
+                <label for="end_date_input">End Date</label>
+                <input type="date" name="" id="end_date_input">
+            </div>
+            <div class="field">
+                <label for="">Fast Pick</label>
+                <div class="ui dropdown fluid right labeled icon button">
+                    Choose Interval
+                    <i class="dropdown icon"></i>
+                    <input type="hidden" onchange="fastPick(this)">
+                    <div class="menu">
+                        <div class="item" data-value="week">Last 7 days</div>
+                        <div class="item" data-value="month">Last 30 days</div>
+                        <div class="item" data-value="year">Last 365 days</div>
+                        <div class="item" data-value="all">All Time</div>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+        
+    </div>
+    <div class="bot stats content">
+        <h1>
+            <span id="seiyuu_name"></span>
+            <span id="seiyuu_id"></span>
+        </h1>
+        <div class="ui three column stackable grid">
+            <div class="column">
+                <div class="ui segment">
+                    <h3><i class="twitter icon"></i>Posts</h3>
+                    <div class="ui statistic">
+                        <div class="value" id="total_posts">164</div>
+                    </div>
+                    <div class="bot stats subinfo">
+                        <span class="value" id="avg_interval">1.1</span>
+                        hours per post
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui segment">
+                    <h3><i class="heart icon"></i>Likes</h3>
+                    <div class="ui statistic">
+                        <div class="value" id="total_likes">1,600</div>
+                    </div>
+                    <div class="bot stats subinfo">
+                        <span class="value" id="avg_likes">35</span>
+                        likes per post
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui segment">
+                    <h3><i class="retweet icon"></i>Retweets</h3>
+                    <div class="ui statistic">
+                        <div class="value" id="total_rts">200</div>
+                    </div>
+                    <div class="bot stats subinfo">
+                        <span class="value" id="avg_rts">12</span>
+                        retweets per post
+                    </div>
+                </div>
+            </div>
+            <div class="sixteen wide column">
+                <div class="ui segment">
+                    <h3><i class="user icon"></i>Followers</h3>
+                    <div class="ui statistic">
+                        <div class="value" id="curr_followers">1200</div>
+                    </div>
+                    <div class="bot stats subinfo">
+                        <span class="value" id="follower_delta">2</span>
+                        more followers per day
+                    </div>
+                    <div class="ui horizontal divider">Trends</div>
+                    <div class="bot stats follower trend wrapper">
+                        <div class="canvas wrapper">
+                            <canvas id="followerTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui segment" id="most_like_tweet_segment">
+                    <h3><i class="fire icon"></i>Most Liked <i class="heart icon"></i></h3>
+                    <!-- Twitter Embed API for the most liked tweet -->
+                    <div id="most_like_tweet">
+                    </div> 
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui segment" id="most_rt_tweet_segment">
+                    <h3><i class="fire icon"></i>Most Retweeted <i class="retweet icon"></i></h3>
+                    <!-- Twitter Embed API for the most liked tweet -->
+                    <div id="most_rt_tweet">
+                    </div> 
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+    <script>
+        window.twttr = (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0],
+          t = window.twttr || {};
+        if (d.getElementById(id)) return t;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      
+        t._e = [];
+        t.ready = function(f) {
+          t._e.push(f);
+        };
+      
+        return t;
+      }(document, "script", "twitter-wjs"));
+    </script>
+
+    <script>
+        $('.ui.dropdown').dropdown();
+    </script>
+
+    <script>
+        var seiyuus;
+        var latest_post_time = new Date();
+        var followerTrendChart;
+
+        window.onload = async () => {
+            const default_values = await fetchDefault();
+            console.log(default_values)
+            /*
+            {
+                "seiyuus": {
+                    "kaorin": {
+                        "name": name,
+                        "screen_name": screen_name,
+                    },
+                },
+                "default_seiyuu": default_seiyuu.id_name,
+                "latest_post_time": latest_post.post_time.strftime("%Y-%m-%d")
+            }
+            */
+            seiyuus = default_values.data.seiyuus;
+            document.getElementById("curr_seiyuu").value = Object.keys(seiyuus)[0];
+            const seiyuu_menu = document.getElementById("seiyuu_menu");
+            const start_input = document.getElementById("start_date_input");
+            const end_input = document.getElementById("end_date_input");
+            seiyuu_menu.innerHTML = ``;
+            for (let id_name in seiyuus) {
+                //console.log(id_name)
+                seiyuu_menu.innerHTML += `<div class="item" data-seiyuu="${id_name}" onclick="switchSeiyuu(this)">${seiyuus[id_name].name}</div>`;
+            }
+            latest_post_time = new Date(Date.parse(default_values.data.latest_post_time));
+            end_input.value = latest_post_time.toISOString().slice(0, 10);
+            const week_ago_time = new Date(latest_post_time.getTime() - (7 * 24 * 60 * 60 * 1000));
+            start_input.value = week_ago_time.toISOString().slice(0, 10);
+            updateStats();
+            start_input.onchange = () => {
+                updateStats();
+            }
+            end_input.onchange = () => {
+                updateStats();
+            }
+        }
+
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            if (sidebar.classList.contains("active")) {
+                sidebar.classList.remove("active");
+            }
+            else {
+                sidebar.classList.add("active");
+            }
+        }
+
+        function fastPick(element) {
+            const type = element.value;
+            let ago_time;
+            if (type === "week") {
+                ago_time = new Date(latest_post_time.getTime() - (7 * 24 * 60 * 60 * 1000));
+            }
+            else if (type === "month") {
+                ago_time = new Date(latest_post_time.getTime() - (30 * 24 * 60 * 60 * 1000));
+            }
+            else if (type === "year") {
+                ago_time = new Date(latest_post_time.getTime() - (365 * 24 * 60 * 60 * 1000));
+            }
+            else if (type === "all") {
+                ago_time = new Date("2020-05-01");
+            }
+
+            document.getElementById("end_date_input").value = latest_post_time.toISOString().slice(0, 10);
+            document.getElementById("start_date_input").value = ago_time.toISOString().slice(0, 10);
+
+            updateStats();
+        }
+
+        function switchSeiyuu(element) {
+            const seiyuu = element.getAttribute("data-seiyuu");
+            document.getElementById("curr_seiyuu").value = seiyuu;
+            updateStats();
+        }
+
+
+        async function updateStats() {
+            const start_date = document.getElementById("start_date_input").value;
+            const end_date = document.getElementById("end_date_input").value;
+            const seiyuu = document.getElementById("curr_seiyuu").value;
+
+            document.getElementById("sidebar").classList.remove("active");
+
+            document.getElementById("total_posts").parentNode.parentNode.classList.add("loading");
+            document.getElementById("total_likes").parentNode.parentNode.classList.add("loading");
+            document.getElementById("total_rts").parentNode.parentNode.classList.add("loading");
+            document.getElementById("curr_followers").parentNode.parentNode.classList.add("loading");
+            document.getElementById("most_like_tweet_segment").classList.add("loading");
+            document.getElementById("most_rt_tweet_segment").classList.add("loading");
+
+            if (start_date && end_date && seiyuu) {
+                if (start_date.length > 0 && end_date.length > 0 && seiyuu.length > 0) {
+                    const data = await fetchStatsData(seiyuu, start_date, end_date);
+                    console.log(data)
+                    /*
+                    {
+                        "status": True,
+                        "start_date": start_date_str,
+                        "end_date": end_date_str,
+                        "interval": (tweet_q.last().post_time.strftime("%Y-%m-%d %H:%M") - tweet_q.first().post_time.strftime("%Y-%m-%d %H:%M")) / timedelta(hours=1),
+                        "posts": tweet_q.count(),
+                        "likes": tweet_q.aggregate(sum_likes=Sum('like'))['sum_likes'] or 0,
+                        "rts": tweet_q.aggregate(sum_rts=Sum('rt'))['sum_rts'] or 0,
+                        "max_likes": tweet_q.order_by('-like').first().id,
+                        "max_rts": tweet_q.order_by('-rt').first().id,
+                        "seiyuu": seiyuu,
+                        "followers": [
+                            "date": date.strftime("%Y-%m-%d"),
+                            "followers": follower
+                        ]
+                    }
+                    */
+                    if (data.status) {
+                        document.getElementById("seiyuu_name").textContent = seiyuus[data.seiyuu].name;
+                        document.getElementById("seiyuu_id").textContent = `(@${seiyuus[data.seiyuu].screen_name})`;
+                        document.getElementById("total_posts").textContent = data.posts.toLocaleString('en-US');
+                        document.getElementById("avg_interval").textContent = (data.posts / data.interval).toFixed(2);
+                        document.getElementById("total_posts").parentNode.parentNode.classList.remove("loading");
+                        document.getElementById("total_likes").textContent = data.likes.toLocaleString('en-US');
+                        document.getElementById("avg_likes").textContent = (data.likes / data.posts).toFixed(2);
+                        document.getElementById("total_likes").parentNode.parentNode.classList.remove("loading");
+                        document.getElementById("total_rts").textContent = data.rts.toLocaleString('en-US');
+                        document.getElementById("avg_rts").textContent = (data.rts / data.posts).toFixed(2);
+                        document.getElementById("total_rts").parentNode.parentNode.classList.remove("loading");
+                        document.getElementById("curr_followers").textContent = data.followers[data.followers.length - 1].followers.toLocaleString('en-US');
+                        document.getElementById("follower_delta").textContent = ((data.followers[data.followers.length - 1].followers - data.followers[0].followers) / (data.interval / 24)).toFixed(2);
+                        await createFollowerTrendChart(data.followers);
+                        document.getElementById("curr_followers").parentNode.parentNode.classList.remove("loading");
+
+                        embedTweet(data.max_likes, "most_like_tweet");
+                        document.getElementById('most_like_tweet_segment').classList.remove("loading");
+                        embedTweet(data.max_rts, "most_rt_tweet");
+                        document.getElementById('most_rt_tweet_segment').classList.remove("loading");
+                    }
+                }
+            }
+        }
+
+        function embedTweet(tweet_id, container_id) {
+            const tweet_container = document.getElementById(container_id);
+        
+            // Remove any existing embedded tweets from the container
+            while (tweet_container.firstChild) {
+                tweet_container.removeChild(tweet_container.firstChild);
+            }
+        
+            // Create a new embedded tweet element
+            const tweet_embed = document.createElement("blockquote");
+            tweet_embed.classList.add("twitter-tweet");
+            tweet_embed.innerHTML = `<a href="https://twitter.com/Twitter/status/${tweet_id}"></a>`;
+        
+            // Add the embedded tweet element to the container
+            tweet_container.appendChild(tweet_embed);
+        
+            // Reload the Twitter widget JavaScript to render the embedded tweet
+            if (typeof twttr !== "undefined") {
+                twttr.widgets.load();
+            }
+        }
+
+        async function fetchDefault() {
+            const apiURL = "{% url 'bot:load_default_stats' %}";
+            try {
+                const response = await fetch(apiURL);
+                const data = await response.json();
+                //console.log(data)
+                return data;
+            } catch (error) {
+                console.error("Error fetching follower data:", error);
+            }
+        }
+
+        
+
+        async function fetchStatsData(seiyuu, start_date, end_date) {
+            // Replace this URL with your backend API endpoint
+            const apiURL = "{% url 'bot:get_stats' %}";
+
+        
+            try {
+                const response = await fetch(apiURL+`?seiyuu=${seiyuu}&start_date=${start_date}&end_date=${end_date}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching follower data:", error);
+            }
+        }
+        
+
+        function createFollowerTrendChart(followerData) {
+            /*
+            data format:
+            [
+                {"date": "2019-02-01", "followers": 1200},
+                {"date": "2019-02-08", "followers": 1300},
+                {"date": "2019-02-15", "followers": 1400},
+                {"date": "2019-02-22", "followers": 1500}
+            ]
+            */
+
+            const ctx = document.getElementById("followerTrendChart").getContext("2d");
+
+            // Destroy the old chart instance if it exists
+            if (followerTrendChart) {
+                followerTrendChart.destroy();
+            }
+        
+            followerTrendChart =  new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: followerData.map((item) => item.date),
+                    datasets: [
+                        {
+                            label: "Followers",
+                            data: followerData.map((item) => item.followers),
+                            borderColor: "rgb(63, 110, 191)",
+                            backgroundColor: "rgb(63, 110, 191)",
+                            tension: 0.1,
+                        },
+                    ],
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                          display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: "time",
+                            time: {
+                                unit: "week",
+                                parser: "yyyy-MM-dd HH:mm:SS", // Add this line to specify the date format
+                                locale: "en-US", // Add this line to set the locale
+                            },
+                            adapters: {
+                                date: "date-fns", // Specify the adapter name without locale configuration
+                            },
+                        },
+                        y: {
+                            beginAtZero: false,
+                        },
+                    },
+                },
+                
+            });
+        }
+    </script>
+
+</body>
+</html>
