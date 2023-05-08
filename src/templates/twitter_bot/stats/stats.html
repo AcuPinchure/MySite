@@ -17,27 +17,59 @@
     <!-- date-fns en-US locale -->
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.27.0/locale/en-US/index.js"></script>
     <style>
+        .bot.site_title {
+            font-style: italic;
+            color: white;
+            margin-bottom: 0;
+        }
+
+
+        .bot.site_subinfo {
+            color: lightgrey;
+        }
+
         .bot.stats.sidebar,
         .bot.stats.sidebar.active {
             z-index: 1500;
             box-sizing: border-box;
             position: fixed;
             width: 15rem;
-            top: 0;
-            left: 0;
             padding: 1rem;
             padding-top: 0rem;
-            height: 100svh;
-            background-color: rgb(63, 110, 191);
+            height: 100vh;
+        }
+
+        .bot.stats.sidebar {
+            transition: left ease 0.3s, right ease 0.3s;
+        }
+
+        .bot.stats.left.sidebar {
+            top: 0;
+            left: 0;
+            background-color: rgb(27, 9, 56);
+        }
+
+        .bot.stats.right.sidebar {
+            top: 0;
+            right: 0;
+            background-color: rgb(240, 240, 240);
         }
 
         .bot.stats.sidebar_close {
             display: none;
         }
 
+        .bot.stats.left.sidebar_close {
+            text-align: left;
+        }
+
+        .bot.stats.right.sidebar_close {
+            text-align: right;
+        }
+
         .bot.stats.content {
-            
             margin-left: 15rem;
+            margin-right: 15rem;
             padding-top: 1rem;
             padding-left: 1rem;
             padding-right: 1rem;
@@ -72,7 +104,7 @@
             left: 0;
             padding: 0.7rem;
             background-color: white;
-            width: 100svw;
+            width: 100vw;
             box-shadow: 0px 0px 5px lightgrey;
         }
 
@@ -80,19 +112,49 @@
             cursor: pointer;
         }
 
+        @media screen and (max-width: 1300px) {
+            .bot.stats.right.sidebar {
+                padding-top: 1rem;
+                width: 100vw;
+                right: -100vw;
+            }
+
+            .bot.stats.right.sidebar_close {
+                display: block;
+            }
+
+            .bot.stats.right.sidebar.active {
+                padding-top: 1rem;
+                right: 0;
+            }
+
+            .bot.stats.content {
+                margin-right: 0;
+                padding-top: 4.2rem;
+            }
+
+            .bot.stats.title.bar {
+                display: block;
+            }
+        }
+
 
         @media screen and (max-width: 600px) {
-            .bot.stats.sidebar {
+            .bot.stats.left.sidebar {
                 padding-top: 1rem;
-                width: 100svw;
-                left: -100svw;
-                transition: left ease 0.5s;
+                width: 100vw;
+                left: -100vw;
             }
-            .bot.stats.sidebar.active {
+
+            .bot.stats.left.sidebar_close {
+                display: block;
+            }
+
+            .bot.stats.left.sidebar.active {
                 padding-top: 1rem;
-                width: 100svw;
                 left: 0;
             }
+
 
             .bot.stats.sidebar_close {
                 display: block;
@@ -100,15 +162,11 @@
 
             .bot.stats.content {
                 margin-left: 0;
-                padding-top: 4.2rem;
                 background-color: rgb(240, 240, 240);
-                min-height: 100svh;
+                min-height: 100vh;
             }
             
 
-            .bot.stats.title.bar {
-                display: block;
-            }
         }
     </style>
 </head>
@@ -116,26 +174,52 @@
     <div class="bot stats title bar">
         <div class="ui grid">
             <div class="middle aligned row">
-                <div class="four wide column">
-                    <i class="bars large icon" onclick="toggleSidebar();"></i>
+                <div class="two wide column">
+                    <i class="bars large icon" onclick="toggleSidebar('sidebar_left');"></i>
                 </div>
-                <div class="eight wide center aligned column">
-                    <h2>Stats Overview</h2>
+                <div class="twelve wide center aligned column">
+                    <h2>Statistics Overview</h2>
                 </div>
-                <div class="four wide column"></div>
+                <div class="two wide column">
+                    <i class="sliders horizontal large icon" onclick="toggleSidebar('sidebar_right');"></i>
+                </div>
             </div>
             
         </div>
     </div>
-    <div class="bot stats sidebar" id="sidebar">
-        <i class="angle left inverted large icon bot stats sidebar_close" onclick="toggleSidebar();"></i>
-        <div class="ui inverted divider bot stats sidebar_close"></div>
-        <h3 class="ui inverted header">Account</h3>
-        <div class="ui vertical text inverted menu" id="seiyuu_menu"></div>
+    <div class="bot stats left sidebar" id="sidebar_left">
+        <div class="bot stats left sidebar_close" onclick="toggleSidebar('sidebar_left');">
+            <i class="angle left large inverted icon"></i>
+        </div>
+        <h1 class="bot inverted site_title">Nijigasaki<br>Seiyuu Bot</h1>
+        <div class="bot inverted site_subinfo">by AcuPinchure</div>
+        <div class="ui divider"></div>
+        <div class="ui vertical inverted large text menu">
+            <a href="" class="item">
+                <i class="home icon"></i>
+                About
+            </a>
+            <a href="" class="item">
+                <i class="chart bar icon"></i>
+                Statistics
+            </a>
+            <a href="" class="item">
+                <i class="tachometer alternate icon"></i>
+                Server Status
+            </a>
+        </div>
+    </div>
+    <div class="bot stats right sidebar" id="sidebar_right">
+        <div class="bot stats right sidebar_close" onclick="toggleSidebar('sidebar_right');">
+            <i class="angle right large icon"></i>
+        </div>
+        <div class="ui divider bot stats sidebar_close"></div>
+        <h3 class="ui header">Account</h3>
+        <div class="ui vertical text menu" id="seiyuu_menu"></div>
         <input type="hidden" id="curr_seiyuu">
-        <div class="ui inverted divider"></div>
-        <h3 class="ui inverted header">Data Interval</h3>
-        <div class="ui inverted form">
+        <div class="ui divider"></div>
+        <h3 class="ui header">Data Interval</h3>
+        <div class="ui form">
             <div class="field">
                 <label for="start_date_input">Start Date</label>
                 <input type="date" name="" id="start_date_input">
@@ -145,9 +229,9 @@
                 <input type="date" name="" id="end_date_input">
             </div>
             <div class="field">
-                <label for="">Fast Pick</label>
+                <label for="">Preset</label>
                 <div class="ui dropdown fluid right labeled icon button">
-                    Choose Interval
+                    Choose Preset
                     <i class="dropdown icon"></i>
                     <input type="hidden" onchange="fastPick(this)">
                     <div class="menu">
@@ -158,10 +242,8 @@
                     </div>
                 </div>
             </div>
-            
-            
+            <button class="ui fluid button" onclick="toggleSidebar('sidebar_right');updateStats();">Apply</button>
         </div>
-        
     </div>
     <div class="bot stats content">
         <h1>
@@ -303,17 +385,11 @@
             const week_ago_time = new Date(latest_post_time.getTime() - (7 * 24 * 60 * 60 * 1000));
             start_input.value = week_ago_time.toISOString().slice(0, 10);
             updateStats();
-            start_input.onchange = () => {
-                updateStats();
-            }
-            end_input.onchange = () => {
-                updateStats();
-            }
         }
 
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
+        function toggleSidebar(sidebar_id) {
+            const sidebar = document.getElementById(sidebar_id);
             if (sidebar.classList.contains("active")) {
                 sidebar.classList.remove("active");
             }
@@ -340,13 +416,14 @@
 
             document.getElementById("end_date_input").value = latest_post_time.toISOString().slice(0, 10);
             document.getElementById("start_date_input").value = ago_time.toISOString().slice(0, 10);
-
+            toggleSidebar('sidebar_right');
             updateStats();
         }
 
         function switchSeiyuu(element) {
             const seiyuu = element.getAttribute("data-seiyuu");
             document.getElementById("curr_seiyuu").value = seiyuu;
+            toggleSidebar('sidebar_right');
             updateStats();
         }
 
@@ -355,8 +432,6 @@
             const start_date = document.getElementById("start_date_input").value;
             const end_date = document.getElementById("end_date_input").value;
             const seiyuu = document.getElementById("curr_seiyuu").value;
-
-            document.getElementById("sidebar").classList.remove("active");
 
             document.getElementById("total_posts").parentNode.parentNode.classList.add("loading");
             document.getElementById("total_likes").parentNode.parentNode.classList.add("loading");
