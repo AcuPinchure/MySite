@@ -17,6 +17,10 @@
     <!-- date-fns en-US locale -->
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.27.0/locale/en-US/index.js"></script>
     <style>
+        :root {
+            --bar-width: 15rem;
+        }
+
         .bot.site_title {
             font-style: italic;
             color: white;
@@ -33,7 +37,7 @@
             z-index: 1500;
             box-sizing: border-box;
             position: fixed;
-            width: 15rem;
+            width: var(--bar-width);
             padding: 1rem;
             padding-top: 0rem;
             height: 100vh;
@@ -68,8 +72,8 @@
         }
 
         .bot.stats.content {
-            margin-left: 15rem;
-            margin-right: 15rem;
+            margin-left: var(--bar-width);
+            margin-right: var(--bar-width);
             padding-top: 1rem;
             padding-left: 1rem;
             padding-right: 1rem;
@@ -108,6 +112,10 @@
             box-shadow: 0px 0px 5px lightgrey;
         }
 
+        .bot.stats.bar_icon {
+            display: none;
+        }
+
         .ui.vertical.text.inverted.menu .item:hover {
             cursor: pointer;
         }
@@ -115,7 +123,7 @@
         @media screen and (max-width: 1300px) {
             .bot.stats.right.sidebar {
                 padding-top: 1rem;
-                width: 100vw;
+                width: var(--bar-width);
                 right: -100vw;
             }
 
@@ -135,6 +143,12 @@
 
             .bot.stats.title.bar {
                 display: block;
+                width: calc(100vw - var(--bar-width));
+                margin-left: var(--bar-width);
+            }
+
+            .bot.stats.right.bar_icon {
+                display: inline;
             }
         }
 
@@ -142,7 +156,7 @@
         @media screen and (max-width: 600px) {
             .bot.stats.left.sidebar {
                 padding-top: 1rem;
-                width: 100vw;
+                width: var(--bar-width);
                 left: -100vw;
             }
 
@@ -165,8 +179,16 @@
                 background-color: rgb(240, 240, 240);
                 min-height: 100vh;
             }
-            
 
+            .bot.stats.title.bar {
+                display: block;
+                width: 100vw;
+                margin-left: var(--bar-width);
+            }
+            
+            .bot.stats.left.bar_icon {
+                display: inline;
+            }
         }
     </style>
 </head>
@@ -175,13 +197,13 @@
         <div class="ui grid">
             <div class="middle aligned row">
                 <div class="two wide column">
-                    <i class="bars large icon" onclick="toggleSidebar('sidebar_left');"></i>
+                    <i class="bot stats left bar_icon bars large icon" onclick="toggleSidebar('sidebar_left');"></i>
                 </div>
                 <div class="twelve wide center aligned column">
                     <h2>Statistics Overview</h2>
                 </div>
-                <div class="two wide column">
-                    <i class="sliders horizontal large icon" onclick="toggleSidebar('sidebar_right');"></i>
+                <div class="two wide right aligned column">
+                    <i class="bot stats right bar_icon sliders horizontal large icon" onclick="toggleSidebar('sidebar_right');"></i>
                 </div>
             </div>
             
@@ -233,12 +255,11 @@
                 <div class="ui dropdown fluid right labeled icon button">
                     Choose Preset
                     <i class="dropdown icon"></i>
-                    <input type="hidden" onchange="fastPick(this)">
                     <div class="menu">
-                        <div class="item" data-value="week">Last 7 days</div>
-                        <div class="item" data-value="month">Last 30 days</div>
-                        <div class="item" data-value="year">Last 365 days</div>
-                        <div class="item" data-value="all">All Time</div>
+                        <div class="item" data-value="week" onclick="fastPick(this)">Last 7 days</div>
+                        <div class="item" data-value="month" onclick="fastPick(this)">Last 30 days</div>
+                        <div class="item" data-value="year" onclick="fastPick(this)">Last 365 days</div>
+                        <div class="item" data-value="all" onclick="fastPick(this)">All Time</div>
                     </div>
                 </div>
             </div>
@@ -255,10 +276,10 @@
                 <div class="ui segment">
                     <h3><i class="twitter icon"></i>Posts</h3>
                     <div class="ui statistic">
-                        <div class="value" id="total_posts">164</div>
+                        <div class="value" id="total_posts">0</div>
                     </div>
                     <div class="bot stats subinfo">
-                        <span class="value" id="avg_interval">1.1</span>
+                        <span class="value" id="avg_interval">0</span>
                         hours per post
                     </div>
                 </div>
@@ -267,10 +288,10 @@
                 <div class="ui segment">
                     <h3><i class="heart icon"></i>Likes</h3>
                     <div class="ui statistic">
-                        <div class="value" id="total_likes">1,600</div>
+                        <div class="value" id="total_likes">0</div>
                     </div>
                     <div class="bot stats subinfo">
-                        <span class="value" id="avg_likes">35</span>
+                        <span class="value" id="avg_likes">0</span>
                         likes per post
                     </div>
                 </div>
@@ -279,10 +300,10 @@
                 <div class="ui segment">
                     <h3><i class="retweet icon"></i>Retweets</h3>
                     <div class="ui statistic">
-                        <div class="value" id="total_rts">200</div>
+                        <div class="value" id="total_rts">0</div>
                     </div>
                     <div class="bot stats subinfo">
-                        <span class="value" id="avg_rts">12</span>
+                        <span class="value" id="avg_rts">0</span>
                         retweets per post
                     </div>
                 </div>
@@ -291,10 +312,10 @@
                 <div class="ui segment">
                     <h3><i class="user icon"></i>Followers</h3>
                     <div class="ui statistic">
-                        <div class="value" id="curr_followers">1200</div>
+                        <div class="value" id="curr_followers">0</div>
                     </div>
                     <div class="bot stats subinfo">
-                        <span class="value" id="follower_delta">2</span>
+                        <span class="value" id="follower_delta">0</span>
                         more followers per day
                     </div>
                     <div class="ui horizontal divider">Trends</div>
@@ -399,7 +420,7 @@
         }
 
         function fastPick(element) {
-            const type = element.value;
+            const type = element.getAttribute("data-value");
             let ago_time;
             if (type === "week") {
                 ago_time = new Date(latest_post_time.getTime() - (7 * 24 * 60 * 60 * 1000));
@@ -466,7 +487,7 @@
                         document.getElementById("seiyuu_name").textContent = seiyuus[data.seiyuu].name;
                         document.getElementById("seiyuu_id").textContent = `(@${seiyuus[data.seiyuu].screen_name})`;
                         document.getElementById("total_posts").textContent = data.posts.toLocaleString('en-US');
-                        document.getElementById("avg_interval").textContent = (data.posts / data.interval).toFixed(2);
+                        document.getElementById("avg_interval").textContent = ((data.posts - 1) / data.interval).toFixed(2);
                         document.getElementById("total_posts").parentNode.parentNode.classList.remove("loading");
                         document.getElementById("total_likes").textContent = data.likes.toLocaleString('en-US');
                         document.getElementById("avg_likes").textContent = (data.likes / data.posts).toFixed(2);
@@ -581,7 +602,7 @@
                         x: {
                             type: "time",
                             time: {
-                                unit: "week",
+                                unit: "day",
                                 parser: "yyyy-MM-dd HH:mm:SS", // Add this line to specify the date format
                                 locale: "en-US", // Add this line to set the locale
                             },
