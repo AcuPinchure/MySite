@@ -34,7 +34,7 @@
 
         .bot.stats.sidebar,
         .bot.stats.sidebar.active {
-            z-index: 1500;
+            z-index: 150;
             box-sizing: border-box;
             position: fixed;
             width: var(--bar-width);
@@ -102,7 +102,7 @@
 
         .bot.stats.title.bar {
             display: none;
-            z-index: 1000;
+            z-index: 100;
             position: fixed;
             top: 0;
             left: 0;
@@ -330,19 +330,36 @@
                 <div class="ui segment" id="most_like_tweet_segment">
                     <h3><i class="fire icon"></i>Most Liked <i class="heart icon"></i></h3>
                     <!-- Twitter Embed API for the most liked tweet -->
-                    <div id="most_like_tweet">
-                    </div> 
+                    <div id="max_like_tweet"></div>
+                    <button class="ui button" onclick="$('#top_like_tweets_modal').modal('show')">See top 10</button>
                 </div>
             </div>
             <div class="eight wide column">
                 <div class="ui segment" id="most_rt_tweet_segment">
                     <h3><i class="fire icon"></i>Most Retweeted <i class="retweet icon"></i></h3>
                     <!-- Twitter Embed API for the most liked tweet -->
-                    <div id="most_rt_tweet">
-                    </div> 
-                    
+                    <div id="max_rt_tweet"></div>
+                    <button class="ui button" onclick="$('#top_rt_tweets_modal').modal('show')">See top 10</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="ui modal" id="top_like_tweets_modal">
+        <div class="header">Top Liked Tweets</div>
+        <div class="content">
+            <center>
+                <div id="top_like_tweets"></div>
+            </center>
+        </div>
+    </div>
+
+    <div class="ui modal" id="top_rt_tweets_modal">
+        <div class="header">Top Retweeted Tweets</div>
+        <div class="content">
+            <center>
+                <div id="top_rt_tweets"></div>
+            </center>
         </div>
     </div>
 
@@ -500,12 +517,47 @@
                         await createFollowerTrendChart(data.followers);
                         document.getElementById("curr_followers").parentNode.parentNode.classList.remove("loading");
 
-                        embedTweet(data.max_likes, "most_like_tweet");
+                        // add top likes
+                        const top_likes_container = document.getElementById("top_like_tweets");
+                        top_likes_container.innerHTML = "";
+                        const top_rts_container = document.getElementById("top_rt_tweets");
+                        top_rts_container.innerHTML = "";
+
+                        embedTweet(data.top_likes[0], `max_like_tweet`);
+                        embedTweet(data.top_rts[0], `max_rt_tweet`);
+
+                        for (let idx = 0 ; idx < data.top_likes.length ; idx++) {
+                            top_likes_container.innerHTML += `<h3>Top Liked #${idx+1}</h3>`;
+                            top_likes_container.innerHTML += `<div id="top_like_tweet_${idx+1}"></div>`;
+                            top_likes_container.innerHTML += `<div class="ui divider"></div>`;
+                            if (idx > 0) {
+                                document.getElementById(`top_like_tweet_${idx+1}`).classList.add("bot", "stats", "secondary", "info");
+                            }
+                            embedTweet(data.top_likes[idx], `top_like_tweet_${idx+1}`);
+                        }
+                        for (let idx = 0 ; idx < data.top_rts.length ; idx++) {
+                            top_rts_container.innerHTML += `<h3>Top Retweeted #${idx+1}</h3>`;
+                            top_rts_container.innerHTML += `<div id="top_rt_tweet_${idx+1}"></div>`;
+                            top_rts_container.innerHTML += `<div class="ui divider"></div>`;
+                            if (idx > 0) {
+                                document.getElementById(`top_rt_tweet_${idx+1}`).classList.add("bot", "stats", "secondary", "info");
+                            }
+                            embedTweet(data.top_rts[idx], `top_rt_tweet_${idx+1}`);
+                        }
+
+                        // Reload the Twitter widget JavaScript to render the embedded tweet
+                        await reloadTwitterWidget();
+
                         document.getElementById('most_like_tweet_segment').classList.remove("loading");
-                        embedTweet(data.max_rts, "most_rt_tweet");
                         document.getElementById('most_rt_tweet_segment').classList.remove("loading");
                     }
                 }
+            }
+        }
+
+        async function reloadTwitterWidget() {
+            if (typeof twttr !== "undefined") {
+                await twttr.widgets.load();
             }
         }
 
@@ -524,11 +576,6 @@
         
             // Add the embedded tweet element to the container
             tweet_container.appendChild(tweet_embed);
-        
-            // Reload the Twitter widget JavaScript to render the embedded tweet
-            if (typeof twttr !== "undefined") {
-                twttr.widgets.load();
-            }
         }
 
         async function fetchDefault() {

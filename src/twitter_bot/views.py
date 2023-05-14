@@ -103,10 +103,15 @@ def getStats(request):
         "posts": tweet_q.count(),
         "likes": tweet_q.aggregate(sum_likes=Sum('like'))['sum_likes'] or 0,
         "rts": tweet_q.aggregate(sum_rts=Sum('rt'))['sum_rts'] or 0,
-        "max_likes": str(tweet_q.order_by('-like').first().id),
-        "max_rts": str(tweet_q.order_by('-rt').first().id),
+        "top_likes": [],
+        "top_rts": [],
         "seiyuu": seiyuu,
     }
+
+    top_like_id_list = tweet_q.order_by('-like')[:10].values_list("id", flat=True)
+    data["top_likes"] = list(map(str, top_like_id_list))
+    top_rt_id_list = tweet_q.order_by('-rt')[:10].values_list("id", flat=True)
+    data["top_rts"] = list(map(str, top_rt_id_list))
 
     followers = []
 
