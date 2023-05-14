@@ -183,7 +183,7 @@
             .bot.stats.title.bar {
                 display: block;
                 width: 100vw;
-                margin-left: var(--bar-width);
+                margin-left: 0;
             }
             
             .bot.stats.left.bar_icon {
@@ -546,7 +546,7 @@
                         }
 
                         // Reload the Twitter widget JavaScript to render the embedded tweet
-                        await reloadTwitterWidget();
+                        reloadTwitterWidget();
 
                         document.getElementById('most_like_tweet_segment').classList.remove("loading");
                         document.getElementById('most_rt_tweet_segment').classList.remove("loading");
