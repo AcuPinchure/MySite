@@ -38,6 +38,8 @@ def data_once(name):
         tweet.rt = tweet_data.retweet_count
         tweet.follower = api.get_user(screen_name=bot_id).followers_count
 
+        # disable rter tracking to avoid over usage
+        """
         spread_count = 0
 
         # get rt user info
@@ -69,6 +71,7 @@ def data_once(name):
             tweet.rt_user.add(the_user)
 
             the_user.save()
+        """
 
         tweet.rt_spread=spread_count
 
