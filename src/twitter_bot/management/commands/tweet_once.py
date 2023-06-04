@@ -8,8 +8,8 @@ from django.core.management.base import BaseCommand
 from pathlib import Path
 
 def post_once(name):
-    api, oauth = auth_api(name)
-    if not (api and oauth):
+    api, oauth, client = auth_api(name)
+    if not (api and oauth and client):
         print("[{}] Error during authentication".format(name))
         return False
     print("[{}] Authentication OK".format(name))
@@ -17,12 +17,15 @@ def post_once(name):
     if name == 'Kaorin':
         search = '前田佳織里'
         bot_id = 'kaorin__bot'
+        bot_user_id = '1215195999552933888'
     elif name == 'Chemi':
         search = '田中ちえ美'
         bot_id = 'chiemi__bot'
+        bot_user_id = '1272424253447495680'
     elif name == 'Akarin':
         search = '鬼頭明里'
         bot_id = 'akarin__bot'
+        bot_user_id = '1316986331965263872'
 
     media_q = Media.objects.filter(seiyuu__name=search)
     media_pks = media_q.values_list('pk', flat=True)
@@ -35,14 +38,17 @@ def post_once(name):
     f_path = os.path.join(Path(os.getcwd()).parent,random_file_path)
     f_type = random_media.file_type
     f_format = [f_type, 'tweet_{}'.format(f_type.split('/')[0])]
-    mediaUpload(f_path, oauth, f_format)
+    tweet_id = mediaUpload(f_path, oauth, f_format, client)
 
-    the_tweet = api.user_timeline(user_id=bot_id, count=1)[0]
+    #the_tweet = api.user_timeline(user_id=bot_id, count=1)[0]  # v1
+    #the_tweet = client.get_users_tweets(id=bot_user_id, max_results=5)[0] # v2
     
-    print("[{}] Posted tweet ID: {}".format(name,the_tweet.id))
+    print("[{}] Posted tweet ID: {}".format(name,tweet_id))
     
     tweet_instance = Tweet(
-        id=the_tweet.id,
+        #id=the_tweet.id, # v1
+        #id=the_tweet['id'] # v2
+        id=int(tweet_id),
         post_time=now(),
         media=random_media
     )
@@ -54,7 +60,8 @@ class Command(BaseCommand):
     help = "Pick a random media and post once"
     
     def handle(self, *args, **kwargs):
-        names = ['Kaorin','Chemi','Akarin']
+        #names = ['Kaorin','Chemi','Akarin']
+        names = ['Chemi']
         for name in names:
             ret = post_once(name)
             if ret:

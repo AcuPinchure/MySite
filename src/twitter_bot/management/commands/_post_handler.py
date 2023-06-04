@@ -16,7 +16,7 @@ POST_TWEET_URL = 'https://api.twitter.com/1.1/statuses/update.json'
 
 class MediaTweet(object):
 
-    def __init__(self, file_name, auth):
+    def __init__(self, file_name, auth, client):
         '''
         Defines video tweet properties
         '''
@@ -25,12 +25,13 @@ class MediaTweet(object):
         self.media_id = None
         self.processing_info = None
         self.auth = auth
+        self.client = client
 
     def upload_init(self, form):  # form: ['image/jpg','tweet_image']
         '''
         Initializes Upload
         '''
-        # print('INIT')
+        print('INIT')
 
 # the file format
 
@@ -60,7 +61,7 @@ class MediaTweet(object):
         while bytes_sent < self.total_bytes:
             chunk = file.read(4*1024*1024)
 
-            # print('APPEND')
+            print('APPEND')
 
             request_data = {
                 'command': 'APPEND',
@@ -83,7 +84,7 @@ class MediaTweet(object):
             segment_id = segment_id + 1
             bytes_sent = file.tell()
 
-            #print('%s of %s bytes uploaded' % (str(bytes_sent), str(self.total_bytes)))
+            print('%s of %s bytes uploaded' % (str(bytes_sent), str(self.total_bytes)))
 
         #print('Upload chunks complete.')
 
@@ -100,7 +101,7 @@ class MediaTweet(object):
 
         req = requests.post(url=MEDIA_ENDPOINT_URL,
                             data=request_data, auth=self.auth)
-        # print(req.json())
+        print(req.json())
 
         self.processing_info = req.json().get('processing_info', None)
         self.check_status()
@@ -114,7 +115,7 @@ class MediaTweet(object):
 
         state = self.processing_info['state']
 
-        #print('Media processing status is %s ' % state)
+        print('Media processing status is %s ' % state)
 
         if state == u'succeeded':
             return
@@ -127,7 +128,7 @@ class MediaTweet(object):
         #print('Checking after %s seconds' % str(check_after_secs))
         time.sleep(check_after_secs)
 
-        # print('STATUS')
+        print('STATUS')
 
         request_params = {
             'command': 'STATUS',
@@ -154,13 +155,19 @@ class MediaTweet(object):
                             data=request_data, auth=self.auth)
         # print(req.json())
 
+    def tweet_v2(self):
+        req = self.client.create_tweet(media_ids=[self.media_id],user_auth=True)
+        print(req)
+        return req.data['id']
 
-def mediaUpload(FILENAME, auth, form):
-    mediaTweet = MediaTweet(FILENAME, auth)
+
+def mediaUpload(FILENAME, auth, form, client):
+    mediaTweet = MediaTweet(FILENAME, auth, client)
     mediaTweet.upload_init(form)
     mediaTweet.upload_append()
     mediaTweet.upload_finalize()
-    mediaTweet.tweet()
+    tweet_id = mediaTweet.tweet_v2()
+    return tweet_id
 
 
 def getForm(ftype):
@@ -183,13 +190,19 @@ root_path = Path(__file__).resolve().parent.parent.parent.parent.parent
 with open(os.path.join(root_path,"data","tokens.json"),"r", encoding="UTF-8") as token_j:
     tokens = json.load(token_j)
 
+with open(os.path.join(root_path,"data","tokens_v2.json"),"r", encoding="UTF-8") as token_v2_j:
+    tokens_v2 = json.load(token_v2_j)
+
 def auth_api(name):
     if name == 'Kaorin':
         the_token = tokens["Kaorin"]
+        the_token_v2 = tokens_v2["Kaorin"]
     elif name == 'Chemi':
         the_token = tokens["Chemi"]
+        the_token_v2 = tokens_v2["Chemi"]
     elif name == 'Akarin':
         the_token = tokens["Akarin"]
+        the_token_v2 = tokens_v2["Akarin"]
     else:
         raise ValueError('Invalid name: {}'.format(name))
 
@@ -203,12 +216,19 @@ def auth_api(name):
 
     try:
         api.verify_credentials()
+        client = tweepy.Client(
+            bearer_token=the_token_v2['bearer_token'],
+            consumer_key=the_token["id"],
+            consumer_secret=the_token["id_secret"],
+            access_token=the_token["access"],
+            access_token_secret=the_token["access_secret"],
+        )
     except tweepy.errors.Unauthorized:
         #print("Error during authentication")
-        return None, None
+        return None, None, None
     else:
         #print("Authentication OK")
-        return api, oauth
+        return api, oauth, client
 
     
 
