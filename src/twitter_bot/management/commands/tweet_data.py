@@ -6,8 +6,8 @@ from datetime import timedelta
 
 
 def data_once(name):
-    api, oauth = auth_api(name)
-    if not (api and oauth):
+    api, oauth, client = auth_api(name)
+    if not (api and oauth and client):
         print("Error during authentication")
         return False
     print("Authentication OK")
@@ -15,12 +15,15 @@ def data_once(name):
     if name == 'Kaorin':
         search = '前田佳織里'
         bot_id = 'kaorin__bot'
+        bot_user_id = '1215195999552933888'
     elif name == 'Chemi':
         search = '田中ちえ美'
         bot_id = 'chiemi__bot'
+        bot_user_id = '1272424253447495680'
     elif name == 'Akarin':
         search = '鬼頭明里'
         bot_id = 'akarin__bot'
+        bot_user_id = '1316986331965263872'
 
     # get tweet q with no data time and
     # more than 24 hours ago
