@@ -231,7 +231,10 @@ def auth_api(name):
         return api, oauth, client
 
     
+def auth_api_v2():
+    client = tweepy.Client(bearer_token=tokens_v2["AcuPinchure"]["bearer_token"])
 
+    return client
 
 
 
