@@ -1,4 +1,4 @@
-from ._post_handler import auth_api
+from ._post_handler import auth_api_v2
 from twitter_bot.models import Tweet,UserAccount
 from django.utils.timezone import now
 from django.core.management.base import BaseCommand
@@ -6,11 +6,7 @@ from datetime import timedelta
 
 
 def data_once(name):
-    api, oauth, client = auth_api(name)
-    if not (api and oauth and client):
-        print("Error during authentication")
-        return False
-    print("Authentication OK")
+    client = auth_api_v2()
 
     if name == 'Kaorin':
         search = '前田佳織里'
@@ -28,6 +24,11 @@ def data_once(name):
     # get tweet q with no data time and
     # more than 24 hours ago
     time_buffer = 24 # hours
+
+    #load followers
+    the_user_data = client.get_user(id=bot_user_id, user_fields="public_metrics")
+
+
     tweet_q = Tweet.objects.filter(
         data_time__isnull=True,
         media__seiyuu__name=search,
@@ -36,10 +37,13 @@ def data_once(name):
     for tweet in tweet_q:
         tweet_id = tweet.id
         print('[{}] Collecting data: {}'.format(name,tweet_id))
-        tweet_data = api.get_status(tweet_id)
-        tweet.like = tweet_data.favorite_count
-        tweet.rt = tweet_data.retweet_count
-        tweet.follower = api.get_user(screen_name=bot_id).followers_count
+        tweet_data = client.get_tweet(id=str(tweet_id),tweet_fields="public_metrics")
+        tweet.like = tweet_data.data.public_metrics["like_count"]
+        tweet.rt = tweet_data.data.public_metrics["retweet_count"]
+        tweet.reply = tweet_data.data.public_metrics["reply_count"]
+        tweet.quote = tweet_data.data.public_metrics["quote_count"]
+        tweet.follower = the_user_data.data.public_metrics["followers_count"]
+        tweet.list_count = the_user_data.data.public_metrics["listed_count"]
 
         # disable rter tracking to avoid over usage
         """
@@ -74,9 +78,11 @@ def data_once(name):
             tweet.rt_user.add(the_user)
 
             the_user.save()
-        """
+        
 
         tweet.rt_spread=spread_count
+        """
+
 
         tweet.data_time = now()
 

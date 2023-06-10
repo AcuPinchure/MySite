@@ -91,7 +91,11 @@ class Tweet(models.Model):
         help_text='The user list that RT this tweet',
         related_name='rts',blank=True)
     rt_spread = models.SmallIntegerField(help_text='Sum of followers of all RTing users',blank=True,null=True)
+    reply = models.SmallIntegerField(help_text="number of replies", blank=True, null=True)
+    quote = models.SmallIntegerField(help_text="number of quotes", blank=True, null=True)
+
     follower = models.SmallIntegerField(help_text='Followers',blank=True,null=True)
+    list_count = models.SmallIntegerField(help_text='number of lists include this account',blank=True,null=True)
 
     media = models.ForeignKey(Media,on_delete=models.PROTECT)
 

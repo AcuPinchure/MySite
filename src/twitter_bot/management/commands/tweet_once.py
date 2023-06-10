@@ -60,8 +60,8 @@ class Command(BaseCommand):
     help = "Pick a random media and post once"
     
     def handle(self, *args, **kwargs):
-        #names = ['Kaorin','Chemi','Akarin']
-        names = ['Chemi']
+        names = ['Kaorin','Chemi','Akarin']
+        #names = ['Chemi']
         for name in names:
             ret = post_once(name)
             if ret:
