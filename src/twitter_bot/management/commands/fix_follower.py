@@ -1,4 +1,4 @@
-from twitter_bot.models import Tweet, WeeklyStats, RtToUser, Seiyuu
+from twitter_bot.models import Tweet, WeeklyStats, RtToUser, Seiyuu, Followers
 from django.core.management.base import BaseCommand
 from django.db.models import Avg, Count
 from django.utils import timezone
@@ -19,36 +19,62 @@ class Command(BaseCommand):
             search = '鬼頭明里'
             bot_id = 'akarin__bot'
 
+        the_seiyuu = Seiyuu.objects.get(name=search)
+
         # get the start and end dates for the range
-        start_date = datetime(2022, 8, 30, 2, 10, 13)
-        end_date = datetime(2023, 2, 19, 3, 51, 8)
+        start_date = datetime(2023, 5, 22, 7, 0, 0)
+        end_date = datetime(2023, 6, 10, 21, 0, 0)
 
         # get the follower counts for the end and start tweets
-        followers_end = Tweet.objects.filter(media__seiyuu__name=search, data_time__gt=end_date).earliest('data_time').follower
-        followers_start = Tweet.objects.filter(media__seiyuu__name=search, data_time__lt=start_date).latest('data_time').follower
+        followers_start = Followers.objects.filter(seiyuu=the_seiyuu, data_time__lt=start_date).latest('data_time')
+        followers_end = Followers.objects.filter(seiyuu=the_seiyuu, data_time__gt=end_date).earliest('data_time')
+
+        # get missing start time
+        missing_start = followers_start.data_time
+        missing_end = followers_end.data_time
+
+        #print(missing_start)
+        #print(missing_end)
+
+        #return 0
+
+        # create missing data points without followers
+        curr_time = missing_start + timedelta(hours=1)
+        missing_data_points = []
+        while curr_time < missing_end:
+            missing_data_points.append(Followers(
+                seiyuu=the_seiyuu,
+                data_time=curr_time
+            ))
+
+            self.stdout.write(self.style.SUCCESS(f'Append follower data point {curr_time}'))
+            curr_time += timedelta(hours=1)
+
+        Followers.objects.bulk_create(missing_data_points)
+        self.stdout.write(self.style.SUCCESS(f'Add follower data points successfully'))
 
         # calculate the follower difference between the start and end tweets
-        follower_diff = followers_end - followers_start
-        tweets_missing = Tweet.objects.filter(media__seiyuu__name=search, data_time__gte=start_date, data_time__lte=end_date)
-        tweet_count = tweets_missing.count()
+        followers_diff = followers_end.followers - followers_start.followers
+        followers_missing = Followers.objects.filter(seiyuu=the_seiyuu, data_time__gte=start_date, data_time__lte=end_date, followers__isnull=True)
+        followers_count = followers_missing.count()
 
         # calculate the increment in follower count between each tweet
-        follower_increment = follower_diff / (tweet_count - 1)
+        follower_increment = followers_diff / (followers_count - 1)
 
         # interpolate the missing follower counts for each tweet
-        current_follower = followers_start
-        for tweet in tweets_missing:
+        current_follower = followers_start.followers
+        for follower in followers_missing:
             current_follower += follower_increment
-            tweet.follower = int(current_follower)
-            tweet.save()
+            follower.followers = int(current_follower)
 
-            self.stdout.write(self.style.SUCCESS(f'Fixed follower for {tweet}'))
+            self.stdout.write(self.style.SUCCESS(f'Append follower update for {follower}'))
         
         # print a success message
-        self.stdout.write(self.style.SUCCESS('Successfully interpolated follower field for Tweet instances'))
+        Followers.objects.bulk_update(followers_missing, fields=["followers"])
+        self.stdout.write(self.style.SUCCESS('Successfully interpolated follower field for Follower instances'))
 
     def handle(self, **options):
         names = ['Kaorin','Chemi','Akarin']
-        for name in names:
+        for name in []:
             self.fixFollower(name)
             
