@@ -13,10 +13,10 @@ from django.core.wsgi import get_wsgi_application
 
 import sys
 
-project_home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if project_home not in sys.path:
-    # print(project_home)
-    sys.path.append(project_home)
+#if Use ENVh
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_DIR)
+sys.path.append('/root/Documents/MySite/venv')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'MySite.settings')
 
