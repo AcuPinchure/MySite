@@ -1,6 +1,7 @@
 # DB and files
 data/
 crontabLog/
+crontab_log/
 
 # django
 *.log

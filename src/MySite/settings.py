@@ -32,6 +32,8 @@ DEBUG = settings_local.DEBUG
 
 ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 
+LOCAL_HOSTS = settings_local.LOCAL_HOSTS
+
 
 # Application definition
 

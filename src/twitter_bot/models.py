@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.files.storage import FileSystemStorage
+import uuid
 
 # Create your models here.
 
@@ -105,6 +106,22 @@ class Tweet(models.Model):
         return "[{}]-{}-{}".format(self.media.seiyuu.name,self.post_time, self.id)
 
 # Tweet.objects = Tweet.objects.using('bot_data')
+
+class Followers(models.Model):
+    class Meta:
+        # managed = False
+        db_table = 'bot_followers'
+
+    uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    seiyuu = models.ForeignKey(Seiyuu,on_delete=models.PROTECT, blank=True, null=True)
+    data_time = models.DateTimeField(help_text='Data collected time', blank=True, null=True)
+    followers = models.IntegerField(help_text="Current followers", blank=True, null=True)
+
+    def __str__(self):
+        return "[{} Followers]-{}-{}".format(self.seiyuu.name, self.data_time, self.followers)
+
+
+
 
 #########################################
 
