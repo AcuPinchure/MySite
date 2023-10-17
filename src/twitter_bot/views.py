@@ -21,6 +21,9 @@ import pytz
 # Create your views here.
 root_path = Path(__file__).resolve().parent.parent.parent
 
+def index(request):
+    return render(request,'twitter_bot/index.html')
+
 def about(request):
     return render(request,'twitter_bot/about.html')
 

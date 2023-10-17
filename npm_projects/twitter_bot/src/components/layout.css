@@ -1,0 +1,175 @@
+:root {
+    --bar-width: 15rem;
+}
+
+.bot.site_title {
+    font-style: italic;
+    color: white;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 0;
+}
+
+
+.bot.site_subinfo {
+    color: lightgrey;
+}
+
+.bot.stats.sidebar,
+.bot.stats.sidebar.active {
+    z-index: 150;
+    box-sizing: border-box;
+    position: fixed;
+    width: var(--bar-width);
+    padding: 1rem;
+    padding-top: 0rem;
+    height: 100vh;
+}
+
+.bot.stats.sidebar {
+    transition: left ease 0.3s, right ease 0.3s;
+}
+
+.bot.stats.left.sidebar {
+    top: 0;
+    left: 0;
+    background-color: rgb(27, 9, 56);
+}
+
+.bot.stats.right.sidebar {
+    top: 0;
+    right: 0;
+    background-color: rgb(240, 240, 240);
+}
+
+.bot.stats.sidebar_close {
+    display: none;
+}
+
+.bot.stats.left.sidebar_close {
+    text-align: left;
+}
+
+.bot.stats.right.sidebar_close {
+    text-align: right;
+}
+
+.bot.stats.content {
+    margin-left: var(--bar-width);
+    margin-right: var(--bar-width);
+    padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: rgb(240, 240, 240);
+    min-height: 100svh;
+}
+
+.bot.stats.subinfo {
+    color: grey;
+}
+.bot.stats.subinfo>.value {
+    display: inline-block;
+    margin-right: 0.4rem;
+    margin-left: 0.4rem;
+    font-size: 1.5rem;
+}
+
+.bot.stats.follower.trend.wrapper {
+    overflow: auto;
+}
+
+.bot.stats.follower.trend.wrapper .canvas.wrapper {
+    min-width: 600px;
+}
+
+
+.bot.stats.title.bar {
+    display: none;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0.7rem;
+    background-color: white;
+    width: 100vw;
+    box-shadow: 0px 0px 5px lightgrey;
+}
+
+.bot.stats.bar_icon {
+    display: none;
+}
+
+.ui.vertical.text.inverted.menu .item:hover {
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1300px) {
+    .bot.stats.right.sidebar {
+        padding-top: 1rem;
+        width: var(--bar-width);
+        right: -100vw;
+    }
+
+    .bot.stats.right.sidebar_close {
+        display: block;
+    }
+
+    .bot.stats.right.sidebar.active {
+        padding-top: 1rem;
+        right: 0;
+    }
+
+    .bot.stats.content {
+        margin-right: 0;
+        padding-top: 4.2rem;
+    }
+
+    .bot.stats.title.bar {
+        display: block;
+        width: calc(100vw - var(--bar-width));
+        margin-left: var(--bar-width);
+    }
+
+    .bot.stats.right.bar_icon {
+        display: inline;
+    }
+}
+
+
+@media screen and (max-width: 600px) {
+    .bot.stats.left.sidebar {
+        padding-top: 1rem;
+        width: var(--bar-width);
+        left: -100vw;
+    }
+
+    .bot.stats.left.sidebar_close {
+        display: block;
+    }
+
+    .bot.stats.left.sidebar.active {
+        padding-top: 1rem;
+        left: 0;
+    }
+
+
+    .bot.stats.sidebar_close {
+        display: block;
+    }
+
+    .bot.stats.content {
+        margin-left: 0;
+        background-color: rgb(240, 240, 240);
+        min-height: 100vh;
+    }
+
+    .bot.stats.title.bar {
+        display: block;
+        width: 100vw;
+        margin-left: 0;
+    }
+    
+    .bot.stats.left.bar_icon {
+        display: inline;
+    }
+}

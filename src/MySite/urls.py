@@ -22,7 +22,7 @@ from main import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('local_auth.urls')),
+    #path('auth/', include('local_auth.urls')),
     path('main/',include('main.urls')),
     path('bot/',include('twitter_bot.urls')),
     path('logistics/',include('logistics.urls')),

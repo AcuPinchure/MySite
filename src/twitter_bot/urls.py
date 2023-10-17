@@ -21,6 +21,7 @@ api_endpoints = [
 
 
 urlpatterns = [
+    path('', views.index, name='index'),
     path('about/', views.about, name='about'),
     path('log/', views.log, name='log'),
     path('log/<str:log_name>', views.log_content, name='log_content'),
