@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'local_auth',
     'twitter_bot',
     'main',
-    'logistics',
+    # 'logistics',
 ]
 
 

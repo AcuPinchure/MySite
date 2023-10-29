@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/twitter_bot/site_media/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/twitter_bot/site_media/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/twitter_bot/site_media/favicon-16x16.png">
+    <link rel="manifest" href="/static/twitter_bot/site_media/site.webmanifest">
+    <link rel="mask-icon" href="/static/twitter_bot/site_media/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/static/twitter_bot/site_media/favicon.ico">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-config" content="/static/twitter_bot/site_media/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
     <title>LoveLive Seiyuu Bot</title>
     <style>
         #loading {
@@ -60,7 +69,7 @@
     <noscript>This website requires javascript, enabled javascript in your browser settings to continue.</noscript>
     <div id="root"></div>
 
-    {% load static %}
+    {% comment %} {% load static %}
     <div id="loading">
         <img class="logo_wrapper" src="{% static 'twitter_bot/site_media/bot_L_logo.svg' %}" alt="">
         <div class="title_mask"></div>
@@ -72,7 +81,7 @@
             document.querySelector('#loading .title_mask').classList.add('moved');
             document.querySelector('#loading .title_wrapper').classList.add('moved');
         }, 500);
-    </script>
+    </script> {% endcomment %}
 
     {% load static %}
     <script src="{% static 'twitter_bot/main.js' %}"></script>

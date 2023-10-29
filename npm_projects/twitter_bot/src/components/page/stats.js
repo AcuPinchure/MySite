@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Segment, Statistic, Icon, Grid } from "semantic-ui-react";
+import React, { useEffect, useState } from "react";
+import { Segment, Statistic, Icon, Grid, Menu, Form, Button, Dropdown } from "semantic-ui-react";
 
 
 function StatsBlock(props) {
@@ -54,10 +54,55 @@ function Stats(props) {
         <>  
             <h1>{stats.seiyuu_name + " " + stats.seiyuu_id}</h1>
             <Grid columns={3} stackable>
-                <StatsBlock loading={loading} size={1} title="Posts" iconName="file alternate" value={stats.posts} subinfo="Posts in the given time period"></StatsBlock>
+                
             </Grid>
         </>
     )
 }
 
-export default Stats;
+function StatsOptions(props) {
+    const [start_date, setStartDate] = useState(null);
+    const [end_date, setEndDate] = useState(null);
+    const [select_seiyuu, setSeiyuu] = useState(null);
+    function handleSelectSeiyuu(e) {
+        setSeiyuu(e.target.getAttribute("data-seiyuu"));
+    }
+
+    useEffect(() => {
+        setStartDate(props.defaultStartDate);
+        setEndDate(props.defaultEndDate);
+        setSeiyuu(props.defaultSeiyuu);
+    }, [props.defaultStartDate, props.defaultEndDate, props.defaultSeiyuu]);
+
+    const presetOptions = [
+        {key:"stats_preset_week", text:"Last 7 days", value:"week"},
+        {key:"stats_preset_month", text:"Last 30 days", value:"month"},
+        {key:"stats_preset_year", text:"Last 365 days", value:"year"},
+        {key:"stats_preset_all", text:"All Time", value:"all"}
+    ]
+    return (
+        <>
+            <h3>Account</h3>
+            <Menu text vertical>
+                <Menu.Item data-seiyuu="kaorin" active={select_seiyuu === "kaorin"} onClick={handleSelectSeiyuu}>前田佳織里</Menu.Item>
+                <Menu.Item data-seiyuu="chemi" active={select_seiyuu === "chemi"} onClick={handleSelectSeiyuu}>田中ちえ美</Menu.Item>
+                <Menu.Item data-seiyuu="akarin" active={select_seiyuu === "akarin"} onClick={handleSelectSeiyuu}>鬼頭明里</Menu.Item>
+            </Menu>
+            <h3>Data Interval</h3>
+            <Form>
+                <Form.Input label="Start Date" type="date" value={props.defaultStartDate}></Form.Input>
+                <Form.Input label="End Date" type="date" value={props.defaultEndDate}></Form.Input>
+                <Form.Field>
+                    <label>Preset</label>
+                    <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait" options={presetOptions}></Dropdown>
+                </Form.Field>
+                <Form.Field>
+                    <Button fluid>Apply</Button>
+                </Form.Field>
+                
+            </Form>
+        </>
+    )
+}
+
+export {Stats, StatsOptions};

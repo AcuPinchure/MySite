@@ -2,62 +2,51 @@ import React, {useEffect, useState} from "react";
 import './layout.css';
 import { Icon, Menu, Divider, Form, Dropdown, Button } from "semantic-ui-react";
 import BotLogo from "../assets/bot_logo.svg";
+import { useLocation, useHistory } from "react-router-dom";
 
 
 function LeftSideBar(props) {
-
-    // useEffect(() => {
-    //     if (props.isActive) {
-    //         window.addEventListener("click", handleClickOutside);
-    //     }
-    //     return () => {
-    //         window.removeEventListener("click", handleClickOutside);
-    //     }
-    // }, [props.isActive]);
-
-    // function handleClickOutside(e) {
-    //     if (!e.target.classList.contains("bot", "stats", "left", "sidebar")) {
-    //         props.setSideActive('left', false);
-    //     }
-    // }
-
     return (
         <div className={`bot stats left sidebar ${props.isActive ? "active" : ""}`}>
-            <div className="bot stats left sidebar_close" onClick={() => props.setSideActive('left', false)}>
-                <Icon name="angle left" inverted={true} size="large"></Icon>
-            </div>
             <SideBarTitle></SideBarTitle>
-            <Divider></Divider>
             <NaviMenu></NaviMenu>
         </div>
     )
 }
 
 function SideBarTitle(props) {
+    const history = useHistory();
     return (
-        <img src={BotLogo} alt="Bot Logo" className="bot stats site_title"></img>
+        <img src={BotLogo} alt="Bot Logo" className="bot stats site_title" onClick={()=>history.push("/")}></img>
     )
 }
 
 
 function NaviMenu(props) {
-    const [active_item, setActive] = useState("");
-    function handleClick(e) {
-        setActive(e.target.getAttribute("data-name"));
-    }
+    const location = useLocation();
+    const history = useHistory();
+
     return (
-        <Menu text vertical inverted>
-            <Menu.Item data-name="about" active={active_item === "about"} onClick={handleClick}>
+        <Menu secondary vertical inverted fluid size="large">
+            <Menu.Item data-name="about" onClick={()=>history.push("/")}>
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
-            <Menu.Item data-name="stats" active={active_item === "stats"} onClick={handleClick}>
+            <Menu.Item active={location.pathname.startsWith("/stats")} onClick={()=>history.push("/stats")}>
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
-            <Menu.Item data-name="status" active={active_item === "status"} onClick={handleClick}>
-                <Icon name="tachometer alternate"></Icon>
-                Server Status
+            <Menu.Item active={location.pathname.startsWith("/settings")} onClick={()=>history.push("/settings")}>
+                <Icon name="cogs"></Icon>
+                Settings
+            </Menu.Item>
+            <Menu.Item active={location.pathname.startsWith("/library")} onClick={()=>history.push("/library")}>
+                <Icon name="images outline"></Icon>
+                Image Library
+            </Menu.Item>
+            <Menu.Item active={location.pathname.startsWith("/logs")} onClick={()=>history.push("/logs")}>
+                <Icon name="clock outline"></Icon>
+                Logs
             </Menu.Item>
         </Menu>
     )
@@ -65,21 +54,6 @@ function NaviMenu(props) {
 
 
 function RightSideBar(props) {
-
-    // useEffect(() => {
-    //     if (props.isActive) {
-    //         window.addEventListener("click", handleClickOutside);
-    //     }
-    //     return () => {
-    //         window.removeEventListener("click", handleClickOutside);
-    //     }
-    // }, [props.isActive]);
-
-    // function handleClickOutside(e) {
-    //     if (!e.target.classList.contains("bot", "stats", "right", "sidebar")) {
-    //         props.setSideActive('right', false);
-    //     }
-    // }
 
     return (
         <div className={`bot stats right sidebar ${props.isActive ? "active" : ""}`}>
@@ -92,43 +66,6 @@ function RightSideBar(props) {
     )
 }
 
-function StatsOptions(props) {
-    const [start_date, setStartDate] = useState(props.defaultStartDate);
-    const [end_date, setEndDate] = useState(props.defaultEndDate);
-    const [select_seiyuu, setSeiyuu] = useState(props.defaultSeiyuu);
-    function handleSelectSeiyuu(e) {
-        setSeiyuu(e.target.getAttribute("data-seiyuu"));
-    }
 
-    const presetOptions = [
-        {key:"stats_preset_week", text:"Last 7 days", value:"week"},
-        {key:"stats_preset_month", text:"Last 30 days", value:"month"},
-        {key:"stats_preset_year", text:"Last 365 days", value:"year"},
-        {key:"stats_preset_all", text:"All Time", value:"all"}
-    ]
-    return (
-        <>
-            <h3>Account</h3>
-            <Menu text vertical>
-                <Menu.Item data-seiyuu="kaorin" active={select_seiyuu === "kaorin"} onClick={handleSelectSeiyuu}>前田佳織里</Menu.Item>
-                <Menu.Item data-seiyuu="chemi" active={select_seiyuu === "chemi"} onClick={handleSelectSeiyuu}>田中ちえ美</Menu.Item>
-                <Menu.Item data-seiyuu="akarin" active={select_seiyuu === "akarin"} onClick={handleSelectSeiyuu}>鬼頭明里</Menu.Item>
-            </Menu>
-            <h3>Data Interval</h3>
-            <Form>
-                <Form.Input label="Start Date" type="date" value={props.defaultStartDate}></Form.Input>
-                <Form.Input label="End Date" type="date" value={props.defaultEndDate}></Form.Input>
-                <Form.Field>
-                    <label>Preset</label>
-                    <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait" options={presetOptions}></Dropdown>
-                </Form.Field>
-                <Form.Field>
-                    <Button fluid>Apply</Button>
-                </Form.Field>
-                
-            </Form>
-        </>
-    )
-}
 
-export {LeftSideBar, RightSideBar, StatsOptions};
+export {LeftSideBar, RightSideBar};
