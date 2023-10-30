@@ -9,7 +9,7 @@ function LeftSideBar(props) {
     const history = useHistory();
     return (
         <div className={`bot stats left sidebar ${props.isActive ? "active" : ""}`}>
-            <SideBarTitle onClick={() => history.push("/")}></SideBarTitle>
+            <SideBarTitle onClick={() => history.push("/bot/")}></SideBarTitle>
             <NaviMenu></NaviMenu>
         </div>
     )
@@ -29,23 +29,23 @@ function NaviMenu(props) {
 
     return (
         <Menu secondary vertical inverted fluid size="large">
-            <Menu.Item data-name="about" onClick={() => history.push("/")}>
+            <Menu.Item data-name="about" onClick={() => history.push("/bot/")}>
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/stats")} onClick={() => history.push("/stats")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/stats")} onClick={() => history.push("/bot/stats")}>
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/config")} onClick={() => history.push("/config")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/config")} onClick={() => history.push("/bot/config")}>
                 <Icon name="cogs"></Icon>
                 Service Config
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/library")} onClick={() => history.push("/library")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/library")} onClick={() => history.push("/bot/library")}>
                 <Icon name="images outline"></Icon>
                 Image Library
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/logs")} onClick={() => history.push("/logs")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/logs")} onClick={() => history.push("/bot/logs")}>
                 <Icon name="clock outline"></Icon>
                 Logs
             </Menu.Item>

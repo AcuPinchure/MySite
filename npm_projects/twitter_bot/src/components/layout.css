@@ -80,6 +80,9 @@
     min-height: 100vh;
     transition: margin ease 0.3s;
 }
+.bot.stats.content.left_active {
+    margin-left: var(--bar-width);
+}
 
 .bot.stats.subinfo {
     color: grey;

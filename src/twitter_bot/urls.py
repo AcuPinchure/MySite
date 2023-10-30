@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from . import views
 
 app_name = 'bot'
@@ -21,10 +21,10 @@ api_endpoints = [
 
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('about/', views.about, name='about'),
-    path('log/', views.log, name='log'),
-    path('log/<str:log_name>', views.log_content, name='log_content'),
-    path('stats/', views.stats, name='stats'),
-    path('api/', include(api_endpoints))
+    # path('about/', views.about, name='about'),
+    # path('log/', views.log, name='log'),
+    # path('log/<str:log_name>', views.log_content, name='log_content'),
+    # path('stats/', views.stats, name='stats'),
+    path('api/', include(api_endpoints)),
+    re_path(r'.*', views.index),
 ]

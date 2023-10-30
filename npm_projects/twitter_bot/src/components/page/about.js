@@ -13,12 +13,12 @@ import { Grid, Image, Menu, Segment, Divider } from "semantic-ui-react";
 function TopMenu(props) {
     const history = useHistory();
     return (
-        <Menu text inverted={props.inverted} fixed="top" size="large" className={`bot about navi_menu ${props.inverted ? "" : "show"}`}>
+        <Menu text inverted={props.inverted} fixed="top" size="huge" className={`bot about navi_menu ${props.inverted ? "" : "show"}`}>
             <Menu.Item header>
-                <Image size="mini" src={BotLogoL} style={{ height: "1rem" }} />
+                <Image size="mini" src={BotLogoL} style={{ height: "1.5rem" }} />
             </Menu.Item>
-            <Menu.Item onClick={() => history.push("/stats")}>Statistics</Menu.Item>
-            <Menu.Item onClick={() => history.push("/config")}>Admin</Menu.Item>
+            <Menu.Item onClick={() => history.push("/bot/stats")}>Statistics</Menu.Item>
+            <Menu.Item onClick={() => history.push("/bot/config")}>Admin</Menu.Item>
         </Menu>
     )
 }

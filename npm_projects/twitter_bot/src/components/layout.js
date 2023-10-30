@@ -107,7 +107,7 @@ function BotLayout(props) {
                     setLeftActive(false)
                 }
             }}></div>
-            <div className={`bot stats content ${left_active ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
+            <div className={`bot stats content ${left_active && viewWidth > 768 ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
                 {props.children}
             </div>
         </>
