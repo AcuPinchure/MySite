@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 function TitleBar(props) {
     const location = useLocation();
 
+
     return (
         <div className={`bot stats title bar ${props.leftActive ? "left_active" : ""} ${props.rightActive ? "right_active" : ""}`}>
             <Grid verticalAlign="middle">
@@ -23,8 +24,8 @@ function TitleBar(props) {
                         switch (location.pathname) {
                             case "/stats":
                                 return <h2>Statistics</h2>;
-                            case "/settings":
-                                return <h2>Service Settings</h2>;
+                            case "/config":
+                                return <h2>Service Configuration</h2>;
                             case "/library":
                                 return <h2>Image Library</h2>;
                             case "/logs":
@@ -35,9 +36,11 @@ function TitleBar(props) {
                     })()}
                 </Grid.Column>
                 <Grid.Column width={2} textAlign="right">
-                    <div className="bot stats right bar_icon">
-                        <Icon name="sliders horizontal" onClick={() => props.setSideActive('right', !props.rightActive)} size="large"></Icon>
-                    </div>
+                    {props.hasOptions ?
+                        <div className="bot stats right bar_icon">
+                            <Icon name="sliders horizontal" onClick={() => props.setSideActive('right', !props.rightActive)} size="large"></Icon>
+                        </div>
+                        : null}
                 </Grid.Column>
             </Grid>
         </div>
@@ -90,19 +93,20 @@ function BotLayout(props) {
         }
     }, [viewWidth]);
 
+
     return (
         <>
-            <TitleBar leftActive={left_active && viewWidth > 768} rightActive={right_active} setSideActive={handleSideActive}></TitleBar>
+            <TitleBar leftActive={left_active && viewWidth > 768} rightActive={right_active} setSideActive={handleSideActive} hasOptions={props.rightBarOptions ? true : false} />
             <LeftSideBar setSideActive={handleSideActive} isActive={left_active}></LeftSideBar>
             <RightSideBar setSideActive={handleSideActive} isActive={right_active}>
                 {props.rightBarOptions}
             </RightSideBar>
-            <div className={`bot stats sidebar_overlay ${(right_active || (viewWidth<=768 && left_active))? "active" : ""}`} onClick={() => {
+            <div className={`bot stats sidebar_overlay ${(right_active || (viewWidth <= 768 && left_active)) ? "active" : ""}`} onClick={() => {
                 setRightActive(false);
                 if (viewWidth <= 768) {
                     setLeftActive(false)
                 }
-                }}></div>
+            }}></div>
             <div className={`bot stats content ${left_active ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
                 {props.children}
             </div>

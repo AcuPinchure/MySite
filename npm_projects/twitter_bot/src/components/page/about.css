@@ -1,6 +1,58 @@
 .bot.about.header {
-    
     height: 100vh;
     width: 100%;
     background-color: rgb(27, 9, 56);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.bot.about.site_title {
+    height: 8rem;
+}
+.bot.about.site_subtitle {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.bot.about.feature.section {
+    min-height: 32rem;
+}
+
+.bot.about.feature.title {
+    font-weight: bold;
+    font-size: 3rem;
+}
+.bot.about.feature.description {
+    font-size: 1.5rem;
+}
+
+.bot.about.footer {
+    background-color: rgb(27, 9, 56);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+.bot.about.twitter_link {
+    text-decoration: none;
+    color: white;
+    display: block;
+    margin: 1rem;
+}
+
+.bot.about.navi_menu {
+    transition: all ease 0.5s;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.bot.about.navi_menu {
+    background-color: rgba(255,255,255,0);
+}
+.bot.about.navi_menu.show {
+    background-color: rgba(255,255,255,1);
+    box-shadow: 0 0 5px lightgray;
 }
