@@ -33,14 +33,30 @@
     background-color: rgb(27, 9, 56);
     color: white;
     text-align: center;
-    padding: 1rem;
+    padding: 5rem 1rem;
+    min-height: 100vh;
+    position: relative;
+}
+.bot.about.footer_bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    color: lightgray;
+    padding: 0.5rem;
 }
 
+.bot.about.twitter_link_group {
+    margin: 5rem 0;
+}
 .bot.about.twitter_link {
     text-decoration: none;
     color: white;
     display: block;
-    margin: 1rem;
+    transition: transform ease 0.5s;
+}
+.bot.about.twitter_link:hover {
+    transform: scale(1.2);
 }
 
 .bot.about.navi_menu {
@@ -49,10 +65,7 @@
     top: 0;
     left: 0;
 }
-.bot.about.navi_menu {
-    background-color: rgba(255,255,255,0);
-}
 .bot.about.navi_menu.show {
-    background-color: rgba(255,255,255,1);
+    background-color: white;
     box-shadow: 0 0 5px lightgray;
 }

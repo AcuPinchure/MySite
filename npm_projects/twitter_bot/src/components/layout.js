@@ -15,20 +15,22 @@ function TitleBar(props) {
         <div className={`bot stats title bar ${props.leftActive ? "left_active" : ""} ${props.rightActive ? "right_active" : ""}`}>
             <Grid verticalAlign="middle">
                 <Grid.Column width={2} textAlign="left">
-                    <div className="bot stats left bar_icon">
+                    {props.hasLeftIcon ? <div className="bot stats left bar_icon">
                         <Icon name="bars" onClick={() => props.setSideActive('left', !props.leftActive)} size="large"></Icon>
-                    </div>
+                    </div> : null}
                 </Grid.Column>
                 <Grid.Column width={12} textAlign="center">
                     {(() => {
                         switch (location.pathname) {
-                            case "/stats":
+                            case "/bot/login":
+                                return <h2>Login</h2>;
+                            case "/bot/stats":
                                 return <h2>Statistics</h2>;
-                            case "/config":
+                            case "/bot/config":
                                 return <h2>Service Configuration</h2>;
-                            case "/library":
+                            case "/bot/library":
                                 return <h2>Image Library</h2>;
-                            case "/logs":
+                            case "/bot/logs":
                                 return <h2>Service Logs</h2>;
                             default:
                                 return <h2>About</h2>;
@@ -47,7 +49,7 @@ function TitleBar(props) {
     )
 }
 
-
+const responsiveWidth = 1000;
 
 function BotLayout(props) {
     const [left_active, setLeftActive] = useState(true);
@@ -57,13 +59,13 @@ function BotLayout(props) {
     function handleSideActive(side, setActive) {
         if (side === 'left') {
             setLeftActive(setActive);
-            if (viewWidth <= 768) {
+            if (viewWidth <= responsiveWidth) {
                 setRightActive(false);
             }
         }
         else if (side === 'right') {
             setRightActive(setActive);
-            if (viewWidth <= 768) {
+            if (viewWidth <= responsiveWidth) {
                 setLeftActive(false);
             }
         }
@@ -85,7 +87,7 @@ function BotLayout(props) {
     }, []);
 
     useEffect(() => {
-        if (viewWidth > 768) {
+        if (viewWidth > responsiveWidth) {
             setLeftActive(true);
         }
         else {
@@ -96,18 +98,18 @@ function BotLayout(props) {
 
     return (
         <>
-            <TitleBar leftActive={left_active && viewWidth > 768} rightActive={right_active} setSideActive={handleSideActive} hasOptions={props.rightBarOptions ? true : false} />
+            <TitleBar leftActive={left_active && viewWidth > responsiveWidth} rightActive={right_active} setSideActive={handleSideActive} hasLeftIcon={viewWidth <= responsiveWidth} hasOptions={props.rightBarOptions ? true : false} />
             <LeftSideBar setSideActive={handleSideActive} isActive={left_active}></LeftSideBar>
             <RightSideBar setSideActive={handleSideActive} isActive={right_active}>
-                {props.rightBarOptions}
+                {React.cloneElement(props.rightBarOptions, { "handleSideActive": handleSideActive, ...props.rightBarOptions.props })}
             </RightSideBar>
-            <div className={`bot stats sidebar_overlay ${(right_active || (viewWidth <= 768 && left_active)) ? "active" : ""}`} onClick={() => {
+            <div className={`bot stats sidebar_overlay ${(right_active || (viewWidth <= responsiveWidth && left_active)) ? "active" : ""}`} onClick={() => {
                 setRightActive(false);
-                if (viewWidth <= 768) {
+                if (viewWidth <= responsiveWidth) {
                     setLeftActive(false)
                 }
             }}></div>
-            <div className={`bot stats content ${left_active && viewWidth > 768 ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
+            <div className={`bot stats content ${left_active && viewWidth > responsiveWidth ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
                 {props.children}
             </div>
         </>

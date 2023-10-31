@@ -17,9 +17,10 @@ function TopMenu(props) {
             <Menu.Item header>
                 <Image size="mini" src={BotLogoL} style={{ height: "1.5rem" }} />
             </Menu.Item>
-            <Menu.Item onClick={() => history.push("/bot/stats")}>Statistics</Menu.Item>
-            <Menu.Item onClick={() => history.push("/bot/config")}>Admin</Menu.Item>
+            <Menu.Item onClick={() => { window.location = "/bot/stats" }}>Statistics</Menu.Item>
+            <Menu.Item onClick={() => { window.location = "/bot/login" }}>Admin</Menu.Item>
         </Menu>
+
     )
 }
 
@@ -63,7 +64,7 @@ function Footer(props) {
             <p className="bot about feature description">
                 Our service currently owns 4 bot accounts, check them out right now.
             </p>
-            <Grid doubling columns={4} stackable>
+            <Grid doubling columns={4} stackable className="bot about twitter_link_group">
                 <Grid.Column>
                     <TwitterLink name="前田佳織里" image={KaorinLink} link="https://twitter.com/kaorin__bot"></TwitterLink>
                 </Grid.Column>
@@ -77,6 +78,11 @@ function Footer(props) {
                     <TwitterLink name="月音こな" image={KonachiLink} link="https://twitter.com/konachi__bot"></TwitterLink>
                 </Grid.Column>
             </Grid>
+            <div className="bot about footer_bottom">
+                <p>
+                    © 2023 Lovelive Seiyuu Bot Project | create by AcuPinchure
+                </p>
+            </div>
         </div>
     )
 }
@@ -116,7 +122,7 @@ function About() {
                 <img src={BotLogo} alt="Bot Logo" className="bot about site_title"></img>
                 <p className="bot about site_subtitle">We gather the gems, {viewWidth <= 768 ? <br></br> : null}so you don’t have to dig.</p>
             </HeaderBanner>
-            <Segment basic padded="very">
+            <Segment basic style={{ padding: viewWidth > 768 ? "3rem" : "0.2rem" }}>
                 <Grid stackable>
                     <FeatureSection imageSide="left">
                         <p className="bot about feature title">Discover Random Surprise</p>
@@ -160,7 +166,7 @@ function About() {
                         </p>
                     </FeatureSection>
                 </Grid>
-            </Segment>
+            </Segment >
 
             <Footer></Footer>
         </>

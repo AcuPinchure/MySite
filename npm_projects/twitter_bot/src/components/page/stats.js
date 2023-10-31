@@ -95,6 +95,10 @@ function StatsOptions(props) {
         setSeiyuu(props.defaultSeiyuu);
     }, [props.defaultStartDate, props.defaultEndDate, props.defaultSeiyuu]);
 
+    function handleApply() {
+        props.handleSideActive("right", false);
+    }
+
     const presetOptions = [
         { key: "stats_preset_week", text: "Last 7 days", value: "week" },
         { key: "stats_preset_month", text: "Last 30 days", value: "month" },
@@ -112,14 +116,14 @@ function StatsOptions(props) {
             </Menu>
             <h3>Data Interval</h3>
             <Form>
-                <Form.Input label="Start Date" type="date" value={props.defaultStartDate}></Form.Input>
-                <Form.Input label="End Date" type="date" value={props.defaultEndDate}></Form.Input>
+                <Form.Input label="Start Date" type="date" value={props.defaultStartDate} onChange={({ value }) => setStartDate(value)}></Form.Input>
+                <Form.Input label="End Date" type="date" value={props.defaultEndDate} onChange={({ value }) => setEndDate(value)}></Form.Input>
                 <Form.Field>
                     <label>Preset</label>
                     <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait" options={presetOptions}></Dropdown>
                 </Form.Field>
                 <Form.Field>
-                    <Button fluid>Apply</Button>
+                    <Button fluid onClick={handleApply}>Apply</Button>
                 </Form.Field>
 
             </Form>
