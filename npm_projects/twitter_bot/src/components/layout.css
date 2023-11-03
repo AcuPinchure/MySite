@@ -40,7 +40,7 @@
 .bot.stats.right.sidebar {
     width: var(--bar-width);
     padding-top: 1rem;
-    z-index: 90;
+    z-index: 150;
     top: 0;
     right: calc(-1*var(--bar-width));
     background-color: rgb(240, 240, 240);
@@ -60,7 +60,7 @@
 }
 .bot.stats.sidebar_overlay.active {
     background-color: rgba(0, 0, 0, 0.3);
-    z-index: 80;
+    z-index: 140;
 }
 
 
@@ -105,7 +105,7 @@
 
 .bot.stats.title.bar {
     display: block;
-    z-index: 100;
+    z-index: 200;
     position: fixed;
     top: 0;
     left: 0;

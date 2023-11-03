@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from .models import Tweet
 
+from datetime import timedelta
+
 
 class TweetSerializer(serializers.ModelSerializer):
-    media = serializers.CharField(read_only=True, source='media.file.url')
+    media_url = serializers.CharField(read_only=True, source='media.file.url')
 
     class Meta:
         model = Tweet
@@ -15,29 +17,40 @@ class TweetSerializer(serializers.ModelSerializer):
             'rt',
             'reply',
             'quote',
-            'media'
+            'media_url'
         ]
 
 
 class StatSerializer(serializers.Serializer):
-    start_date = serializers.DateTimeField()  # Start date of the week
-    end_date = serializers.DateTimeField()  # End date of the week
 
-    posts = serializers.IntegerField()  # Total number of posts this week
-    likes = serializers.IntegerField()  # Total number of liks this week
-    rts = serializers.IntegerField()  # Total number of rts this week
+    seiyuu_id_name = serializers.CharField(required=True)  # seiyuu id_name
 
-    # Average number of likes of all tweets this week
-    avg_likes = serializers.FloatField()
-    # Average number of retweets of all tweets this week
-    avg_retweets = serializers.FloatField()
+    start_date = serializers.DateTimeField(
+        required=True)  # Start date of the week
+    end_date = serializers.DateTimeField(
+        required=True)  # End date of the week
+
+    time_interval = serializers.SerializerMethodField()  # Time interval in hours
+
+    # Total number of posts this week
+    posts = serializers.IntegerField(required=True)
+    # Total number of liks this week
+    likes = serializers.IntegerField(required=True)
+    # Total number of rts this week
+    rts = serializers.IntegerField(required=True)
 
     # Tweet id with the highest number of likes this week
-    max_likes = serializers.IntegerField()
+    max_likes = serializers.IntegerField(required=True)
     # Tweet id with the highest number of retweets this week
-    max_rts = serializers.IntegerField()
+    max_rts = serializers.IntegerField(required=True)
+
+    def get_time_interval(self, obj):
+        return (obj.end_date - obj.start_date) / timedelta(hours=1)
 
 
 class FollowerSerializer(serializers.Serializer):
-    data_time = serializers.DateTimeField()  # when was this follower recorded
-    followers = serializers.IntegerField()  # the number of followers at that time
+    seiyuu_id_name = serializers.CharField(required=True)  # seiyuu id_name
+    data_time = serializers.DateTimeField(
+        required=True)  # when was this follower recorded
+    # the number of followers at that time
+    followers = serializers.IntegerField(required=True)

@@ -35,15 +35,16 @@ function HeaderBanner(props) {
 function FeatureSection(props) {
     return (
         <Grid.Row verticalAlign="middle" className="bot about feature section">
-            {props.imageSide === "left" ? <Grid.Column width={6} textAlign="right">
-                <Image size="small" centered src={props.image ? props.image : BotLogoL}></Image>
-            </Grid.Column> : null}
-            <Grid.Column width={10}>
+            {props.imageSide === "right" ? <Grid.Column width={10} textAlign="right">
                 {props.children}
-            </Grid.Column>
-            {props.imageSide === "right" ? <Grid.Column width={6} textAlign="left">
-                <Image size="small" centered src={props.image ? props.image : BotLogoL}></Image>
             </Grid.Column> : null}
+            <Grid.Column width={6} textAlign="center">
+                <Image size="small" centered src={props.image ? props.image : BotLogoL}></Image>
+            </Grid.Column>
+            {props.imageSide === "left" ? <Grid.Column width={10} textAlign="left">
+                {props.children}
+            </Grid.Column> : null}
+
         </Grid.Row>
     )
 }

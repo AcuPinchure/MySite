@@ -11,10 +11,18 @@ tweet_api_endpoints = [
 
 followers_api_endpoints = [
     path('set', api_views.setFollowers, name="set_followers"),
+    path('get', api_views.getFollowers, name="get_followers"),
+]
+
+detail_stats_api_endpoints = [
+    path('posts', api_views.getPostDetail, name="get_post_detail"),
+    path('likes', api_views.getLikeDetail, name="get_like_detail"),
+    path('rts', api_views.getRtDetail, name="get_rt_detail"),
 ]
 
 api_endpoints = [
     path('getStats', api_views.getStats, name="get_stats"),
+    path('detailStats/', include(detail_stats_api_endpoints)),
     path('loadDefaultStats', api_views.loadDefaultStats, name="load_default_stats"),
     path('tweet/', include(tweet_api_endpoints)),
     path('followers/', include(followers_api_endpoints)),

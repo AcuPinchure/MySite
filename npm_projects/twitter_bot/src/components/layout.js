@@ -55,6 +55,11 @@ function BotLayout(props) {
     const [left_active, setLeftActive] = useState(true);
     const [right_active, setRightActive] = useState(false);
     const [viewWidth, setViewWidth] = useState(window.innerWidth);
+    const [crossData, setCrossData] = useState({});
+
+    function updateCrossData(data) {
+        setCrossData(data);
+    }
 
     function handleSideActive(side, setActive) {
         if (side === 'left') {
@@ -101,7 +106,7 @@ function BotLayout(props) {
             <TitleBar leftActive={left_active && viewWidth > responsiveWidth} rightActive={right_active} setSideActive={handleSideActive} hasLeftIcon={viewWidth <= responsiveWidth} hasOptions={props.rightBarOptions ? true : false} />
             <LeftSideBar setSideActive={handleSideActive} isActive={left_active}></LeftSideBar>
             <RightSideBar setSideActive={handleSideActive} isActive={right_active}>
-                {React.cloneElement(props.rightBarOptions, { "handleSideActive": handleSideActive, ...props.rightBarOptions.props })}
+                {props.rightBarOptions ? React.cloneElement(props.rightBarOptions, { "handleSideActive": handleSideActive, "crossData": crossData, "updateCrossData": updateCrossData, ...props.rightBarOptions.props }) : null}
             </RightSideBar>
             <div className={`bot stats sidebar_overlay ${(right_active || (viewWidth <= responsiveWidth && left_active)) ? "active" : ""}`} onClick={() => {
                 setRightActive(false);
@@ -110,7 +115,7 @@ function BotLayout(props) {
                 }
             }}></div>
             <div className={`bot stats content ${left_active && viewWidth > responsiveWidth ? "left_active" : ""} ${right_active ? "right_active" : ""}`}>
-                {props.children}
+                {props.children ? React.cloneElement(props.children, { "crossData": crossData, "updateCrossData": updateCrossData, ...props.children.props }) : null}
             </div>
         </>
     )
