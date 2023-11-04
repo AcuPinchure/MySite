@@ -206,7 +206,7 @@ function Stats(props) {
             url_params.append("seiyuu", statsOptions.seiyuu);
             url_params.append("start_date", statsOptions.start_date);
             url_params.append("end_date", statsOptions.end_date);
-            fetch("/bot/api/getStats?" + url_params.toString())
+            fetch("/bot/api/getStats/?" + url_params.toString())
                 .then(res => res.json())
                 .then(data => {
                     if (!data.status) {
@@ -232,7 +232,7 @@ function Stats(props) {
                     setLoading(false);
                 }
                 );
-            fetch("/bot/api/followers/get?" + url_params.toString())
+            fetch("/bot/api/followers/get/?" + url_params.toString())
                 .then(res => res.json())
                 .then(data => {
                     if (!data.status) {
@@ -279,13 +279,13 @@ function Stats(props) {
             <h1>{stats.status ? (stats.seiyuu_name + " " + stats.seiyuu_id) : statsOptions.seiyuu}</h1>
             {stats.status ? (
                 <Grid columns={3} stackable>
-                    <StatsDetailModal open={modalOpen.posts} handleClose={() => setModalOpen(prev => ({ ...prev, posts: false }))} title="Posts" statsOptions={statsOptions} src="/bot/api/detailStats/posts" />
+                    <StatsDetailModal open={modalOpen.posts} handleClose={() => setModalOpen(prev => ({ ...prev, posts: false }))} title="Posts" statsOptions={statsOptions} src="/bot/api/detailStats/posts/" />
                     <StatsBlock title="Posts" iconName="twitter" value={stats.posts.toLocaleString()} subinfo={`${(stats.posts / stats.interval).toFixed(2)} posts per hour`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, posts: true }))} />
 
-                    <StatsDetailModal open={modalOpen.likes} handleClose={() => setModalOpen(prev => ({ ...prev, likes: false }))} title="Likes" statsOptions={statsOptions} src="/bot/api/detailStats/likes" />
+                    <StatsDetailModal open={modalOpen.likes} handleClose={() => setModalOpen(prev => ({ ...prev, likes: false }))} title="Likes" statsOptions={statsOptions} src="/bot/api/detailStats/likes/" />
                     <StatsBlock title="Likes" iconName="heart" value={stats.likes.toLocaleString()} subinfo={`${(stats.likes / stats.posts).toFixed(2)} likes per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, likes: true }))} />
 
-                    <StatsDetailModal open={modalOpen.rts} handleClose={() => setModalOpen(prev => ({ ...prev, rts: false }))} title="Retweets" statsOptions={statsOptions} src="/bot/api/detailStats/rts" />
+                    <StatsDetailModal open={modalOpen.rts} handleClose={() => setModalOpen(prev => ({ ...prev, rts: false }))} title="Retweets" statsOptions={statsOptions} src="/bot/api/detailStats/rts/" />
                     <StatsBlock title="Retweets" iconName="retweet" value={stats.rts.toLocaleString()} subinfo={`${(stats.rts / stats.posts).toFixed(2)} retweets per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, rts: true }))} />
                 </Grid>
             ) : (

@@ -29,7 +29,7 @@ function NaviMenu(props) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        fetch("/bot/api/testAuth").then(res => {
+        fetch("/bot/api/testAuth/").then(res => {
             setIsAuthenticated(res.status === 200);
         })
     }, []);
@@ -40,31 +40,31 @@ function NaviMenu(props) {
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/bot/stats")} onClick={() => history.push("/bot/stats")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/stats/")} onClick={() => history.push("/bot/stats/")}>
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
             {isAuthenticated ?
                 <>
-                    <Menu.Item active={location.pathname.startsWith("/bot/config")} onClick={() => history.push("/bot/config")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => history.push("/bot/config/")}>
                         <Icon name="cogs"></Icon>
                         Service Config
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/library")} onClick={() => history.push("/bot/library")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/library/")} onClick={() => history.push("/bot/library/")}>
                         <Icon name="images outline"></Icon>
                         Image Library
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/logs")} onClick={() => history.push("/bot/logs")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/logs/")} onClick={() => history.push("/bot/logs/")}>
                         <Icon name="clock outline"></Icon>
                         Logs
                     </Menu.Item>
-                    <Menu.Item onClick={() => { window.location = "/bot/logout" }}>
+                    <Menu.Item onClick={() => { window.location = "/bot/logout/" }}>
                         <Icon name="log out"></Icon>
                         Logout
                     </Menu.Item>
                 </>
                 :
-                <Menu.Item onClick={() => history.push("/bot/login")}>
+                <Menu.Item onClick={() => history.push("/bot/login/")}>
                     <Icon name="sign in"></Icon>
                     Admin
                 </Menu.Item>
