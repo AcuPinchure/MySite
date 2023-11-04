@@ -7,6 +7,8 @@ function LoginForm(props) {
     const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState(null);
 
+    const csrf_token = window.localStorage.getItem("csrf_token");
+
     useEffect(() => {
         setLoginMessage(null);
     }, [username, password])
@@ -26,7 +28,8 @@ function LoginForm(props) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': Cookies.get('csrftoken')
+                // 'X-CSRFToken': Cookies.get('csrftoken')
+                'X-CSRFToken': csrf_token
             },
             body: JSON.stringify({ username, password })
         }).then(response => {
@@ -42,7 +45,7 @@ function LoginForm(props) {
 
     return (
         <Form onSubmit={handleSubmit} method="post">
-            <input type="hidden" name="csrfmiddlewaretoken" value={Cookies.get('csrftoken')} />
+            <input type="hidden" name="csrfmiddlewaretoken" value={csrf_token} />
             <Form.Input label="Username" name="username" value={username} onChange={handleUsernameChange} />
             <Form.Input label="Password" name="password" type="password" value={password} onChange={handlePasswordChange} />
             <Form.Button type="submit" primary>Login</Form.Button>
