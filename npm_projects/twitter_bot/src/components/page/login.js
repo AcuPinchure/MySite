@@ -22,7 +22,7 @@ function LoginForm(props) {
 
     function handleSubmit(e) {
         e.preventDefault();
-        fetch('/bot/api/testLogin', {
+        fetch('/bot/api/testLogin/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

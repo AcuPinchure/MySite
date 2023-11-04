@@ -14,25 +14,25 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/bot/" component={About} />
-        <Route path="/bot/stats" component={() =>
+        <Route path="/bot/stats/" component={() =>
           (<BotLayout rightBarOptions={<StatsOptions defaultStartDate="2023-06-30" defaultEndDate="2023-07-31" defaultSeiyuu="kaorin" />} ><Stats></Stats></BotLayout>)
         } />
-        <Route path="/bot/login" component={() =>
+        <Route path="/bot/login/" component={() =>
         (<BotLayout>
           <Login></Login>
         </BotLayout>)
         } />
-        <Route path="/bot/config" component={() =>
+        <Route path="/bot/config/" component={() =>
         (<BotLayout>
           <ConfigPage />
         </BotLayout>)
         } />
-        <Route path="/bot/library" component={() =>
+        <Route path="/bot/library/" component={() =>
         (<BotLayout rightBarOptions={<LibraryOptions></LibraryOptions>}>
           <ImageLibrary></ImageLibrary>
         </BotLayout>)
         } />
-        <Route path="/bot/logs" component={() =>
+        <Route path="/bot/logs/" component={() =>
           (<BotLayout></BotLayout>)
         } />
       </Switch>
