@@ -56,23 +56,34 @@ function StatsDetailModal(props) {
 
     const data_rows = data.map((item, index) => (
         <Table.Row key={index}>
-            <Table.Cell width={6}>{item.name}</Table.Cell>
             {(() => {
                 switch (typeof item.value) {
                     case "number":
-                        return <Table.Cell width={10}>{item.value.toLocaleString('en-US', {
-                            maximumFractionDigits: 2,
-                            minimumFractionDigits: 0
-                        })}</Table.Cell>;
+                        return (
+                            <>
+                                <Table.Cell width={6}>{item.name}</Table.Cell>
+                                <Table.Cell width={10}>{item.value.toLocaleString('en-US', {
+                                    maximumFractionDigits: 2,
+                                    minimumFractionDigits: 0
+                                })}</Table.Cell>
+                            </>)
                     case "string":
-                        return <Table.Cell width={10}>{item.value}</Table.Cell>;
+                        return (
+                            <>
+                                <Table.Cell width={6}>{item.name}</Table.Cell>
+                                <Table.Cell width={10}>{item.value}</Table.Cell>
+                            </>)
                     case "boolean":
-                        return <Table.Cell width={10}>{item.value ? (<Icon name="check" color="green" />) : (<Icon name="x" color="green" />)}</Table.Cell>;
+                        return (
+                            <>
+                                <Table.Cell width={6}>{item.name}</Table.Cell>
+                                <Table.Cell width={10}>{item.value ? (<Icon name="check" color="green" />) : (<Icon name="x" color="green" />)}</Table.Cell>
+                            </>)
                     case "object":
                         display_tweets = item.value;
                         return null;
                     default:
-                        return <Table.Cell width={10}>Unknown</Table.Cell>;
+                        return <Table.Cell width={10}>Unknown</Table.Cell>
                 }
             })()}
         </Table.Row>
@@ -85,6 +96,7 @@ function StatsDetailModal(props) {
         >
             <Modal.Header>{props.title}</Modal.Header>
             <Modal.Content scrolling>
+                <h3>Detail</h3>
                 <Table celled basic="very">
                     <Table.Body>
                         {data_rows}
@@ -94,9 +106,9 @@ function StatsDetailModal(props) {
                 {display_tweets.length > 0 ? (
                     <>
                         <Divider></Divider>
-                        <h2>Top 10 Tweets - {props.title}</h2>
+                        <h3>Top 10 Tweets - {props.title}</h3>
                         {display_tweets.map((tweet_id, index) => (
-                            <Segment style={{ "maxWidth": "550px", "margin": "auto" }}>
+                            <Segment style={{ "maxWidth": "550px", "margin": "1rem auto" }}>
                                 <Label color='red' size="large" ribbon># {index + 1}</Label>
                                 <Tweet key={index} id={tweet_id}></Tweet>
                             </Segment>

@@ -8,8 +8,15 @@ import KonachiLink from "../../assets/Konachi_Link.jpg";
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import "./about.css"
-import { Grid, Image, Menu, Segment, Divider } from "semantic-ui-react";
+import { Grid, Image, Menu, Segment, Divider, Modal, Button } from "semantic-ui-react";
 
+
+/**
+ * The menu bar at the top of the page
+ * @param {object} props see prop
+ * @prop {boolean} inverted - Whether the menu bar color is inverted or not
+ * @returns JSX
+ */
 function TopMenu(props) {
     const history = useHistory();
     return (
@@ -24,6 +31,12 @@ function TopMenu(props) {
     )
 }
 
+/**
+ * The banner at the top of the page, with LOGO and subtitle
+ * @param {object} props see prop
+ * @prop {JSX} children - The content of the banner
+ * @returns JSX
+ */
 function HeaderBanner(props) {
     return (
         <div className="bot about header">
@@ -32,6 +45,43 @@ function HeaderBanner(props) {
     )
 }
 
+/**
+ * The modal that shows the detail description of a feature
+ * @param {object} props see prop
+ * @prop {JSX} triggerText - The text that triggers the modal
+ * @prop {string} title - The title of the modal
+ * @prop {JSX} children - The content of the modal
+ * @returns JSX
+ */
+function FeatureDetailModal(props) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Modal
+            trigger={<a style={{ cursor: "pointer" }}>{props.triggerText}</a>}
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+        >
+            <Modal.Header>{props.title}</Modal.Header>
+            <Modal.Content>
+                {props.children}
+            </Modal.Content>
+            <Modal.Actions>
+                <Button onClick={() => setOpen(false)}>Close</Button>
+            </Modal.Actions>
+        </Modal>
+    )
+}
+
+
+/**
+ * The section that describes a feature
+ * @param {object} props see prop
+ * @prop {string} imageSide - The side of the image, either "left" or "right"
+ * @prop {string} image - The image of the feature
+ * @prop {JSX} children - The content of the feature
+ * @returns JSX
+ */
 function FeatureSection(props) {
     return (
         <Grid.Row verticalAlign="middle" className="bot about feature section">
@@ -49,6 +99,13 @@ function FeatureSection(props) {
     )
 }
 
+/**
+ * The link to a bot's twitter account
+ * @param {object} props see prop
+ * @prop {string} name - The name of the bot
+ * @prop {string} image - The image of the bot
+ * @returns JSX
+ */
 function TwitterLink(props) {
     return (
         <a href={props.link} target="_blank" rel="noreferrer" className="bot about twitter_link">
@@ -58,9 +115,13 @@ function TwitterLink(props) {
     )
 }
 
-function Footer(props) {
+/**
+ * The footer of the page
+ * @returns JSX
+ */
+function Footer() {
     return (
-        <div basic inverted className="bot about footer">
+        <div className="bot about footer">
             <p className="bot about feature title">Stay Tuned</p>
             <p className="bot about feature description">
                 Our service currently owns 4 bot accounts, check them out right now.
@@ -88,6 +149,10 @@ function Footer(props) {
     )
 }
 
+/**
+ * The about page
+ * @returns JSX
+ */
 function About() {
     const [viewWidth, setViewWidth] = useState(window.innerWidth);
     const [scrollDistance, setScrollDistance] = useState(0);
@@ -130,10 +195,12 @@ function About() {
                         <p className="bot about feature description">
                             Our bot randomly picks images of your favorite seiyuu and posts them on twitter. You'll never miss that perfect profile pic, moments or meme!
                         </p>
+                        <FeatureDetailModal triggerText="Learn more about how we collect images" title="How do we collect images?">
+                        </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
                     <FeatureSection imageSide="right">
-                        <p className="bot about feature title">Reminisce, <br />as well as Stay up-to-date</p>
+                        <p className="bot about feature title">Reminisce<br /><span style={{ fontWeight: "normal" }}>as well as</span><br />Stay up-to-date</p>
                         <p className="bot about feature description">
                             While we continuously update our libraries with new images, we also retain those special older gems. That way you can rediscover and enjoy your favorites' gorgeous moments from years past that should never be forgotten.
                         </p>
@@ -144,6 +211,8 @@ function About() {
                         <p className="bot about feature description">
                             With new images posted hourly*, you'll get a regular dose of joy when your favorite seiyuu pops up in your feed. It's a great way to stay connected to your “oshi”!
                         </p>
+                        <FeatureDetailModal triggerText="See service status" title="Service status">
+                        </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
                     <FeatureSection imageSide="right">
@@ -151,6 +220,7 @@ function About() {
                         <p className="bot about feature description">
                             Our libraries include not only static images, but also delightful gifs and short video clips capturing moments of your favorites. See their personalities and emotions shine through these dynamic slices of life!
                         </p>
+
                     </FeatureSection>
                     <Divider></Divider>
                     <FeatureSection imageSide="left">
@@ -158,6 +228,8 @@ function About() {
                         <p className="bot about feature description">
                             We analyze the popularity of each post to learn what images resonate most with fans. This means our libraries continuously improve to feature your favorites.
                         </p>
+                        <FeatureDetailModal triggerText="See how we collect data" title="What data do we collect?">
+                        </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
                     <FeatureSection imageSide="right">

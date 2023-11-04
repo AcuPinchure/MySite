@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,7 @@
     <meta name="msapplication-config" content="/static/twitter_bot/site_media/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
     <title>LoveLive Seiyuu Bot</title>
-    <style>
+    {% comment %} <style>
         #loading {
             position: fixed;
             top: 0;
@@ -25,6 +26,7 @@
             z-index: 1;
             transition: all 1s ease;
         }
+
         #loading .logo_wrapper {
             position: absolute;
             top: 50%;
@@ -34,6 +36,7 @@
             z-index: 4;
             transition: all 1s ease;
         }
+
         #loading .title_mask {
             position: absolute;
             top: 50%;
@@ -45,6 +48,7 @@
             z-index: 3;
             transition: all 1s ease;
         }
+
         #loading .title_wrapper {
             position: absolute;
             top: 50%;
@@ -54,17 +58,21 @@
             z-index: 2;
             transition: all 1s ease;
         }
+
         #loading .logo_wrapper.moved {
             transform: translate(-280%, -50%);
         }
+
         #loading .title_mask.moved {
             transform: translate(-130%, -50%);
         }
+
         #loading .title_wrapper.moved {
             transform: translate(-30%, -50%);
         }
-    </style>
+    </style> {% endcomment %}
 </head>
+
 <body>
     <noscript>This website requires javascript, enabled javascript in your browser settings to continue.</noscript>
     <div id="root"></div>
@@ -86,4 +94,5 @@
     {% load static %}
     <script src="{% static 'twitter_bot/main.js' %}"></script>
 </body>
+
 </html>
