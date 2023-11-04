@@ -18,7 +18,7 @@ function LeftSideBar(props) {
 function SideBarTitle(props) {
     const history = useHistory();
     return (
-        <img src={BotLogo} alt="Bot Logo" className="bot stats site_title" onClick={() => { window.location = "/bot" }}></img>
+        <img src={BotLogo} alt="Bot Logo" className="bot stats site_title" onClick={() => { window.location = "/bot/" }}></img>
     )
 }
 
@@ -36,7 +36,7 @@ function NaviMenu(props) {
 
     return (
         <Menu secondary vertical inverted fluid size="large">
-            <Menu.Item data-name="about" onClick={() => { window.location = "/bot" }}>
+            <Menu.Item data-name="about" onClick={() => { window.location = "/bot/" }}>
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
