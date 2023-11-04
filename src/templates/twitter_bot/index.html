@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/twitter_bot/site_media/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/twitter_bot/site_media/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/twitter_bot/site_media/favicon-16x16.png">
+    <link rel="manifest" href="/static/twitter_bot/site_media/site.webmanifest">
+    <link rel="mask-icon" href="/static/twitter_bot/site_media/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/static/twitter_bot/site_media/favicon.ico">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-config" content="/static/twitter_bot/site_media/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <title>LoveLive Seiyuu Bot</title>
+    {% comment %} <style>
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgb(27, 9, 56);
+            color: white;
+            z-index: 1;
+            transition: all 1s ease;
+        }
+
+        #loading .logo_wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 4rem;
+            z-index: 4;
+            transition: all 1s ease;
+        }
+
+        #loading .title_mask {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-90%, -50%);
+            background-color: rgb(27, 9, 56);
+            height: 5rem;
+            width: 16rem;
+            z-index: 3;
+            transition: all 1s ease;
+        }
+
+        #loading .title_wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-91%, -50%);
+            height: 4rem;
+            z-index: 2;
+            transition: all 1s ease;
+        }
+
+        #loading .logo_wrapper.moved {
+            transform: translate(-280%, -50%);
+        }
+
+        #loading .title_mask.moved {
+            transform: translate(-130%, -50%);
+        }
+
+        #loading .title_wrapper.moved {
+            transform: translate(-30%, -50%);
+        }
+    </style> {% endcomment %}
+</head>
+
+<body>
+    <noscript>This website requires javascript, enabled javascript in your browser settings to continue.</noscript>
+    <div id="root"></div>
+
+    {% comment %} {% load static %}
+    <div id="loading">
+        <img class="logo_wrapper" src="{% static 'twitter_bot/site_media/bot_L_logo.svg' %}" alt="">
+        <div class="title_mask"></div>
+        <img class="title_wrapper" src="{% static 'twitter_bot/site_media/bot_title.svg' %}" alt="">
+    </div>
+    <script>
+        setInterval(() => {
+            document.querySelector('#loading .logo_wrapper').classList.add('moved');
+            document.querySelector('#loading .title_mask').classList.add('moved');
+            document.querySelector('#loading .title_wrapper').classList.add('moved');
+        }, 500);
+    </script> {% endcomment %}
+
+    {% load static %}
+    <script src="{% static 'twitter_bot/main.js' %}"></script>
+</body>
+
+</html>

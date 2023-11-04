@@ -1,0 +1,128 @@
+:root {
+    --bar-width: 15rem;
+}
+
+.bot.site_title {
+    font-style: italic;
+    color: white;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+
+.bot.site_subinfo {
+    color: lightgrey;
+}
+
+.bot.stats.sidebar {
+    box-sizing: border-box;
+    position: fixed;
+    width: var(--bar-width);
+    padding: 1rem;
+    padding-top: 0rem;
+    height: 100vh;
+    transition: left ease 0.3s, right ease 0.3s;
+}
+
+
+.bot.stats.left.sidebar {
+    z-index: 150;
+    top: 0;
+    left: calc(-1*var(--bar-width));
+    background-color: rgb(27, 9, 56);
+}
+.bot.stats.left.sidebar.active {
+    left: 0;
+}
+
+.bot.stats.right.sidebar {
+    width: var(--bar-width);
+    padding-top: 1rem;
+    z-index: 150;
+    top: 0;
+    right: calc(-1*var(--bar-width));
+    background-color: rgb(240, 240, 240);
+}
+.bot.stats.right.sidebar.active {
+    right: 0;
+}
+.bot.stats.sidebar_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-color: rgb(0, 0, 0, 0);
+    transition: background-color ease 0.3s, z-index ease 0.3s;
+}
+.bot.stats.sidebar_overlay.active {
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 140;
+}
+
+
+.bot.stats.left.sidebar_close {
+    text-align: left;
+}
+
+.bot.stats.right.sidebar_close {
+    text-align: right;
+}
+
+.bot.stats.content {
+    padding-top: 5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: rgb(240, 240, 240);
+    min-height: 100vh;
+    transition: margin ease 0.3s;
+}
+.bot.stats.content.left_active {
+    margin-left: var(--bar-width);
+}
+
+.bot.stats.subinfo {
+    color: grey;
+}
+.bot.stats.subinfo>.value {
+    display: inline-block;
+    margin-right: 0.4rem;
+    margin-left: 0.4rem;
+    font-size: 1.5rem;
+}
+
+.bot.stats.follower.trend.wrapper {
+    overflow: auto;
+}
+
+.bot.stats.follower.trend.wrapper .canvas.wrapper {
+    min-width: 600px;
+}
+
+
+.bot.stats.title.bar {
+    display: block;
+    z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0.7rem;
+    background-color: white;
+    width: 100vw;
+    transition: margin ease 0.3s, width ease 0.3s;
+    box-shadow: 0 0 5px lightgray;
+}
+.bot.stats.title.bar.left_active {
+    margin-left: var(--bar-width);
+    width: calc(100vw - var(--bar-width));
+}
+
+
+.ui.vertical.text.inverted.menu .item:hover {
+    cursor: pointer;
+}
+
+

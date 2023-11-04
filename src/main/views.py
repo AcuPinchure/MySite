@@ -7,8 +7,9 @@ from MySite import settings
 
 
 def index(request):
-    return HttpResponse('main index')
+    return render(request, 'main/index.html')
 
 def sslValidation(request,file_name):
     file = open(os.path.join(settings.BASE_DIR,"data","pki",file_name))
     return HttpResponse(file)
+
