@@ -409,7 +409,7 @@ def getNoDataTweets(request):
 
         no_data_tweets = Tweet.objects.select_related('media__seiyuu')
 
-        time_buffer = 24  # hours
+        time_buffer = 72  # hours
 
         no_data_tweets = no_data_tweets.filter(data_time__isnull=True, post_time__lte=timezone.now(
         )-timedelta(hours=time_buffer)).order_by("post_time")
