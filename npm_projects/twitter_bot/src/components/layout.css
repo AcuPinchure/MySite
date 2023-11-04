@@ -28,7 +28,7 @@
 
 
 .bot.stats.left.sidebar {
-    z-index: 150;
+    z-index: 250;
     top: 0;
     left: calc(-1*var(--bar-width));
     background-color: rgb(27, 9, 56);

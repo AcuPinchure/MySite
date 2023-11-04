@@ -93,6 +93,11 @@
 
     {% load static %}
     <script src="{% static 'twitter_bot/main.js' %}"></script>
+
+    <script>
+        const local_storage = window.localStorage;
+        local_storage.setItem('csrf_token', '{{ csrf_token }}');
+    </script>
 </body>
 
 </html>
