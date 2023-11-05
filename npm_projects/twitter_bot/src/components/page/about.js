@@ -5,10 +5,53 @@ import AkarinLink from "../../assets/Akarin_Link.jpg";
 import ChemiLink from "../../assets/Chemi_Link.jpg";
 import KonachiLink from "../../assets/Konachi_Link.jpg";
 
+import Slide1 from "../../assets/about_images/slide_1.jpg";
+import Slide2 from "../../assets/about_images/slide_2.jpg";
+import Slide3 from "../../assets/about_images/slide_3.jpg";
+import Slide4 from "../../assets/about_images/slide_4.jpg";
+import Motion from "../../assets/about_images/motion.gif";
+import Library from "../../assets/about_images/library.png";
+import TweetDemo from "../../assets/about_images/tweet_demo.png";
+import StatsDemo from "../../assets/about_images/stats.jpeg";
+
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import "./about.css"
-import { Grid, Image, Menu, Segment, Divider, Modal, Button } from "semantic-ui-react";
+import { Grid, Image, Menu, Segment, Divider, Modal, Button, List, Table, Icon } from "semantic-ui-react";
+
+
+/**
+ * An image slider that shows the example images
+ * @param {object} props see prop
+ * @prop {array} images - The array of image urls
+ * @prop {integer} interval - The interval between each image in seconds
+ */
+function ImageSlider(props) {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (currentImageIndex < props.images.length - 1) {
+                setCurrentImageIndex(currentImageIndex + 1);
+            } else {
+                setCurrentImageIndex(0);
+            }
+        }, props.interval * 1000);
+
+        return () => clearInterval(interval);
+    }, [currentImageIndex, props.images, props.interval]);
+
+
+    return (
+        <div className="bot about image_slider">
+            {props.images.map((image, index) => {
+                return (
+                    <Image centered src={image} className={index === currentImageIndex ? "" : "vanish"} key={index} />
+                )
+            })}
+        </div>
+    )
+}
 
 
 /**
@@ -78,7 +121,7 @@ function FeatureDetailModal(props) {
  * The section that describes a feature
  * @param {object} props see prop
  * @prop {string} imageSide - The side of the image, either "left" or "right"
- * @prop {string} image - The image of the feature
+ * @prop {JSX} image - The image of the feature
  * @prop {JSX} children - The content of the feature
  * @returns JSX
  */
@@ -89,7 +132,7 @@ function FeatureSection(props) {
                 {props.children}
             </Grid.Column> : null}
             <Grid.Column width={6} textAlign="center">
-                <Image size="small" centered src={props.image ? props.image : BotLogoL}></Image>
+                {props.image ? props.image : <Image src={BotLogoL} size="small" centered />}
             </Grid.Column>
             {props.imageSide === "left" ? <Grid.Column width={10} textAlign="left">
                 {props.children}
@@ -124,7 +167,7 @@ function Footer() {
         <div className="bot about footer">
             <p className="bot about feature title">Stay Tuned</p>
             <p className="bot about feature description">
-                Our service currently owns 4 bot accounts, check them out right now.
+                Our service currently owns 4 accounts, click the avatar to view them on Twitter.
             </p>
             <Grid doubling columns={4} stackable className="bot about twitter_link_group">
                 <Grid.Column>
@@ -142,7 +185,14 @@ function Footer() {
             </Grid>
             <div className="bot about footer_bottom">
                 <p>
-                    © 2023 Lovelive Seiyuu Bot Project | create by AcuPinchure
+                    © 2020 Lovelive Seiyuu Bot Project | create by AcuPinchure
+                </p>
+                <p>
+
+                    <a href="https://github.com/AcuPinchure/MySite">
+                        <Icon name="github"></Icon>
+                        view source code
+                    </a>
                 </p>
             </div>
         </div>
@@ -190,45 +240,111 @@ function About() {
             </HeaderBanner>
             <Segment basic style={{ padding: viewWidth > 768 ? "3rem" : "0.2rem" }}>
                 <Grid stackable>
-                    <FeatureSection imageSide="left">
+                    <FeatureSection imageSide="left" image={<ImageSlider images={[Slide1, Slide2, Slide3, Slide4]} interval={2}></ImageSlider>}>
                         <p className="bot about feature title">Discover Random Surprise</p>
                         <p className="bot about feature description">
                             Our bot randomly picks images of your favorite seiyuu and posts them on twitter. You'll never miss that perfect profile pic, moments or meme!
                         </p>
                         <FeatureDetailModal triggerText="Learn more about how we collect images" title="How do we collect images?">
+                            <p>All images and clips are collected from the following source.</p>
+                            <List bulleted>
+                                <List.Item>Social media such as Twitter, Instagram, YouTube, etc.</List.Item>
+                                <List.Item>News websites</List.Item>
+                                <List.Item>Official websites</List.Item>
+                                <List.Item>Other public source</List.Item>
+                            </List>
+                            <p>The media from the following source will not be included.</p>
+                            <List bulleted>
+                                <List.Item>Fan clubs</List.Item>
+                                <List.Item>Magazine or photobook scans</List.Item>
+                                <List.Item>Live concert streaming service</List.Item>
+                                <List.Item>Live concert BD</List.Item>
+                                <List.Item>Other paid source</List.Item>
+                                <List.Item>Anything marked as redistribution prohibited</List.Item>
+                            </List>
                         </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
-                    <FeatureSection imageSide="right">
+                    <FeatureSection imageSide="right" image={<Image src={Library} style={{ width: "30rem" }} centered></Image>}>
                         <p className="bot about feature title">Reminisce<br /><span style={{ fontWeight: "normal" }}>as well as</span><br />Stay up-to-date</p>
                         <p className="bot about feature description">
-                            While we continuously update our libraries with new images, we also retain those special older gems. That way you can rediscover and enjoy your favorites' gorgeous moments from years past that should never be forgotten.
+                            While we continuously update with new images, older gems still remain. You always have changes to rediscover those gorgeous moments years later.
                         </p>
                     </FeatureSection>
                     <Divider></Divider>
-                    <FeatureSection imageSide="left">
+                    <FeatureSection imageSide="left" image={<Image src={TweetDemo} style={{ height: "30rem" }} centered></Image>}>
                         <p className="bot about feature title">Scheduled, hourly Joy</p>
                         <p className="bot about feature description">
-                            With new images posted hourly*, you'll get a regular dose of joy when your favorite seiyuu pops up in your feed. It's a great way to stay connected to your “oshi”!
+                            You'll get a regular dose of joy when your favorite seiyuu pops up in your feed. It's a great way to stay connected to your “oshi”!
                         </p>
-                        <FeatureDetailModal triggerText="See service status" title="Service status">
+                        <FeatureDetailModal triggerText="See posts interval of each account" title="Service status">
+                            <Table basic="very" celled>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Account</Table.HeaderCell>
+                                        <Table.HeaderCell>Status</Table.HeaderCell>
+                                        <Table.HeaderCell>Interval</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    <Table.Row>
+                                        <Table.Cell>前田佳織里</Table.Cell>
+                                        <Table.Cell>
+                                            <Icon name="check" color="green"></Icon>
+                                            Online
+                                        </Table.Cell>
+                                        <Table.Cell>1 hour</Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row>
+                                        <Table.Cell>鬼頭明里</Table.Cell>
+                                        <Table.Cell>
+                                            <Icon name="check" color="green"></Icon>
+                                            Online
+                                        </Table.Cell>
+                                        <Table.Cell>1 hour</Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row>
+                                        <Table.Cell>田中ちえ美</Table.Cell>
+                                        <Table.Cell>
+                                            <Icon name="check" color="green"></Icon>
+                                            Online
+                                        </Table.Cell>
+                                        <Table.Cell>1 hour</Table.Cell>
+                                    </Table.Row>
+                                    <Table.Row>
+                                        <Table.Cell>月音こな</Table.Cell>
+                                        <Table.Cell>
+                                            <Icon name="x" color="red"></Icon>
+                                            Offline
+                                        </Table.Cell>
+                                        <Table.Cell>-</Table.Cell>
+                                    </Table.Row>
+                                </Table.Body>
+                            </Table>
                         </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
-                    <FeatureSection imageSide="right">
-                        <p className="bot about feature title">Kawaii, Gorgeous, in Motion!!</p>
+                    <FeatureSection imageSide="right" image={<Image src={Motion} style={{ width: "30rem" }} centered></Image>}>
+                        <p className="bot about feature title">Sometimes in Motion!!</p>
                         <p className="bot about feature description">
-                            Our libraries include not only static images, but also delightful gifs and short video clips capturing moments of your favorites. See their personalities and emotions shine through these dynamic slices of life!
+                            Our libraries include not only static images, but also short clips as well. See their personalities and emotions shine through these dynamic slices of life!
                         </p>
 
                     </FeatureSection>
                     <Divider></Divider>
-                    <FeatureSection imageSide="left">
+                    <FeatureSection imageSide="left" image={<Image src={StatsDemo} style={{ width: "30rem" }} centered></Image>}>
                         <p className="bot about feature title">Data-Driven Curation</p>
                         <p className="bot about feature description">
                             We analyze the popularity of each post to learn what images resonate most with fans. This means our libraries continuously improve to feature your favorites.
                         </p>
                         <FeatureDetailModal triggerText="See how we collect data" title="What data do we collect?">
+                            <p>In order to better understand the popularity of the posted images or clips, the bot records the following data from each tweet 72 hours after posting. No personal information from any account will be collected.</p>
+                            <List bulleted>
+                                <List.Item>The number of likes</List.Item>
+                                <List.Item>The number of retweets (including quotes)</List.Item>
+                                <List.Item>The number of followers of the account</List.Item>
+                            </List>
+                            <p>You can see the statistics of each account in <a href="/bot/stats/">the statistics page</a>.</p>
                         </FeatureDetailModal>
                     </FeatureSection>
                     <Divider></Divider>
