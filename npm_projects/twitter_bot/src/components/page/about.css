@@ -1,7 +1,7 @@
 .bot.about.header {
     height: 100vh;
     width: 100%;
-    background-color: rgb(27, 9, 56);
+    background: linear-gradient(180deg, rgba(27,9,56,1) 0%, rgba(27,9,56,1) 10%, rgba(27,9,56,0.9) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -43,7 +43,7 @@
     left: 0;
     width: 100vw;
     color: lightgray;
-    padding: 0.5rem;
+    padding: 1rem 0.5rem;
 }
 
 .bot.about.twitter_link_group {
@@ -68,4 +68,21 @@
 .bot.about.navi_menu.show {
     background-color: white;
     box-shadow: 0 0 5px lightgray;
+}
+
+.bot.about.image_slider {
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+}
+.bot.about.image_slider img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: z-index ease 0.5s, opacity ease 0.5s;
+    width: 100%;
+}
+.bot.about.image_slider img.vanish {
+    opacity: 0;
 }
