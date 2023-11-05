@@ -358,51 +358,41 @@ function Stats(props) {
  * @returns JSX
  */
 function StatsOptions(props) {
+    const curr_time = new Date();
+    const curr_date = curr_time.toISOString().split("T")[0];
+    const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const prev_date = prev_time.toISOString().split("T")[0];
     const [statsOptions, setStatsOptions] = useState({
-        "start_date": "",
-        "end_date": "",
-        "seiyuu": ""
+        "start_date": prev_date,
+        "end_date": curr_date,
+        "seiyuu": "kaorin"
     });
 
 
     const localStorage = window.localStorage;
 
-
-    function handleSelectSeiyuu(e) {
-        setStatsOptions(prev => (
-            {
-                ...prev,
-                "seiyuu": e.target.getAttribute("data-seiyuu")
-            }
-        ));
-        handleApply();
-    }
-
     useEffect(() => {
-        // if (localStorage.getItem("stats_options")) {
-        //     const stats_options = JSON.parse(localStorage.getItem("stats_options"));
-        //     setStartDate(stats_options.start_date);
-        //     setEndDate(stats_options.end_date);
-        //     setSeiyuu(stats_options.seiyuu);
-        // }
-        const curr_time = new Date();
-        const curr_date = curr_time.toISOString().split("T")[0];
-        const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const prev_date = prev_time.toISOString().split("T")[0];
-        setStatsOptions({
-            "start_date": prev_date,
-            "end_date": curr_date,
-            "seiyuu": "kaorin"
-        });
+        if (localStorage.getItem("stats_options")) {
+            const stats_options = JSON.parse(localStorage.getItem("stats_options"));
+            handleApply(stats_options);
+        }
+        else {
+            handleApply(statsOptions);
+        }
     }, []);
 
-    useEffect(() => {
-        props.updateCrossData(statsOptions);
-    }, [statsOptions]);
+    function handleSelectSeiyuu(e) {
+        handleApply({
+            ...statsOptions,
+            "seiyuu": e.target.getAttribute("data-seiyuu")
+        });
+    }
 
-    function handleApply() {
-        localStorage.setItem("stats_options", JSON.stringify(statsOptions));
+    function handleApply(stats_options) {
+        setStatsOptions(stats_options);
+        localStorage.setItem("stats_options", JSON.stringify(stats_options));
         props.handleSideActive("right", false);
+        props.updateCrossData(stats_options);
     }
 
     function handlePresets(preset_value) {
@@ -411,47 +401,46 @@ function StatsOptions(props) {
         if (preset_value === "week") {
             const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
             const prev_date = prev_time.toISOString().split("T")[0];
-            setStatsOptions(prev => (
+            handleApply(
                 {
-                    ...prev,
+                    ...statsOptions,
                     "start_date": prev_date,
                     "end_date": curr_date
                 }
-            ));
+            );
         }
         else if (preset_value === "month") {
             const prev_time = new Date(curr_time.getTime() - 30 * 24 * 60 * 60 * 1000);
             const prev_date = prev_time.toISOString().split("T")[0];
-            setStatsOptions(prev => (
+            handleApply(
                 {
-                    ...prev,
+                    ...statsOptions,
                     "start_date": prev_date,
                     "end_date": curr_date
                 }
-            ));
+            );
         }
         else if (preset_value === "year") {
             const prev_time = new Date(curr_time.getTime() - 365 * 24 * 60 * 60 * 1000);
             const prev_date = prev_time.toISOString().split("T")[0];
-            setStatsOptions(prev => (
+            handleApply(
                 {
-                    ...prev,
+                    ...statsOptions,
                     "start_date": prev_date,
                     "end_date": curr_date
                 }
-            ));
+            );
         }
         else if (preset_value === "all") {
-            setStatsOptions(prev => (
+            handleApply(
                 {
-                    ...prev,
+                    ...statsOptions,
                     "start_date": "2000-01-01",
                     "end_date": curr_date
                 }
-            ));
+            );
         }
 
-        handleApply();
     }
 
 
@@ -472,8 +461,8 @@ function StatsOptions(props) {
             </Menu>
             <h3>Data Interval</h3>
             <Form>
-                <Form.Input label="Start Date" control="input" type="date" value={statsOptions.start_date} onChange={(e) => setStartDate(prev => ({ ...prev, "start_date": e.target.value }))}></Form.Input>
-                <Form.Input label="End Date" control="input" type="date" value={statsOptions.end_date} onChange={(e) => setEndDate(prev => ({ ...prev, "end_date": e.target.value }))}></Form.Input>
+                <Form.Input label="Start Date" control="input" type="date" value={statsOptions.start_date} onChange={(e) => setStatsOptions(prev => ({ ...prev, "start_date": e.target.value }))}></Form.Input>
+                <Form.Input label="End Date" control="input" type="date" value={statsOptions.end_date} onChange={(e) => setStatsOptions(prev => ({ ...prev, "end_date": e.target.value }))}></Form.Input>
                 <Form.Field>
                     <label>Preset</label>
                     <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait" options={presetOptions} onChange={(e, { value }) => {
@@ -481,7 +470,7 @@ function StatsOptions(props) {
                     }}></Dropdown>
                 </Form.Field>
                 <Form.Field>
-                    <Button fluid onClick={handleApply}>Apply</Button>
+                    <Button fluid onClick={() => handleApply(statsOptions)}>Apply</Button>
                 </Form.Field>
 
             </Form>
