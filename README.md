@@ -184,7 +184,17 @@ If you want to setup your own image bot, follow the instructions.
         ```
     * Now you have your own bot service, for adding new image in the future, just add image to `ImportQueue/<Your account image folder name>/` and run `import_img` command again
     * The repository currently does not include data collection function due to Twitter removing free access to Twitter API v1, but you may use the data collection API in this project to send collected data to the database.
-        * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `limit` param as the limited number of posts, suggest `limit=12` every hour.
+        * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `limit` param as the limited number of posts, suggest `limit=12` every hour. The API will response the following data:
+            ```
+            [
+                {
+                    "id": <tweet_id in integer>,
+                    "post_time": "<The time the tweet is posted, ISO string>",
+                    "media__seiyuu__screen_name": "<The account screen name>"
+                },
+                // other tweet
+            ]
+            ```
         * Setup your own data collection service, once you get the data, make a POST request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following data
             ```
             {
