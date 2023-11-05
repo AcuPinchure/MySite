@@ -69,6 +69,7 @@ This section includes documentation of each Django app in this project.
 An app that manage auto post images of Lovelive seiyuu on Twitter, collecting likes and retweets data and analyze the popularity of each image.
 For more information about what this app is for, see the [about page of "Lovelive Seiyuu BOT"](https://acupinchure.ddns.net/bot/).
 
+### Setup
 If you want to setup your own image bot, follow the instructions.
 
 1. Setup the project mentioned in [Fork and deploy](#Fork-and-deploy)
@@ -183,24 +184,34 @@ If you want to setup your own image bot, follow the instructions.
         read reply
         ```
     * Now you have your own bot service, for adding new image in the future, just add image to `ImportQueue/<Your account image folder name>/` and run `import_img` command again
-    * The repository currently does not include data collection function due to Twitter removing free access to Twitter API v1, but you may use the data collection API in this project to send collected data to the database.
-        * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `limit` param as the limited number of posts, suggest `limit=12` every hour. The API will response the following data:
-            ```
-            [
-                {
-                    "id": <tweet_id in integer>,
-                    "post_time": "<The time the tweet is posted, ISO string>",
-                    "media__seiyuu__screen_name": "<The account screen name>"
-                },
-                // other tweet
-            ]
-            ```
-        * Setup your own data collection service, once you get the data, make a POST request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following data
-            ```
-            {
-                "data_time": "<The time the data is collected, ISO string>",
-                "like": "<The number of like in this tweet>",
-                "rt": "<The number of rt in this tweet>",
-                "quote": "<The number of quote in this tweet>",
-            }
-            ```
+### Data collection API
+The repository currently does not include data collection function due to Twitter removing free access to Twitter API v1, but you may use the data collection API in this project to send collected data to the database.
+1. Followers data collection
+    * Setup your own data collection service, once you get the followers data, make a POST request to `/bot/api/followers/set` with the following request body, the API will auto insert data_time to the database:
+    ```
+    {
+        "seiyuu": "<The account screen name>",
+        "followers": "<The number of followers in integer>"
+    }
+    ```
+2. Tweet data collection
+    * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `limit` param as the limited number of posts, suggest `limit=12` every hour. The API will response the following data:
+    ```
+    [
+        {
+            "id": <tweet_id in integer>,
+            "post_time": "<The time the tweet is posted, ISO string>",
+            "media__seiyuu__screen_name": "<The account screen name>"
+        },
+        // other tweet
+    ]
+    ```
+    * Setup your own data collection service, once you get the tweet data, make a POST request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following request body:
+        ```
+        {
+            "data_time": "<The time the data is collected, ISO string>",
+            "like": "<The number of like in this tweet>",
+            "rt": "<The number of rt in this tweet>",
+            "quote": "<The number of quote in this tweet>",
+        }
+        ```
