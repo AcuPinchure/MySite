@@ -22,15 +22,15 @@ function TitleBar(props) {
                 <Grid.Column width={12} textAlign="center">
                     {(() => {
                         switch (location.pathname) {
-                            case "/bot/login":
+                            case "/bot/login/":
                                 return <h2>Login</h2>;
-                            case "/bot/stats":
+                            case "/bot/stats/":
                                 return <h2>Statistics</h2>;
-                            case "/bot/config":
+                            case "/bot/config/":
                                 return <h2>Service Configuration</h2>;
-                            case "/bot/library":
+                            case "/bot/library/":
                                 return <h2>Image Library</h2>;
-                            case "/bot/logs":
+                            case "/bot/logs/":
                                 return <h2>Service Logs</h2>;
                             default:
                                 return <h2>About</h2>;
