@@ -1,7 +1,7 @@
 .bot.about.header {
     height: 100vh;
     width: 100%;
-    background: linear-gradient(180deg, rgba(27,9,56,1) 0%, rgba(27,9,56,1) 10%, rgba(27,9,56,0.9) 100%);
+    background: linear-gradient(180deg, rgba(27,9,56,1) 0%, rgba(27,9,56,1) 10%, rgba(27,9,56,0.8) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;

@@ -268,7 +268,7 @@ function About() {
                     <FeatureSection imageSide="right" image={<Image src={Library} style={{ width: "30rem" }} centered></Image>}>
                         <p className="bot about feature title">Reminisce<br /><span style={{ fontWeight: "normal" }}>as well as</span><br />Stay up-to-date</p>
                         <p className="bot about feature description">
-                            While we continuously update with new images, older gems still remain. You always have changes to rediscover those gorgeous moments years later.
+                            While we continuously update with new images, older gems still remain. You always have chances to rediscover those gorgeous moments years later.
                         </p>
                     </FeatureSection>
                     <Divider></Divider>

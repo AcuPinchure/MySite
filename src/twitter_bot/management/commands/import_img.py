@@ -2,26 +2,21 @@ import os
 from pathlib import Path
 from twitter_bot.models import Media, Seiyuu
 from django.core.management.base import BaseCommand
+from MySite.settings import BASE_DIR
 
 
 class Command(BaseCommand):
+    help = "Import new image from ImportQueue to Library, and create Media instance"
+
     def handle(self, **options):
 
-        for info in [
-            ('前田佳織里','KaorinPicture'),
-            ('鬼頭明里','AkarinPicture'),
-            ('田中ちえ美','ChemiPicture')
-        ]:
+        for the_seiyuu_instance in Seiyuu.objects.all():
 
-            name, id = info
-        
-            s = Seiyuu.objects.get(name=name)
+            imgs_path = os.path.join(
+                BASE_DIR, 'data', 'media', 'Library', the_seiyuu_instance.image_folder)
+            import_path = os.path.join(
+                BASE_DIR, 'data', 'media', 'ImportQueue', the_seiyuu_instance.image_folder)
 
-            root_path = Path(__file__).resolve().parent.parent.parent.parent.parent
-
-            imgs_path = os.path.join(root_path,'data','media','Library',id)
-            import_path = os.path.join(root_path,'data','media','ImportQueue',id)
-            
             imgs = os.listdir(imgs_path)
             import_imgs = os.listdir(import_path)
 
@@ -31,8 +26,8 @@ class Command(BaseCommand):
                 ret = 'Failed'
                 if not (img in imgs):
                     os.rename(
-                        os.path.join(import_path,img),
-                        os.path.join(imgs_path,img)
+                        os.path.join(import_path, img),
+                        os.path.join(imgs_path, img)
                     )
                     if img.lower().endswith(".jpg") or img.lower().endswith(".jpeg"):
                         file_type = 'image/jpg'
@@ -43,13 +38,14 @@ class Command(BaseCommand):
                     elif img.lower().endswith(".gif"):
                         file_type = 'gif/gif'
                     else:
-                        raise ValueError("Invalid file_type: {}".format(img.split(".")[-1].lower()))
+                        raise ValueError("Invalid file_type: {}".format(
+                            img.split(".")[-1].lower()))
                     i = Media.objects.create(
-                        file=os.path.join('data','media','Library',id,img),
-                        seiyuu=s,
-                        file_type = file_type)
+                        file=os.path.join('data', 'media', 'Library', id, img),
+                        seiyuu=the_seiyuu_instance,
+                        file_type=file_type)
                     i.save()
                     ret = 'Success'
-                    
-                self.stdout.write(self.style.SUCCESS("[{}] Now at: {}/{} - {} - {}".format(name, idx+1, import_len, img, ret)))
-            
+
+                self.stdout.write(self.style.SUCCESS(
+                    f"[{the_seiyuu_instance.id_name}] Now at: {idx+1}/{import_len} - {img} - {ret}"))

@@ -20,6 +20,8 @@ class Seiyuu(models.Model):
         help_text='If the bot is activated', default=True)
     interval = models.IntegerField(
         help_text='Interval between tweets in hours', default=1)
+    image_folder = models.CharField(
+        help_text='The folder name of the images', max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.name
