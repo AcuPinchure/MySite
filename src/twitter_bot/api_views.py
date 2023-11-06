@@ -195,11 +195,11 @@ def getFollowers(request):
 
         json_data = []
 
-        curr_diff = None
-        prev_diff = None
-        prev_data_point = None
+        curr_diff = 0
+        prev_diff = 0
+        prev_data_point = follower_query[0]
         # get data with even interval
-        for data_point in follower_query:
+        for data_point in follower_query[1:]:
             curr_diff = abs(data_point.data_time - time_anchors[0])
             if data_point.data_time > time_anchors[0]:
                 if prev_diff and curr_diff > prev_diff:
@@ -207,15 +207,21 @@ def getFollowers(request):
                         "data_time": prev_data_point.data_time.strftime("%Y-%m-%d %H:%M"),
                         "followers": prev_data_point.followers,
                     })
+                else:
+                    json_data.append({
+                        "data_time": data_point.data_time.strftime("%Y-%m-%d %H:%M"),
+                        "followers": data_point.followers,
+                    })
                 time_anchors.pop(0)
             prev_diff = curr_diff
             prev_data_point = data_point
+        json_data.append({
+            "data_time": end_date.strftime("%Y-%m-%d %H:%M"),
+            "followers": follower_query.last().followers,
+        })
     else:
         json_data = follower_query.values(
             'data_time', 'followers').order_by("data_time")
-
-    if not json_data:
-        return Response({'status': False, 'message': 'No Followers found in the given interval'}, status=status.HTTP_404_NOT_FOUND)
 
     return Response({"status": True, "data": json_data}, status=status.HTTP_200_OK)
 

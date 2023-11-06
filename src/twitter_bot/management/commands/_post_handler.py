@@ -8,6 +8,8 @@ import requests
 from requests_oauthlib import OAuth1
 from pathlib import Path
 
+from twitter_bot.models import Seiyuu
+
 
 # The media upload method
 MEDIA_ENDPOINT_URL = 'https://upload.twitter.com/1.1/media/upload.json'
@@ -48,7 +50,7 @@ class MediaTweet(object):
 
         self.media_id = media_id
 
-        #print('Media ID: %s' % str(media_id))
+        # print('Media ID: %s' % str(media_id))
 
     def upload_append(self):
         '''
@@ -84,9 +86,10 @@ class MediaTweet(object):
             segment_id = segment_id + 1
             bytes_sent = file.tell()
 
-            print('%s of %s bytes uploaded' % (str(bytes_sent), str(self.total_bytes)))
+            print('%s of %s bytes uploaded' %
+                  (str(bytes_sent), str(self.total_bytes)))
 
-        #print('Upload chunks complete.')
+        # print('Upload chunks complete.')
 
     def upload_finalize(self):
         '''
@@ -125,7 +128,7 @@ class MediaTweet(object):
 
         check_after_secs = self.processing_info['check_after_secs']
 
-        #print('Checking after %s seconds' % str(check_after_secs))
+        # print('Checking after %s seconds' % str(check_after_secs))
         time.sleep(check_after_secs)
 
         print('STATUS')
@@ -156,7 +159,8 @@ class MediaTweet(object):
         # print(req.json())
 
     def tweet_v2(self):
-        req = self.client.create_tweet(media_ids=[self.media_id],user_auth=True)
+        req = self.client.create_tweet(
+            media_ids=[self.media_id], user_auth=True)
         print(req)
         return req.data['id']
 
@@ -186,25 +190,22 @@ def getForm(ftype):
 
 # main post action is here
 
+
 root_path = Path(__file__).resolve().parent.parent.parent.parent.parent
-with open(os.path.join(root_path,"data","tokens.json"),"r", encoding="UTF-8") as token_j:
+with open(os.path.join(root_path, "data", "tokens.json"), "r", encoding="UTF-8") as token_j:
     tokens = json.load(token_j)
 
-with open(os.path.join(root_path,"data","tokens_v2.json"),"r", encoding="UTF-8") as token_v2_j:
+with open(os.path.join(root_path, "data", "tokens_v2.json"), "r", encoding="UTF-8") as token_v2_j:
     tokens_v2 = json.load(token_v2_j)
 
-def auth_api(name):
-    if name == 'Kaorin':
-        the_token = tokens["Kaorin"]
-        the_token_v2 = tokens_v2["Kaorin"]
-    elif name == 'Chemi':
-        the_token = tokens["Chemi"]
-        the_token_v2 = tokens_v2["Chemi"]
-    elif name == 'Akarin':
-        the_token = tokens["Akarin"]
-        the_token_v2 = tokens_v2["Akarin"]
-    else:
-        raise ValueError('Invalid name: {}'.format(name))
+
+def auth_api(the_seiyuu_instance: Seiyuu):
+    try:
+        the_token = tokens[the_seiyuu_instance.id_name]
+        the_token_v2 = tokens_v2[the_seiyuu_instance.id_name]
+    except KeyError:
+        raise ValueError(
+            f'Token missing for id_name: {the_seiyuu_instance.id_name}')
 
     # Authenticate to Twitter
     auth = tweepy.OAuthHandler(the_token["id"], the_token["id_secret"])
@@ -224,19 +225,19 @@ def auth_api(name):
             access_token_secret=the_token["access_secret"],
         )
     except tweepy.errors.Unauthorized:
-        #print("Error during authentication")
+        # print("Error during authentication")
         return None, None, None
     else:
-        #print("Authentication OK")
+        # print("Authentication OK")
         return api, oauth, client
 
-    
+
 def auth_api_v2():
-    client = tweepy.Client(bearer_token=tokens_v2["AcuPinchure"]["bearer_token"])
+    client = tweepy.Client(
+        bearer_token=tokens_v2["AcuPinchure"]["bearer_token"])
 
     return client
 
 
-
 if __name__ == '__main__':
-    auth_api('Kaorin')
+    pass
