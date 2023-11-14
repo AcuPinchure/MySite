@@ -1,7 +1,38 @@
 from rest_framework import serializers
-from .models import Tweet
+from .models import Tweet, Seiyuu, Media
 
 from datetime import timedelta
+
+
+class SeiyuuSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Seiyuu
+        fields = [
+            'id',
+            'name',
+            'id_name',
+            'screen_name',
+            'interval',
+            'activated',
+            'image_folder'
+        ]
+
+
+class MediaSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    file = serializers.FileField(read_only=True)
+
+    class Meta:
+        model = Media
+        fields = [
+            'id',
+            'file',
+            'file_type',
+            'weight',
+            'seiyuu'
+        ]
 
 
 class TweetSerializer(serializers.ModelSerializer):

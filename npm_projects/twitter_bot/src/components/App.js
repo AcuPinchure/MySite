@@ -3,6 +3,7 @@ import About from './page/about';
 import { Stats, StatsOptions } from "./page/stats";
 import Login from './page/login';
 import ConfigPage from './page/service_config';
+import StatusPage from './page/service_status';
 import { LibraryOptions, ImageLibrary } from './page/library';
 
 import React from 'react';
@@ -20,6 +21,11 @@ function App() {
         <Route path="/bot/login/" component={() =>
         (<BotLayout>
           <Login></Login>
+        </BotLayout>)
+        } />
+        <Route path="/bot/status/" component={() =>
+        (<BotLayout>
+          <StatusPage></StatusPage>
         </BotLayout>)
         } />
         <Route path="/bot/config/" component={() =>

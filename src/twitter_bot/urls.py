@@ -35,6 +35,7 @@ api_endpoints = [
 urlpatterns = [
     path('', views.index, name='about'),
     path('stats/', views.index, name='stats'),
+    path('status/', views.index, name='status'),
     path('login/', views.indexLogin, name='login'),
     path('logout/', views.indexLogout, name='logout'),
     path('config/', views.indexLoginRequired, name='config'),

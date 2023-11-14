@@ -44,6 +44,10 @@ function NaviMenu(props) {
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
+            <Menu.Item active={location.pathname.startsWith("/bot/status/")} onClick={() => history.push("/bot/status/")}>
+                <Icon name="signal"></Icon>
+                Service Status
+            </Menu.Item>
             {isAuthenticated ?
                 <>
                     <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => history.push("/bot/config/")}>
@@ -64,10 +68,7 @@ function NaviMenu(props) {
                     </Menu.Item>
                 </>
                 :
-                <Menu.Item onClick={() => history.push("/bot/login/")}>
-                    <Icon name="sign in"></Icon>
-                    Admin
-                </Menu.Item>
+                null
             }
 
         </Menu>
