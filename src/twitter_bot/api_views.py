@@ -19,6 +19,9 @@ import pytz
 from .models import Seiyuu, Tweet, Followers
 from django.db.models import Avg, Count, Sum
 
+# serializers
+from .serializer import ServiceConfigSerializer
+
 
 @api_view(['POST'])
 def testLogin(request):
@@ -492,3 +495,73 @@ def setFollowers(request):
         return Response({"message": "Object create successfully"}, status=status.HTTP_200_OK)
     else:
         return Response({"message": "Not allowed host name"}, status=status.HTTP_403_FORBIDDEN)
+
+
+@api_view(['GET'])
+def getServiceConfig(request):
+    """
+    load status of all seiyuu
+
+    [return]
+    seiyuu_id_name: seiyuu id_name
+    is_active: if the service is active
+    interval: time interval in hours
+    last_post_time: last post time
+    """
+
+    data = []
+
+    # get all seiyuu
+    seiyuu_list = Seiyuu.objects.all().order_by("id")
+
+    for seiyuu in seiyuu_list:
+
+        last_post_time = Tweet.objects.filter(
+            media__seiyuu=seiyuu).latest("post_time").post_time.strftime("%Y-%m-%d %H:%M:%S") if Tweet.objects.filter(media__seiyuu=seiyuu).exists() else None
+
+        data.append({
+            "seiyuu_id_name": seiyuu.id_name,
+            "is_active": seiyuu.activated,
+            "interval": seiyuu.interval,
+            "last_post_time": last_post_time
+        })
+
+    return Response({
+        "status": True,
+        "data": ServiceConfigSerializer(data, many=True).data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def updateServiceConfig(request, seiyuu_id_name):
+    """
+    update service config
+
+    [url params]
+    seiyuu_id_name: seiyuu_id_name
+
+    [body params]
+    is_active: if the service is active
+    interval: time interval in hours
+    """
+
+    # Extract the data from the PUT request using request.data
+    serializer = ServiceConfigSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+
+    try:
+        # Retrieve the object you want to update based on the 'pk' parameter
+        the_seiyuu = Seiyuu.objects.get(id_name=data["seiyuu_id_name"])
+    except Seiyuu.DoesNotExist:
+        return Response({"message": "Seiyuu not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Update the fields of the object with the data from the request
+    the_seiyuu.activated = data.get('is_active')
+    the_seiyuu.interval = data.get('interval')
+    # Add more fields as needed
+
+    # Save the updated object to the database
+    the_seiyuu.save()
+
+    return Response({"message": "Object updated successfully"}, status=status.HTTP_200_OK)

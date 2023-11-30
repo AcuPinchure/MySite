@@ -20,11 +20,18 @@ detail_stats_api_endpoints = [
     path('rts/', api_views.getRtDetail, name="get_rt_detail"),
 ]
 
+config_endpoints = [
+    path('get/', api_views.getServiceConfig, name="get_config"),
+    path('update/<str:seiyuu_id_name>/',
+         api_views.updateServiceConfig, name="update_config"),
+]
+
 api_endpoints = [
     path('getStats/', api_views.getStats, name="get_stats"),
     path('detailStats/', include(detail_stats_api_endpoints)),
     path('loadDefaultStats/', api_views.loadDefaultStats,
          name="load_default_stats"),
+    path('config/', include(config_endpoints)),
     path('tweet/', include(tweet_api_endpoints)),
     path('followers/', include(followers_api_endpoints)),
     path('testLogin/', api_views.testLogin, name="test_login"),

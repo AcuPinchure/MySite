@@ -47,3 +47,9 @@ function App() {
 }
 
 export default App;
+export const seiyuu_name = {
+  "kaorin": "前田佳織里 kaorin__bot",
+  "akarin": "鬼頭明里 akarin__bot",
+  "chemi": "田中ちえ美 Chiemi__bot",
+  "konachi": "月音こな konachi__bot"
+}

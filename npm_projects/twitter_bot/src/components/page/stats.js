@@ -8,6 +8,10 @@ import "./stats.css"
 import { set } from "date-fns";
 import { Tweet } from 'react-tweet'
 
+import { seiyuu_name } from "../App";
+
+import PropTypes from 'prop-types';
+
 
 
 
@@ -128,6 +132,13 @@ function StatsDetailModal(props) {
         </Modal>
     )
 }
+StatsDetailModal.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleClose: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    src: PropTypes.string.isRequired,
+    statsOptions: PropTypes.object.isRequired
+}
 
 
 
@@ -161,6 +172,15 @@ function StatsBlock(props) {
             </Segment>
         </Grid.Column>
     )
+}
+StatsBlock.propTypes = {
+    size: PropTypes.number,
+    title: PropTypes.string.isRequired,
+    iconName: PropTypes.string.isRequired,
+    value: PropTypes.string.isRequired,
+    subinfo: PropTypes.string.isRequired,
+    loading: PropTypes.bool.isRequired,
+    handleClick: PropTypes.func
 }
 
 /**
@@ -276,7 +296,7 @@ function Stats(props) {
 
     return (
         <>
-            <h1>{stats.status ? (stats.seiyuu_name + " " + stats.seiyuu_id) : statsOptions.seiyuu}</h1>
+            <h1>{seiyuu_name[statsOptions.seiyuu]}</h1>
             {stats.status ? (
                 <Grid columns={3} stackable>
                     <StatsDetailModal open={modalOpen.posts} handleClose={() => setModalOpen(prev => ({ ...prev, posts: false }))} title="Posts" statsOptions={statsOptions} src="/bot/api/detailStats/posts/" />
@@ -346,6 +366,10 @@ function Stats(props) {
 
         </>
     )
+}
+Stats.propTypes = {
+    crossData: PropTypes.object,
+    updateCrossData: PropTypes.func
 }
 
 
@@ -476,6 +500,11 @@ function StatsOptions(props) {
             </Form>
         </>
     )
+}
+StatsOptions.propTypes = {
+    updateCrossData: PropTypes.func,
+    handleSideActive: PropTypes.func,
+    crossData: PropTypes.object
 }
 
 export { Stats, StatsOptions };
