@@ -22,7 +22,7 @@ detail_stats_api_endpoints = [
 
 config_endpoints = [
     path('get/', api_views.getServiceConfig, name="get_config"),
-    path('update/<str:seiyuu_id_name>/',
+    path('update/',
          api_views.updateServiceConfig, name="update_config"),
 ]
 

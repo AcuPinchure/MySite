@@ -36,7 +36,7 @@ function StatusBlock(props) {
                     </Table.Row>
                     <Table.Row>
                         <Table.Cell collapsing>Interval</Table.Cell>
-                        <Table.Cell>{props.interval ? `${props.interval} hours` : "-"} </Table.Cell>
+                        <Table.Cell>{props.interval && props.active ? `${props.interval} hours` : "-"} </Table.Cell>
                     </Table.Row>
                 </Table.Body>
             </Table>

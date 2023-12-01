@@ -7,7 +7,7 @@ function LoginForm(props) {
     const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState(null);
 
-    const csrf_token = window.localStorage.getItem("csrf_token");
+    const csrf_token = Cookies.get("csrftoken");
 
     useEffect(() => {
         setLoginMessage(null);
