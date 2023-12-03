@@ -18,13 +18,13 @@ The site currently contains following apps:
 
 For documentation of each app, see "Apps Documentation" section
 
-## Fork and deploy
-If you want to fork this repository and setup your own website. 
+## Deploy
+If you want to deploy this repository and setup your own website. 
 Here's how to do it.
 
-1. Fork and clone this repository
+1. Clone this repository
 2. Setup python virtual environment
-    ```
+    ```bash
     python -m venv venv
 
     ./venv/bin/activate
@@ -32,7 +32,7 @@ Here's how to do it.
     pip install -r requirements.txt
     ```
 3. Setup npm environment for each app (currently only `twitter_bot` has npm project)
-    ```
+    ```bash
     cd ./npm_projects/<app_name>
 
     npm install --dev
@@ -40,13 +40,13 @@ Here's how to do it.
 4. Setup extra configs. These configs does not include in the repository due to sensitive data. You have to setup by yourself.
     * Create data/ folder at root to store website local files and database
     * Create django_keys.json in data/ for django SECRET_KEY
-        ```
+        ```json
         {
             "SECRET_KEY" : "django-insecure-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         }
         ```
     * Create setting_local.py to pass localize settings to Django, these settings are different between production and development environment. Develop environment examples:
-        ```
+        ```python
         # Show or hide Django buit-in debug page when an error occurs, highly recommend to set to False in production
         DEBUG = True
 
@@ -72,14 +72,14 @@ For more information about what this app is for, see the [about page of "Loveliv
 ### Setup
 If you want to setup your own image bot, follow the instructions.
 
-1. Setup the project mentioned in [Fork and deploy](#Fork-and-deploy)
-2. Create your twitter bot account
+1. Follow the steps mentioned in [Deploy](#Deploy) to setup the project.
+2. Create your twitter bot account.
 3. Setup your Twitter API for the account.
     * Obtain the necessary keys from Twitter API: `api_key`, `api_key_secret`, `access`, `access_secret`, `bearer_token`. See [Twitter Developer Documentation](https://developer.twitter.com/en/docs) for more information.
     * Create `tokens.json` at data/ folder and paste `api_key`, `api_key_secret`, `access`, `access_secret`
-        ```
+        ```json
         {
-            "<Your account name>": {
+            "<Your account short name>": {
                 "id": "<api_key>",
                 "id_secret": "<api_key_secret>",
                 "access": "<access>",
@@ -89,92 +89,40 @@ If you want to setup your own image bot, follow the instructions.
         }
         ```
     * `tokens_v2.json` at data/ folder and paste `bearer_token`
-        ```
+        ```json
         {
-            "<Your account name>": {
+            "<Your account short name>": {
                 "bearer_token": "<bearer_token>"
             }
             // more accounts here
         }
         ```
 4. Setup twitter bot account in auto posting service
-    * Open `src/twitter_bot/management/commands/_post_handler.py` and modify the account info
-        ```
-        # _post_handler.py
-
-        if name == '<Your account name>':
-            the_token = tokens["<Your account name>"]
-            the_token_v2 = tokens_v2["<Your account name>"]
-        elif name == '<Other account name>':
-            the_token = tokens["<Other account name>"]
-            the_token_v2 = tokens_v2["<Other account name>"]
-        # ...
-        else:
-            raise ValueError('Invalid name: {}'.format(name))
-        ```
-    * Open `src/twitter_bot/management/commands/tweet_once.py` and modify the account info
-        ```
-        # tweet_once.py
-
-        def post_once(name):
-            api, oauth, client = auth_api(name)
-            if not (api and oauth and client):
-                print("[{}] Error during authentication".format(name))
-                return False
-            print("[{}] Authentication OK".format(name))
-
-        if name == '<Your account name>':
-            search = '<Your account verbose name>'
-            bot_id = '<Your account screen name>'
-            bot_user_id = '<Your account user id>'
-        elif name == '<Other account name>':
-            # ...
-
-        # ...
-
-        class Command(BaseCommand):
-        help = "Pick a random media and post once"
-        
-        def handle(self, *args, **kwargs):
-            names = ['<Your account name>','<Other account name>']
-        ```
-    * Create folder `ImportQueue` and `Library` at `data/media/`. Under these 2 folder, create folders for each bot account with desired folder name.
-    * Modify `src/twitter_bot/management/commands/import_img.py` and add your image folder name
-        ```
-        # import_img.py
-
-        class Command(BaseCommand):
-        def handle(self, **options):
-
-            for info in [
-                ('<Your account verbose name>','<Your account image folder name>'),
-                ('<Other account verbose name>','<Other account image folder name>'),
-                # ...
-            ]:
-        ```
-    * Open Django management shell and add accounts to database
-        ```
+    * Register a Django user or superuser, see [this tutorial](https://www.w3schools.com/django/django_admin_create_user.php).
+    * Create folder `ImportQueue` and `Library` at `data/media/`. Under these 2 folder, create folders for each bot account with desired folder name (the folder names in two directory should be the same for each account).
+    * Open Django management shell and register accounts to database
+        ```bash
         # terminal
 
         cd src/
         python manage.py shell
         ```
-        ```
+        ```python
         # python shell
 
         from twitter_bot.models import Seiyuu
-        s = Seiyuu.objects.create(name='<Your account verbose name>', screen_name='<Your account screen name>', id_name='<Your account short name>')
+        s = Seiyuu.objects.create(name='<Your account verbose name>', screen_name='<Your account screen name>', id_name='<Your account short name>', image_folder='<Your account image folder name>', activated=False) # set false first before importing any image
         # add other accounts
         ```
     * Put your images into `data/media/ImportQueue/<Your account image folder name>/`. Currently only supports `.jpg`, `.jpeg`, `.png`, `.gif`, `.mp4`.
     * Run import command
-        ```
+        ```bash
         # terminal
 
         cd src/
         python manage.py import_img
         ```
-    * Setup any scheduling service such as Linux Cron to run the `tweet_once` command in desired interval (suggest more than 1 hour)
+    * Setup any scheduling service such as Linux Cron to run the `tweet_once` command every hour.
         ```
         #!/bin/bash
 
@@ -183,20 +131,23 @@ If you want to setup your own image bot, follow the instructions.
         echo press Enter
         read reply
         ```
+    * Run django dev server, locate to `/bot/login/`, login as the user you created.
+    * Go to `Service Config (/bot/config/)`, adjust the post interval with desired value and activate the service (you may also set the interval and activate using django management shell).
     * Now you have your own bot service, for adding new image in the future, just add image to `ImportQueue/<Your account image folder name>/` and run `import_img` command again
 ### Data collection API
-The repository currently does not include data collection function due to Twitter removing free access to Twitter API v1, but you may use the data collection API in this project to send collected data to the database.
+The repository currently does not include data collection service due to Twitter removing free access to Twitter API v1, but you may use the data collection API provided by the app to send collected data to the database and view graphical statistics in `/bot/stats/`.
 1. Followers data collection
-    * Setup your own data collection service, once you get the followers data, make a POST request to `/bot/api/followers/set` with the following request body, the API will auto insert data_time to the database:
-    ```
+    * Setup your own data collection service, once you get the followers data, make a POST request to `/bot/api/followers/set` with the following request header and body, the API will auto insert data_time to the database:
+    ```json
+    // body
     {
         "seiyuu": "<The account screen name>",
         "followers": "<The number of followers in integer>"
     }
     ```
 2. Tweet data collection
-    * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `limit` param as the limited number of posts, suggest `limit=12` every hour. The API will response the following data:
-    ```
+    * Make a GET request from this endpoint: `http://<the host name you specify in settings_local.LOCAL_HOSTS>/bot/api/tweet/noData/` to get the tweet id list that does not have data collected, you need to pass `?limit=` param as the limited number of posts (to avoid Twitter API throttling). The API will response the following data:
+    ```json
     [
         {
             "id": <tweet_id in integer>,
@@ -207,7 +158,7 @@ The repository currently does not include data collection function due to Twitte
     ]
     ```
     * Setup your own data collection service, once you get the tweet data, make a POST request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following request body:
-        ```
+        ```json
         {
             "data_time": "<The time the data is collected, ISO string>",
             "like": "<The number of like in this tweet>",
