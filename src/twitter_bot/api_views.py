@@ -533,7 +533,7 @@ def getServiceConfig(request):
 
 
 @api_view(['PUT'])
-def updateServiceConfig(request, seiyuu_id_name):
+def updateServiceConfig(request):
     """
     update service config
 

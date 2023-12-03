@@ -40,7 +40,7 @@ function ServiceConfig(props) {
     }
 
     function handleApply() {
-        fetch(`/bot/api/config/update/${props.title}/`, {
+        fetch(`/bot/api/config/update/`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
