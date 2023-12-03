@@ -26,6 +26,8 @@ function TitleBar(props) {
                                 return <h2>Login</h2>;
                             case "/bot/stats/":
                                 return <h2>Statistics</h2>;
+                            case "/bot/status/":
+                                return <h2>Service Status</h2>;
                             case "/bot/config/":
                                 return <h2>Service Configuration</h2>;
                             case "/bot/library/":

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Message, Container } from "semantic-ui-react";
+import { Form, Message, Container, Segment } from "semantic-ui-react";
 import Cookies from "js-cookie";
 
 function LoginForm(props) {
@@ -7,7 +7,7 @@ function LoginForm(props) {
     const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState(null);
 
-    const csrf_token = window.localStorage.getItem("csrf_token");
+    const csrf_token = Cookies.get("csrftoken");
 
     useEffect(() => {
         setLoginMessage(null);
@@ -46,9 +46,9 @@ function LoginForm(props) {
     return (
         <Form onSubmit={handleSubmit} method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value={csrf_token} />
-            <Form.Input label="Username" name="username" value={username} onChange={handleUsernameChange} />
-            <Form.Input label="Password" name="password" type="password" value={password} onChange={handlePasswordChange} />
-            <Form.Button type="submit" primary>Login</Form.Button>
+            <Form.Input icon="user" iconPosition='left' label="Username" name="username" value={username} onChange={handleUsernameChange} />
+            <Form.Input icon="lock" iconPosition='left' label="Password" name="password" type="password" value={password} onChange={handlePasswordChange} />
+            <Form.Button type="submit" fluid primary>Login</Form.Button>
             {loginMessage ?
                 <Message negative>
                     <Message.Header>Login Failed</Message.Header>
@@ -63,7 +63,7 @@ function LoginForm(props) {
 function Login(props) {
     return (
         <div style={{ maxWidth: "32rem", margin: "auto", paddingTop: "20vh" }}>
-            <h1>Continue with Admin</h1>
+            <h1 style={{ textAlign: "center" }}>Login as Admin to Continue</h1>
             <LoginForm setLoginStatus={props.setLoginStatus}></LoginForm>
         </div>
     )

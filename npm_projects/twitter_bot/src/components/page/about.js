@@ -68,7 +68,7 @@ function TopMenu(props) {
                 <Image size="mini" src={BotLogoL} style={{ height: "1.5rem" }} />
             </Menu.Item>
             <Menu.Item onClick={() => { window.location = "/bot/stats/" }}>Statistics</Menu.Item>
-            <Menu.Item onClick={() => { window.location = "/bot/login/" }}>Admin</Menu.Item>
+            <Menu.Item onClick={() => { window.location = "/bot/status/" }}>Service Status</Menu.Item>
         </Menu>
 
     )

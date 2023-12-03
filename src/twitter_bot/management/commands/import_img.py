@@ -41,7 +41,8 @@ class Command(BaseCommand):
                         raise ValueError("Invalid file_type: {}".format(
                             img.split(".")[-1].lower()))
                     i = Media.objects.create(
-                        file=os.path.join('data', 'media', 'Library', id, img),
+                        file=os.path.join(
+                            'data', 'media', 'Library', the_seiyuu_instance.image_folder, img),
                         seiyuu=the_seiyuu_instance,
                         file_type=file_type)
                     i.save()

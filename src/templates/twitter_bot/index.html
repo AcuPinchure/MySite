@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--Favicon-->
     <link rel="apple-touch-icon" sizes="180x180" href="/static/twitter_bot/site_media/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/twitter_bot/site_media/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/twitter_bot/site_media/favicon-16x16.png">
@@ -13,7 +15,26 @@
     <meta name="msapplication-TileColor" content="#00aba9">
     <meta name="msapplication-config" content="/static/twitter_bot/site_media/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
-    <title>LoveLive Seiyuu Bot</title>
+
+    <!--SEO-->
+    <meta name="title" content="Lovelive Seiyuu BOT">
+    <meta name="description"
+        content="Lovelive Seiyuu Twitter Image Bot Project. The project is to create Twitter accounts that randomly posts images or clips of a specific Lovelive Seiyuu">
+    <meta name="keywords" content="Twitter bot, Lovelive, Seiyuu, 画像bot">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="30 days">
+    <meta name="author" content="AcuPinchure">
+
+    <!--Open Graph / Facebook-->
+    <meta property="og:title" content="Lovelive Seiyuu BOT">
+    <meta property="og:description"
+        content="Lovelive Seiyuu Twitter Image Bot Project. The project is to create Twitter accounts that randomly posts images or clips of a specific Lovelive Seiyuu">
+    <meta property="og:url" content="https://acupinchure.ddns.net/bot/">
+    <meta property="og:image" content="https://acupinchure.ddns.net/static/twitter_bot/site_media/favicon-32x32.png">
+    <meta property="og:site_name" content="Lovelive Seiyuu BOT">
+    <title>Lovelive Seiyuu Bot</title>
     {% comment %} <style>
         #loading {
             position: fixed;
@@ -92,7 +113,7 @@
     </script> {% endcomment %}
 
     {% load static %}
-    <script src="{% static 'twitter_bot/main.js' %}"></script>
+    <script src="{% static 'twitter_bot/main.js' %}?date=20231106"></script>
 
     <script>
         const local_storage = window.localStorage;
