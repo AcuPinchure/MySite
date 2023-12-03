@@ -123,11 +123,11 @@ If you want to setup your own image bot, follow the instructions.
         python manage.py import_img
         ```
     * Setup any scheduling service such as Linux Cron to run the `tweet_once` command every hour.
-        ```
+        ```bash
         #!/bin/bash
 
         cd /path/to/project/src
-        /root/Documents/MySite/venv/bin/python manage.py tweet_once
+        /path/to/project/venv/bin/python manage.py tweet_once
         echo press Enter
         read reply
         ```
@@ -135,7 +135,7 @@ If you want to setup your own image bot, follow the instructions.
     * Go to `Service Config (/bot/config/)`, adjust the post interval with desired value and activate the service (you may also set the interval and activate using django management shell).
     * Now you have your own bot service, for adding new image in the future, just add image to `ImportQueue/<Your account image folder name>/` and run `import_img` command again
 ### Data collection API
-The repository currently does not include data collection service due to Twitter removing free access to Twitter API v1, but you may use the data collection API provided by the app to send collected data to the database and view graphical statistics in `/bot/stats/`.
+The repository currently does not include data collection service due to Twitter removing free access to Twitter API v1, but you may use the data collection API provided by the app to send collected data to the database and view statistics dashboard at `/bot/stats/`.
 1. Followers data collection
     * Setup your own data collection service, once you get the followers data, make a POST request to `/bot/api/followers/set` with the following request header and body, the API will auto insert data_time to the database:
     ```json
