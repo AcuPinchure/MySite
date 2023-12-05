@@ -23,6 +23,9 @@ class Seiyuu(models.Model):
     image_folder = models.CharField(
         help_text='The folder name of the images', max_length=20, blank=True, null=True)
 
+    hidden = models.BooleanField(
+        help_text='If the seiyuu should be hidden from website', default=False)
+
     def __str__(self):
         return self.name
 
