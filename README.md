@@ -157,7 +157,7 @@ The repository currently does not include data collection service due to Twitter
         // other tweet
     ]
     ```
-    * Setup your own data collection service, once you get the tweet data, make a POST request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following request body:
+    * Setup your own data collection service, once you get the tweet data, make a PUT request to `/bot/api/tweet/updateData/<The id of the tweet>/` with the following request body:
         ```json
         {
             "data_time": "<The time the data is collected, ISO string>",

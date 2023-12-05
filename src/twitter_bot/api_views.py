@@ -512,7 +512,7 @@ def getServiceConfig(request):
     data = []
 
     # get all seiyuu
-    seiyuu_list = Seiyuu.objects.all().order_by("id")
+    seiyuu_list = Seiyuu.objects.filter(hidden=False).order_by("id")
 
     for seiyuu in seiyuu_list:
 
