@@ -5,6 +5,9 @@ import BotLogo from "../assets/bot_logo.svg";
 import { useLocation, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+import store from "../store";
+import { setLeftActive } from "../store/layout_slice";
+
 
 function LeftSideBar(props) {
     return (
@@ -28,31 +31,36 @@ function NaviMenu() {
 
     const showAdminMenu = useSelector(state => state.LayoutSlice.showAdminMenu);
 
+    function handleItemClick(path) {
+        history.push(path);
+        store.dispatch(setLeftActive(false));
+    }
+
     return (
         <Menu secondary vertical inverted fluid size="large">
             <Menu.Item data-name="about" onClick={() => { window.location = "/bot/" }}>
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/bot/stats/")} onClick={() => history.push("/bot/stats/")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/stats/")} onClick={() => handleItemClick("/bot/stats/")}>
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/bot/status/")} onClick={() => history.push("/bot/status/")}>
+            <Menu.Item active={location.pathname.startsWith("/bot/status/")} onClick={() => handleItemClick("/bot/status/")}>
                 <Icon name="signal"></Icon>
                 Service Status
             </Menu.Item>
             {showAdminMenu ?
                 <>
-                    <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => history.push("/bot/config/")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => handleItemClick("/bot/config/")}>
                         <Icon name="cogs"></Icon>
                         Service Config
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/library/")} onClick={() => history.push("/bot/library/")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/library/")} onClick={() => handleItemClick("/bot/library/")}>
                         <Icon name="images outline"></Icon>
                         Image Library
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/logs/")} onClick={() => history.push("/bot/logs/")}>
+                    <Menu.Item active={location.pathname.startsWith("/bot/logs/")} onClick={() => handleItemClick("/bot/logs/")}>
                         <Icon name="clock outline"></Icon>
                         Logs
                     </Menu.Item>
