@@ -120,16 +120,20 @@ function BotLayout(props) {
 
     return (
         <>
-            <TitleBar leftActive={layout_state.left_active} rightActive={layout_state.right_active} hasLeftIcon={layout_state.viewWidth <= layout_state.responsiveWidth} hasOptions={props.rightBarOptions ? true : false} />
+            <TitleBar leftActive={layout_state.left_active && layout_state.view_width > layout_state.responsive_width} rightActive={layout_state.right_active} hasLeftIcon={layout_state.view_width <= layout_state.responsive_width} hasOptions={props.rightBarOptions ? true : false} />
             <LeftSideBar isActive={layout_state.left_active}></LeftSideBar>
             <RightSideBar isActive={layout_state.right_active}>
                 {props.rightBarOptions}
             </RightSideBar>
-            <div className={`bot stats sidebar_overlay ${(layout_state.right_active || (layout_state.left_active && layout_state.view_width <= layout_state.responsive_width)) ? "active" : ""}`} onClick={() => {
-                store.dispatch(setLeftActive(false));
-                store.dispatch(setRightActive(false));
-            }}></div>
-            <div className={`bot stats content ${layout_state.left_active ? "left_active" : ""} ${layout_state.right_active ? "right_active" : ""}`}>
+            <div
+                className={`bot stats sidebar_overlay ${(layout_state.right_active || (layout_state.left_active && layout_state.view_width <= layout_state.responsive_width)) ? "active" : ""}`}
+                style={layout_state.left_active && layout_state.view_width <= layout_state.responsive_width ? { zIndex: 200 } : null}
+                onClick={() => {
+                    store.dispatch(setLeftActive(false));
+                    store.dispatch(setRightActive(false));
+                }}
+            ></div>
+            <div className={`bot stats content ${layout_state.left_active && layout_state.view_width > layout_state.responsive_width ? "left_active" : ""} ${layout_state.right_active ? "right_active" : ""}`}>
                 {props.children}
             </div>
         </>
