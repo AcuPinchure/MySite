@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Segment, Statistic, Icon, Grid, Menu, Form, Button, Dropdown, Message, Modal, Table, Dimmer, Loader, Divider, Label } from "semantic-ui-react";
-import { Line } from "react-chartjs-2";
-import { Chart } from "chart.js/auto";
-import 'chartjs-adapter-date-fns';
-import { enUS } from 'date-fns/locale';
 import "./stats.css"
 import { set } from "date-fns";
 import { Tweet } from 'react-tweet'
 
-import { seiyuu_name } from "../App";
+import store from "../../store";
+import { useSelector } from "react-redux";
+import { setStatsOption, setSummary, setFollowers, setLikesDetail, setPostsDetail, setRtsDetail } from "../../store/stats_slice";
+import { setRightActive } from "../../store/layout_slice";
+
+
+import Chart from "react-apexcharts";
 
 import PropTypes from 'prop-types';
 
@@ -32,8 +34,12 @@ function StatsDetailModal(props) {
 
     useEffect(() => {
         setLoading(true);
-        if (props.open && props.statsOptions && props.statsOptions.start_date && props.statsOptions.end_date && props.statsOptions.seiyuu) {
-            fetch(props.src + "?" + new URLSearchParams(props.statsOptions).toString())
+        if (props.open && props.statsOptions && props.statsOptions.start_date && props.statsOptions.end_date && props.statsOptions.seiyuu_id_name) {
+            fetch(props.src + "?" + new URLSearchParams({
+                "seiyuu": props.statsOptions.seiyuu_id_name,
+                "start_date": props.statsOptions.start_date,
+                "end_date": props.statsOptions.end_date
+            }).toString())
                 .then(res => res.json())
                 .then(data => {
                     if (!data.status) {
@@ -56,7 +62,7 @@ function StatsDetailModal(props) {
                 }
                 );
         }
-    }, [props.open, props.statsOptions]);
+    }, [props.statsOptions, props.open, props.src]);
 
     const data_rows = data.map((item, index) => (
         <Table.Row key={index}>
@@ -97,6 +103,7 @@ function StatsDetailModal(props) {
     return (
         <Modal
             open={props.open}
+            onClose={props.handleClose}
         >
             <Modal.Header>{props.title}</Modal.Header>
             <Modal.Content scrolling>
@@ -112,9 +119,9 @@ function StatsDetailModal(props) {
                         <Divider></Divider>
                         <h3>Top 10 Tweets - {props.title}</h3>
                         {display_tweets.map((tweet_id, index) => (
-                            <Segment style={{ "maxWidth": "550px", "margin": "1rem auto" }}>
+                            <Segment key={index} style={{ "maxWidth": "550px", "margin": "1rem auto" }}>
                                 <Label color='red' size="large" ribbon># {index + 1}</Label>
-                                <Tweet key={index} id={tweet_id}></Tweet>
+                                <Tweet id={tweet_id}></Tweet>
                             </Segment>
                         ))}
                     </>
@@ -185,28 +192,14 @@ StatsBlock.propTypes = {
 
 /**
  * 
- * @param {object} props see prop
- * @prop {object} crossData The cross data
- * @prop {function} updateCrossData The function to update the cross data
  * @returns JSX
  */
-function Stats(props) {
-    // props: seiyuu<str:"kaorin","akarin","chemi">, startDate<str:"YYYY-MM-DD">, endDate<str:"YYYY-MM-DD">
-    const [stats, setStats] = useState({
-        "status": true,
-        "seiyuu_name": "",
-        "seiyuu_id": "",
-        "start_date": "",
-        "end_date": "",
-        "interval": 0,
-        "posts": 0,
-        "likes": 0,
-        "rts": 0
-    });
-    const [followers, setFollowers] = useState({
-        "status": true,
-        "data": []
-    });
+function Stats() {
+    const stats_options = useSelector(state => state.StatsSlice.stats_options);
+    const stats_summary = useSelector(state => state.StatsSlice.summary);
+    const followers = useSelector(state => state.StatsSlice.followers);
+
+    const curr_seiyuu = stats_options.seiyuu_list.find(item => item.id_name === stats_options.seiyuu_id_name);
 
     const [loading, setLoading] = useState(true);
 
@@ -216,67 +209,72 @@ function Stats(props) {
         "rts": false
     });
 
-    const statsOptions = props.crossData;
-
     useEffect(() => {
-        if (statsOptions && statsOptions.start_date && statsOptions.end_date && statsOptions.seiyuu) {
-            console.log("fetching stats");
-            setLoading(true);
-            const url_params = new URLSearchParams();
-            url_params.append("seiyuu", statsOptions.seiyuu);
-            url_params.append("start_date", statsOptions.start_date);
-            url_params.append("end_date", statsOptions.end_date);
-            fetch("/bot/api/getStats/?" + url_params.toString())
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.status) {
-                        throw new Error("No data");
-                    }
-                    setStats(data);
-                    localStorage.setItem("stats_data", JSON.stringify(data));
-                    setLoading(false);
+        if (!(stats_options.start_date && stats_options.end_date && stats_options.seiyuu_id_name)) return;
+        console.log("fetching stats");
+        setLoading(true);
+        const url_params = new URLSearchParams();
+        url_params.append("seiyuu", stats_options.seiyuu_id_name);
+        url_params.append("start_date", stats_options.start_date);
+        url_params.append("end_date", stats_options.end_date);
+        const summary_fetch = fetch("/bot/api/getStats/?" + url_params.toString())
+            .then(res => res.json())
+            .then(data => {
+                if (!data.status) {
+                    throw new Error("No data");
                 }
-                ).catch(err => {
-                    setStats({
-                        "status": false,
-                        "seiyuu_name": "",
-                        "seiyuu_id": "",
-                        "start_date": "",
-                        "end_date": "",
-                        "interval": 0,
-                        "posts": 0,
-                        "likes": 0,
-                        "rts": 0
-                    });
-                    console.log(err);
-                    setLoading(false);
+                store.dispatch(setSummary({
+                    "seiyuu_name": data.seiyuu_name,
+                    "seiyuu_id": data.seiyuu_id,
+                    "start_date": data.start_date,
+                    "end_date": data.end_date,
+                    "interval": data.interval,
+                    "posts": data.posts,
+                    "likes": data.likes,
+                    "rts": data.rts
+                }));
+            }
+            ).catch(err => {
+                store.dispatch(setSummary({
+                    "seiyuu_name": "",
+                    "seiyuu_id": "",
+                    "start_date": "",
+                    "end_date": "",
+                    "interval": 0,
+                    "posts": 0,
+                    "likes": 0,
+                    "rts": 0
+                }));
+                console.error(err);
+            }
+            );
+        const followers_fetch = fetch("/bot/api/followers/get/?" + url_params.toString())
+            .then(res => res.json())
+            .then(data => {
+                if (!data.status) {
+                    throw new Error("No data");
                 }
-                );
-            fetch("/bot/api/followers/get/?" + url_params.toString())
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.status) {
-                        throw new Error("No data");
-                    }
-                    setFollowers(data);
-                    setLoading(false);
-                }
-                ).catch(err => {
-                    setFollowers({
-                        "status": false,
-                        "data": []
-                    });
-                    console.log(err);
-                    setLoading(false);
-                }
-                );
-        }
-    }, [props.crossData]);
+                store.dispatch(setFollowers(data.data));
+            }
+            ).catch(err => {
+                store.dispatch(setFollowers([]));
+                console.error(err);
+            }
+            );
+
+        Promise.all([summary_fetch, followers_fetch]).then(() => {
+            setLoading(false);
+        }).catch(err => {
+            alert("Failed to fetch data");
+            console.error(err);
+            setLoading(false);
+        });
+    }, [stats_options.seiyuu_id_name, stats_options.start_date, stats_options.end_date]);
 
     // calculate current followers
     let curr_followers;
-    if (followers.status && followers.data.length > 0) {
-        curr_followers = followers.data[followers.data.length - 1].followers;
+    if (followers.length > 0) {
+        curr_followers = followers[followers.length - 1].followers;
     }
     else {
         curr_followers = 0;
@@ -284,9 +282,9 @@ function Stats(props) {
 
     // calculate average followers growth
     let avg_followers_growth;
-    if (followers.status && followers.data.length > 0) {
-        const followers_diff = followers.data[followers.data.length - 1].followers - followers.data[0].followers;
-        const day_diff = (new Date(followers.data[followers.data.length - 1].data_time) - new Date(followers.data[0].data_time)) / (1000 * 60 * 60 * 24);
+    if (followers.length > 0) {
+        const followers_diff = followers[followers.length - 1].followers - followers[0].followers;
+        const day_diff = (new Date(followers[followers.length - 1].data_time) - new Date(followers[0].data_time)) / (1000 * 60 * 60 * 24);
         avg_followers_growth = followers_diff / day_diff;
     }
     else {
@@ -296,61 +294,63 @@ function Stats(props) {
 
     return (
         <>
-            <h1>{seiyuu_name[statsOptions.seiyuu]}</h1>
-            {stats.status ? (
+            <h1>{curr_seiyuu && `${curr_seiyuu.name} @${curr_seiyuu.screen_name}`}</h1>
+            {(stats_summary.start_date && stats_summary.end_date && stats_options.seiyuu_id_name) ? (
                 <Grid columns={3} stackable>
-                    <StatsDetailModal open={modalOpen.posts} handleClose={() => setModalOpen(prev => ({ ...prev, posts: false }))} title="Posts" statsOptions={statsOptions} src="/bot/api/detailStats/posts/" />
-                    <StatsBlock title="Posts" iconName="twitter" value={stats.posts.toLocaleString()} subinfo={`${(stats.posts / stats.interval).toFixed(2)} posts per hour`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, posts: true }))} />
+                    <StatsDetailModal open={modalOpen.posts} handleClose={() => setModalOpen(prev => ({ ...prev, posts: false }))} title="Posts" statsOptions={stats_options} src="/bot/api/detailStats/posts/" />
+                    <StatsBlock title="Posts" iconName="twitter" value={stats_summary.posts.toLocaleString()} subinfo={`${(stats_summary.posts / stats_summary.interval).toFixed(2)} posts per hour`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, posts: true }))} />
 
-                    <StatsDetailModal open={modalOpen.likes} handleClose={() => setModalOpen(prev => ({ ...prev, likes: false }))} title="Likes" statsOptions={statsOptions} src="/bot/api/detailStats/likes/" />
-                    <StatsBlock title="Likes" iconName="heart" value={stats.likes.toLocaleString()} subinfo={`${(stats.likes / stats.posts).toFixed(2)} likes per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, likes: true }))} />
+                    <StatsDetailModal open={modalOpen.likes} handleClose={() => setModalOpen(prev => ({ ...prev, likes: false }))} title="Likes" statsOptions={stats_options} src="/bot/api/detailStats/likes/" />
+                    <StatsBlock title="Likes" iconName="heart" value={stats_summary.likes.toLocaleString()} subinfo={`${(stats_summary.likes / stats_summary.posts).toFixed(2)} likes per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, likes: true }))} />
 
-                    <StatsDetailModal open={modalOpen.rts} handleClose={() => setModalOpen(prev => ({ ...prev, rts: false }))} title="Retweets" statsOptions={statsOptions} src="/bot/api/detailStats/rts/" />
-                    <StatsBlock title="Retweets" iconName="retweet" value={stats.rts.toLocaleString()} subinfo={`${(stats.rts / stats.posts).toFixed(2)} retweets per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, rts: true }))} />
+                    <StatsDetailModal open={modalOpen.rts} handleClose={() => setModalOpen(prev => ({ ...prev, rts: false }))} title="Retweets" statsOptions={stats_options} src="/bot/api/detailStats/rts/" />
+                    <StatsBlock title="Retweets" iconName="retweet" value={stats_summary.rts.toLocaleString()} subinfo={`${(stats_summary.rts / stats_summary.posts).toFixed(2)} retweets per post`} loading={loading} handleClick={() => setModalOpen(prev => ({ ...prev, rts: true }))} />
                 </Grid>
             ) : (
                 <Message negative>
-                    <Message.Header>Failed to load statistics: {statsOptions.start_date} ~ {statsOptions.end_date}</Message.Header>
-                    <p>There is no post data for the selected time interval.</p>
+                    <Message.Header>Failed to load statistics: {stats_options.start_date} ~ {stats_options.end_date}</Message.Header>
+                    <p>There is no post data in the selected date interval.</p>
                 </Message>
             )}
-            {followers.status ? (
+            {followers.length > 0 ? (
                 <Grid columns={3} stackable>
                     <StatsBlock size={16} title="Followers" iconName="users" value={curr_followers.toLocaleString()} subinfo={`${avg_followers_growth.toFixed(2)} new followers per day`} loading={loading}>
                         <div className="bot stats linechart_container">
                             <div className="bot stats linechart_wrapper">
-                                <Line data={{
-                                    labels: followers.data.map((item) => (item.data_time)),
-                                    datasets: [
+                                <Chart
+                                    options={{
+                                        chart: {
+                                            id: "followers-chart",
+                                            type: "line",
+                                            zoom: {
+                                                type: 'x',
+                                                enabled: true,
+                                                autoScaleYaxis: false
+                                            }
+                                        },
+                                        dataLabels: {
+                                            enabled: false
+                                        },
+                                        markers: {
+                                            size: 0,
+                                        },
+                                        title: {
+                                            text: 'Followers Trends',
+                                            align: 'left'
+                                        },
+                                        xaxis: {
+                                            type: "datetime",
+                                        },
+                                    }}
+                                    series={[
                                         {
-                                            label: "Followers",
-                                            data: followers.data.map((item) => (item.followers)),
-                                            fill: false,
-                                            borderColor: "#2185d0",
-                                            backgroundColor: "#2185d0",
-                                            tension: 0.1,
+                                            name: "followers",
+                                            data: followers.map(item => [new Date(item.data_time), item.followers])
                                         }
-                                    ]
-                                }} options={{
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        }
-                                    },
-                                    scales: {
-                                        x: {
-                                            type: "time",
-                                            adapters: {
-                                                date: {
-                                                    locale: enUS, // Add this line to set the locale
-                                                }, // Specify the adapter name without locale configuration
-                                            },
-                                        },
-                                        y: {
-                                            beginAtZero: false,
-                                        },
-                                    },
-                                }} />
+                                    ]}
+                                    type="line"
+                                    width="100%"
+                                ></Chart>
                             </div>
                         </div>
 
@@ -359,24 +359,19 @@ function Stats(props) {
 
             ) : (
                 <Message negative>
-                    <Message.Header>Failed to load followers data: {statsOptions.start_date} ~ {statsOptions.end_date}</Message.Header>
-                    <p>There is no followers data for the selected time interval.</p>
+                    <Message.Header>Failed to load followers data: {stats_options.start_date} ~ {stats_options.end_date}</Message.Header>
+                    <p>There is no followers data in the selected date interval.</p>
                 </Message>
             )}
 
         </>
     )
 }
-Stats.propTypes = {
-    crossData: PropTypes.object,
-    updateCrossData: PropTypes.func
-}
 
 
 /**
  * 
  * @param {object} props see prop
- * @prop {function} updateCrossData - The function to update the cross data
  * @prop {function} handleSideActive - The function to handle the side bar active 
  * @prop {object} crossData - The cross data
  * @returns JSX
@@ -386,125 +381,93 @@ function StatsOptions(props) {
     const curr_date = curr_time.toISOString().split("T")[0];
     const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
     const prev_date = prev_time.toISOString().split("T")[0];
-    const [statsOptions, setStatsOptions] = useState({
-        "start_date": prev_date,
-        "end_date": curr_date,
-        "seiyuu": "kaorin"
+
+    const stats_options = useSelector(state => state.StatsSlice.stats_options);
+
+    const [statsOptionLocal, setStatsOptionLocal] = useState({
+        "seiyuu_id_name": "",
+        "start_date": "",
+        "end_date": ""
     });
 
-
-    const localStorage = window.localStorage;
+    useEffect(() => {
+        if (stats_options.seiyuu_list.length === 0) return;
+        store.dispatch(setStatsOption({
+            "seiyuu_id_name": stats_options.seiyuu_list[0].id_name,
+            "start_date": prev_date,
+            "end_date": curr_date
+        }));
+    }, [stats_options.seiyuu_list, prev_date, curr_date]);
 
     useEffect(() => {
-        if (localStorage.getItem("stats_options")) {
-            const stats_options = JSON.parse(localStorage.getItem("stats_options"));
-            handleApply(stats_options);
+        if (stats_options.seiyuu_id_name && stats_options.start_date && stats_options.end_date) {
+            setStatsOptionLocal({
+                "seiyuu_id_name": stats_options.seiyuu_id_name,
+                "start_date": stats_options.start_date,
+                "end_date": stats_options.end_date
+            });
         }
-        else {
-            handleApply(statsOptions);
-        }
-    }, []);
+    }, [stats_options.seiyuu_id_name, stats_options.start_date, stats_options.end_date]);
 
     function handleSelectSeiyuu(e) {
-        handleApply({
-            ...statsOptions,
-            "seiyuu": e.target.getAttribute("data-seiyuu")
-        });
+        store.dispatch(setStatsOption({
+            ...stats_options,
+            seiyuu_id_name: e.target.getAttribute("data-seiyuu")
+        })
+        );
+        store.dispatch(setRightActive(false));
     }
 
-    function handleApply(stats_options) {
-        setStatsOptions(stats_options);
-        localStorage.setItem("stats_options", JSON.stringify(stats_options));
-        props.handleSideActive("right", false);
-        props.updateCrossData(stats_options);
+    function handleSelectPreset(start_date, end_date) {
+        store.dispatch(setStatsOption({
+            ...stats_options,
+            "start_date": start_date,
+            "end_date": end_date
+        }));
+        store.dispatch(setRightActive(false));
     }
 
-    function handlePresets(preset_value) {
-        const curr_time = new Date();
-        const curr_date = curr_time.toISOString().split("T")[0];
-        if (preset_value === "week") {
-            const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
-            const prev_date = prev_time.toISOString().split("T")[0];
-            handleApply(
-                {
-                    ...statsOptions,
-                    "start_date": prev_date,
-                    "end_date": curr_date
-                }
-            );
-        }
-        else if (preset_value === "month") {
-            const prev_time = new Date(curr_time.getTime() - 30 * 24 * 60 * 60 * 1000);
-            const prev_date = prev_time.toISOString().split("T")[0];
-            handleApply(
-                {
-                    ...statsOptions,
-                    "start_date": prev_date,
-                    "end_date": curr_date
-                }
-            );
-        }
-        else if (preset_value === "year") {
-            const prev_time = new Date(curr_time.getTime() - 365 * 24 * 60 * 60 * 1000);
-            const prev_date = prev_time.toISOString().split("T")[0];
-            handleApply(
-                {
-                    ...statsOptions,
-                    "start_date": prev_date,
-                    "end_date": curr_date
-                }
-            );
-        }
-        else if (preset_value === "all") {
-            handleApply(
-                {
-                    ...statsOptions,
-                    "start_date": "2000-01-01",
-                    "end_date": curr_date
-                }
-            );
-        }
-
+    function handleApply() {
+        store.dispatch(setStatsOption({
+            ...stats_options,
+            ...statsOptionLocal
+        }));
+        store.dispatch(setRightActive(false));
     }
 
-
-    const presetOptions = [
-        { key: "stats_preset_week", text: "Last 7 days", value: "week" },
-        { key: "stats_preset_month", text: "Last 30 days", value: "month" },
-        { key: "stats_preset_year", text: "Last 365 days", value: "year" },
-        { key: "stats_preset_all", text: "All Time", value: "all" }
-    ]
     return (
         <>
             <h3>Account</h3>
             <Menu text vertical>
-                <Menu.Item data-seiyuu="kaorin" active={statsOptions.seiyuu === "kaorin"} onClick={handleSelectSeiyuu}>前田佳織里</Menu.Item>
-                <Menu.Item data-seiyuu="chemi" active={statsOptions.seiyuu === "chemi"} onClick={handleSelectSeiyuu}>田中ちえ美</Menu.Item>
-                <Menu.Item data-seiyuu="akarin" active={statsOptions.seiyuu === "akarin"} onClick={handleSelectSeiyuu}>鬼頭明里</Menu.Item>
-                <Menu.Item data-seiyuu="konachi" active={statsOptions.seiyuu === "konachi"} onClick={handleSelectSeiyuu}>月音こな</Menu.Item>
+                {stats_options.seiyuu_list.map((item, index) => (
+                    <Menu.Item key={item.id_name} data-seiyuu={item.id_name} active={statsOptionLocal.seiyuu_id_name === item.id_name} onClick={handleSelectSeiyuu}>{item.name}</Menu.Item>
+                ))}
             </Menu>
             <h3>Data Interval</h3>
             <Form>
-                <Form.Input label="Start Date" control="input" type="date" value={statsOptions.start_date} onChange={(e) => setStatsOptions(prev => ({ ...prev, "start_date": e.target.value }))}></Form.Input>
-                <Form.Input label="End Date" control="input" type="date" value={statsOptions.end_date} onChange={(e) => setStatsOptions(prev => ({ ...prev, "end_date": e.target.value }))}></Form.Input>
+                <Form.Input label="Start Date" control="input" type="date" value={statsOptionLocal.start_date} onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "start_date": e.target.value }))}></Form.Input>
+                <Form.Input label="End Date" control="input" type="date" value={statsOptionLocal.end_date} onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "end_date": e.target.value }))}></Form.Input>
                 <Form.Field>
-                    <label>Preset</label>
-                    <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait" options={presetOptions} onChange={(e, { value }) => {
-                        handlePresets(value);
-                    }}></Dropdown>
+                    <Button fluid onClick={handleApply}>Apply</Button>
                 </Form.Field>
                 <Form.Field>
-                    <Button fluid onClick={() => handleApply(statsOptions)}>Apply</Button>
+                    <label>Date Preset</label>
+                    <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait">
+                        <Dropdown.Menu>
+                            {
+                                stats_options.preset_dates.map((item, index) => (
+                                    <Dropdown.Item key={index} onClick={() => handleSelectPreset(item.start_date, item.end_date)}>{item.name}</Dropdown.Item>
+                                ))
+                            }
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </Form.Field>
-
             </Form>
         </>
     )
 }
 StatsOptions.propTypes = {
-    updateCrossData: PropTypes.func,
     handleSideActive: PropTypes.func,
-    crossData: PropTypes.object
 }
 
 export { Stats, StatsOptions };

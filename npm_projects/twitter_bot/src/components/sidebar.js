@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import './layout.css';
 import { Icon, Menu, Divider, Form, Dropdown, Button } from "semantic-ui-react";
 import BotLogo from "../assets/bot_logo.svg";
 import { useLocation, useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 function LeftSideBar(props) {
-    const history = useHistory();
     return (
         <div className={`bot stats left sidebar ${props.isActive ? "active" : ""}`}>
             <SideBarTitle></SideBarTitle>
@@ -15,24 +15,18 @@ function LeftSideBar(props) {
     )
 }
 
-function SideBarTitle(props) {
-    const history = useHistory();
+function SideBarTitle() {
     return (
         <img src={BotLogo} alt="Bot Logo" className="bot stats site_title" onClick={() => { window.location = "/bot/" }}></img>
     )
 }
 
 
-function NaviMenu(props) {
+function NaviMenu() {
     const location = useLocation();
     const history = useHistory();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    useEffect(() => {
-        fetch("/bot/api/testAuth/").then(res => {
-            setIsAuthenticated(res.status === 200);
-        })
-    }, []);
+    const showAdminMenu = useSelector(state => state.LayoutSlice.showAdminMenu);
 
     return (
         <Menu secondary vertical inverted fluid size="large">
@@ -48,7 +42,7 @@ function NaviMenu(props) {
                 <Icon name="signal"></Icon>
                 Service Status
             </Menu.Item>
-            {isAuthenticated ?
+            {showAdminMenu ?
                 <>
                     <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => history.push("/bot/config/")}>
                         <Icon name="cogs"></Icon>

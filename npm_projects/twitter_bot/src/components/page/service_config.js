@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Accordion, Form, Icon, Divider } from "semantic-ui-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Accordion, Form, Icon, Divider, Segment, Table } from "semantic-ui-react";
 
 import PropTypes from 'prop-types';
 import Cookies from "js-cookie";
 
+import store from "../../store";
+import { useSelector } from "react-redux";
+import { setSeiyuuList } from "../../store/stats_slice";
+
 import { seiyuu_name } from "../App";
+import { set } from "date-fns";
+import { CompactContainer } from "../layout";
 
 /**
  * A row of service config
  * @param {object} props - see prop
- * @prop {string} title - title of service config
+ * @prop {string} name - seiyuu name
+ * @prop {string} screenName - twitter screen name
+ * @prop {string} idName - seiyuu id name
  * @prop {boolean} active - is service active
  * @prop {number} interval - interval between posts
  * @prop {function} handleApply - callback function when apply button is clicked
@@ -21,7 +29,7 @@ function ServiceConfig(props) {
         "active": false
     });
 
-
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setConfig({
@@ -30,80 +38,133 @@ function ServiceConfig(props) {
         });
     }, [props.active, props.posts_interval]);
 
+    const interval_input_ref = useRef(null);
 
-    function handleIntervalChange(e) {
-        setConfig({ ...config, "posts_interval": parseInt(e.target.value) });
+    function handleFocusInput() {
+        if (interval_input_ref.current) {
+            interval_input_ref.current.focus();
+        }
     }
 
-    function handleActiveChange(e) {
-        setConfig({ ...config, "active": !config.active });
+    function handleIntervalChange(e) {
+        setConfig(prev => ({ ...prev, "posts_interval": parseInt(e.target.value) }));
+    }
+
+    function handleActiveChange() {
+        setConfig(prev => ({ ...prev, "active": !prev.active }));
     }
 
     function handleApply() {
-        fetch(`/bot/api/config/update/`, {
+        setLoading(true);
+        fetch(`/bot/api/config/update/${props.idName}/`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": Cookies.get("csrftoken")
             },
             body: JSON.stringify({
-                "seiyuu_id_name": props.title,
                 "interval": config.posts_interval,
-                "is_active": config.active
+                "activated": config.active
             })
         }).then(res => {
             if (res.status === 200) {
-                props.handleApply();
+                fetch("/bot/api/config/get/").then(res => {
+                    if (res.status === 200) {
+                        res.json().then(data => {
+                            store.dispatch(setSeiyuuList(data.data));
+                        });
+                    }
+                });
             }
-        })
+            console.log(res.json());
+            throw new Error("Failed to update config");
+        }).catch(err => {
+            console.error(err);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+
+    function handleReset() {
+        setConfig({
+            "posts_interval": props.interval,
+            "active": props.active
+        });
     }
 
     return (
-        <>
-            <h2>{seiyuu_name[props.title]}</h2>
+        <Segment>
             <Form>
-                <Form.Group inline>
-                    <Form.Input label="Posts Interval" control="input" type="number" value={config.posts_interval} min={1} max={24} onChange={handleIntervalChange} />
-                    <Form.Checkbox label='Activate' checked={config.active} onChange={handleActiveChange} name="active" toggle />
-                    {config.active === props.active && config.posts_interval === props.interval ? null : <Form.Button positive onClick={handleApply}>Apply</Form.Button>}
-                </Form.Group>
+                <h3>{`${props.name} ${props.screenName}`}</h3>
+                <Table basic="very">
+                    <Table.Body>
+                        <Table.Row style={{ cursor: "pointer" }} onClick={handleFocusInput}>
+                            <Table.Cell collapsing>Posts Interval</Table.Cell>
+                            <Table.Cell>
+                                <Form.Field>
+                                    <input ref={interval_input_ref} type="number" required value={config.posts_interval} min={1} max={24} onChange={handleIntervalChange} />
+                                </Form.Field>
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row onClick={handleActiveChange} style={{ cursor: "pointer" }}>
+                            <Table.Cell collapsing>Activate</Table.Cell>
+                            <Table.Cell>
+                                <Form.Checkbox checked={config.active} name="active" toggle />
+                            </Table.Cell>
+                        </Table.Row>
+                        <Table.Row >
+                            <Table.Cell colSpan={2}>
+                                <Form.Group>
+                                    <Form.Button
+                                        width={8}
+                                        fluid
+                                        color="teal"
+                                        loading={loading}
+                                        disabled={
+                                            loading ||
+                                            (config.posts_interval === props.interval && config.active === props.active)
+                                        }
+                                        onClick={handleApply}
+                                    >Apply</Form.Button>
+                                    <Form.Button
+                                        width={8}
+                                        fluid
+                                        loading={loading}
+                                        disabled={
+                                            loading ||
+                                            (config.posts_interval === props.interval && config.active === props.active)
+                                        }
+                                        onClick={handleReset}
+                                    >Reset</Form.Button>
+                                </Form.Group>
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
             </Form>
-            <Divider></Divider>
-        </>
+        </Segment>
     )
 }
 ServiceConfig.propTypes = {
-    title: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    screenName: PropTypes.string.isRequired,
+    idName: PropTypes.string.isRequired,
     active: PropTypes.bool.isRequired,
     interval: PropTypes.number.isRequired,
-    handleApply: PropTypes.func.isRequired
 }
 
-function ConfigPage(props) {
-    const [config, setConfig] = useState([]);
+function ConfigPage() {
 
-    useEffect(() => {
-        getConfig();
-    }, []);
-
-    function getConfig() {
-        fetch("/bot/api/config/get/").then(res => {
-            if (res.status === 200 && res.status) {
-                res.json().then(data => {
-                    setConfig(data.data);
-                });
-            }
-        })
-    }
+    const config = useSelector(state => state.StatsSlice.stats_options.seiyuu_list);
 
     return (
-        <>
+        <CompactContainer>
             {config.map((service, index) => {
                 return (
-                    <ServiceConfig key={index} title={service.seiyuu_id_name} active={service.is_active} interval={service.interval} handleApply={getConfig}></ServiceConfig>
+                    <ServiceConfig key={service.id} idName={service.id_name} name={service.name} screenName={service.screen_name} active={service.activated} interval={service.interval} ></ServiceConfig>
                 )
             })}
-        </>
+        </CompactContainer>
     )
 }
 

@@ -73,9 +73,8 @@
 }
 
 .bot.stats.content {
+    padding: 1rem;
     padding-top: 5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
     background-color: rgb(240, 240, 240);
     min-height: 100vh;
     transition: margin ease 0.3s;
