@@ -3,10 +3,15 @@ import { Grid, Icon, Button, Label, Form, Segment, Table } from "semantic-ui-rea
 
 import PropTypes from 'prop-types';
 
+import store from "../../store";
+import { useSelector } from "react-redux";
+import { CompactContainer } from "../layout";
+
 /**
  * 
  * @param {object} props see prop
- * @prop {string} title title of status block
+ * @prop {string} name service name
+ * @prop {string} screenName twitter screen name
  * @prop {boolean} active is service online
  * @prop {string} lastPostTime last post time
  * @prop {number} interval interval between posts
@@ -14,17 +19,19 @@ import PropTypes from 'prop-types';
  */
 function StatusBlock(props) {
 
-    const seiyuu_name = {
-        "kaorin": "前田佳織里 kaorin__bot",
-        "akarin": "鬼頭明里 akarin__bot",
-        "chemi": "田中ちえ美 Chiemi__bot",
-        "konachi": "月音こな konachi__bot"
-    }
-
     return (
         <Segment>
-            <h3>{seiyuu_name[props.title]}</h3>
-            <Table celled basic="very">
+            <h3>
+                {`${props.name} ${props.screenName}`}
+                {
+                    props.active &&
+                    <a href={`https://twitter.com/${props.screenName}`} target="__blank" style={{ color: "grey", marginLeft: "1rem" }}>
+                        <Icon name="external alternate"></Icon>
+                    </a>
+                }
+
+            </h3>
+            <Table basic="very">
                 <Table.Body>
                     <Table.Row>
                         <Table.Cell collapsing>Service Status</Table.Cell>
@@ -44,29 +51,21 @@ function StatusBlock(props) {
     )
 }
 StatusBlock.propTypes = {
-    title: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    screenName: PropTypes.string.isRequired,
     active: PropTypes.bool.isRequired,
     lastPostTime: PropTypes.string,
     interval: PropTypes.number,
 }
 
 function StatusPage() {
-    const [config, setConfig] = useState([]);
 
-    useEffect(() => {
-        fetch("/bot/api/config/get/").then(res => {
-            if (res.status === 200 && res.status) {
-                res.json().then(data => {
-                    setConfig(data.data);
-                });
-            }
-        })
-    }, []);
+    const config = useSelector(state => state.StatsSlice.stats_options.seiyuu_list);
 
     return (
         <>
-            {config.map((service, index) => {
-                return <StatusBlock key={index} title={service.seiyuu_id_name} active={service.is_active} lastPostTime={service.last_post_time} interval={service.interval}></StatusBlock>
+            {config.map((service) => {
+                return <StatusBlock key={service.id} name={service.name} screenName={service.screen_name} active={service.activated} lastPostTime={service.last_post_time} interval={service.interval}></StatusBlock>
             }
             )}
         </>

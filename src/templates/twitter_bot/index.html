@@ -35,6 +35,16 @@
     <meta property="og:image" content="https://acupinchure.ddns.net/static/twitter_bot/site_media/favicon-32x32.png">
     <meta property="og:site_name" content="Lovelive Seiyuu BOT">
     <title>Lovelive Seiyuu Bot</title>
+
+    <!--Twitter-->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://acupinchure.ddns.net/bot/">
+    <meta property="twitter:title" content="Lovelive Seiyuu BOT">
+    <meta property="twitter:description"
+        content="Lovelive Seiyuu Twitter Image Bot Project. The project is to create Twitter accounts that randomly posts images or clips of a specific Lovelive Seiyuu">
+    <meta property="twitter:image"
+        content="https://acupinchure.ddns.net/static/twitter_bot/site_media/favicon-32x32.png">
+
     {% comment %} <style>
         #loading {
             position: fixed;
@@ -92,6 +102,11 @@
             transform: translate(-30%, -50%);
         }
     </style> {% endcomment %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css"
+        integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
 
 <body>
@@ -113,7 +128,7 @@
     </script> {% endcomment %}
 
     {% load static %}
-    <script src="{% static 'twitter_bot/main.js' %}?date=20231106"></script>
+    <script src="{% static 'twitter_bot/main.js' %}?date=20240222"></script>
 
     <script>
         const local_storage = window.localStorage;

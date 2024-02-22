@@ -1,7 +1,8 @@
-.bot.stats.linechart_wrapper {
+/* .bot.stats.linechart_wrapper {
     min-width: 900px;
-}
+} */
 
 .bot.stats.linechart_container {
-    overflow-x: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }

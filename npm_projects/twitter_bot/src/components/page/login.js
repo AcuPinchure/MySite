@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Form, Message, Container, Segment } from "semantic-ui-react";
 import Cookies from "js-cookie";
 
-function LoginForm(props) {
+import { CompactContainer } from "../layout";
+
+import PropTypes from 'prop-types';
+
+function LoginForm() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loginMessage, setLoginMessage] = useState(null);
@@ -48,7 +52,7 @@ function LoginForm(props) {
             <input type="hidden" name="csrfmiddlewaretoken" value={csrf_token} />
             <Form.Input icon="user" iconPosition='left' label="Username" name="username" value={username} onChange={handleUsernameChange} />
             <Form.Input icon="lock" iconPosition='left' label="Password" name="password" type="password" value={password} onChange={handlePasswordChange} />
-            <Form.Button type="submit" fluid primary>Login</Form.Button>
+            <Form.Button type="submit" fluid color="teal">Login</Form.Button>
             {loginMessage ?
                 <Message negative>
                     <Message.Header>Login Failed</Message.Header>
@@ -60,12 +64,12 @@ function LoginForm(props) {
 }
 
 
-function Login(props) {
+function Login() {
     return (
-        <div style={{ maxWidth: "32rem", margin: "auto", paddingTop: "20vh" }}>
+        <CompactContainer topPadded>
             <h1 style={{ textAlign: "center" }}>Login as Admin to Continue</h1>
-            <LoginForm setLoginStatus={props.setLoginStatus}></LoginForm>
-        </div>
+            <LoginForm></LoginForm>
+        </CompactContainer>
     )
 }
 

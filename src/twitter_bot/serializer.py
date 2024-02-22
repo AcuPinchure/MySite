@@ -4,27 +4,40 @@ from .models import Tweet, Seiyuu, Media
 from datetime import timedelta
 
 
-class ServiceConfigSerializer(serializers.Serializer):
-    seiyuu_id_name = serializers.CharField(required=True)
-    is_active = serializers.BooleanField(required=True)
-    interval = serializers.IntegerField(required=True)
-    last_post_time = serializers.DateTimeField(read_only=True)
+# class ServiceConfigSerializer(serializers.Serializer):
+#     seiyuu_id_name = serializers.CharField(required=True)
+#     is_active = serializers.BooleanField(required=True)
+#     interval = serializers.IntegerField(required=True)
+#     last_post_time = serializers.DateTimeField(read_only=True)
 
 
-# class SeiyuuSerializer(serializers.ModelSerializer):
-#     id = serializers.IntegerField(read_only=True)
+class SeiyuuSerializer(serializers.ModelSerializer):
+    last_post_time = serializers.SerializerMethodField()
 
-#     class Meta:
-#         model = Seiyuu
-#         fields = [
-#             'id',
-#             'name',
-#             'id_name',
-#             'screen_name',
-#             'interval',
-#             'activated',
-#             'image_folder'
-#         ]
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    id_name = serializers.CharField(read_only=True)
+    screen_name = serializers.CharField(read_only=True)
+
+    def get_last_post_time(self, obj):
+
+        if Tweet.objects.filter(media__seiyuu=obj).exists():
+            return Tweet.objects.filter(
+                media__seiyuu=obj).latest("post_time").post_time.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return None
+
+    class Meta:
+        model = Seiyuu
+        fields = [
+            'id',
+            'name',
+            'id_name',
+            'screen_name',
+            'interval',
+            'activated',
+            'last_post_time'
+        ]
 
 
 class MediaSerializer(serializers.ModelSerializer):
