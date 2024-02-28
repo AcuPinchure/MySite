@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import Tweet, Seiyuu, Media
+from .models import Tweet, Seiyuu, Media, Followers
+
+from django.db.models import Sum
 
 from datetime import timedelta
 
@@ -42,36 +44,79 @@ class SeiyuuSerializer(serializers.ModelSerializer):
 
 class MediaSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    file = serializers.FileField(read_only=True)
+    file = serializers.URLField(read_only=True, source='file.url')
+    file_name = serializers.SerializerMethodField()
     file_type = serializers.CharField(read_only=True)
-    seiyuu = serializers.CharField(source='seiyuu.id_name', read_only=True)
+    total_weight = serializers.SerializerMethodField()
+    seiyuu_name = serializers.CharField(read_only=True, source='seiyuu.name')
+    seiyuu_screen_name = serializers.CharField(
+        read_only=True, source='seiyuu.screen_name')
+    seiyuu_id_name = serializers.CharField(
+        read_only=True, source='seiyuu.id_name')
+    posts = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
+    rts = serializers.SerializerMethodField()
+
+    def get_total_weight(self, obj):
+        return Media.objects.filter(seiyuu=obj.seiyuu).aggregate(Sum('weight'))['weight__sum']
+
+    def get_file_name(self, obj):
+        return obj.file.name.split('/')[-1]
+
+    def get_posts(self, obj):
+        return obj.tweet_set.count()
+
+    def get_likes(self, obj):
+        return obj.tweet_set.aggregate(Sum('like'))['like__sum']
+
+    def get_rts(self, obj):
+        return obj.tweet_set.aggregate(Sum('rt'))['rt__sum']
 
     class Meta:
         model = Media
         fields = [
             'id',
             'file',
+            'file_name',
             'file_type',
             'weight',
-            'seiyuu'
+            'total_weight',
+            'seiyuu_name',
+            'seiyuu_screen_name',
+            'seiyuu_id_name',
+            'posts',
+            'likes',
+            'rts'
         ]
 
 
-# class TweetSerializer(serializers.ModelSerializer):
-#     media_url = serializers.CharField(read_only=True, source='media.file.url')
+class TweetSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(read_only=True)
 
-#     class Meta:
-#         model = Tweet
-#         fields = [
-#             'id',
-#             'post_time',
-#             'data_time',
-#             'like',
-#             'rt',
-#             'reply',
-#             'quote',
-#             'media_url'
-#         ]
+    media = serializers.URLField(read_only=True, source='media.file.url')
+
+    followers = serializers.SerializerMethodField(read_only=True)
+
+    def get_followers(self, obj):
+        if not Followers.objects.filter(
+                data_time__lte=obj.post_time, seiyuu=obj.media.seiyuu).exists():
+            return "No data"
+        return Followers.objects.filter(
+            data_time__lte=obj.post_time, seiyuu=obj.media.seiyuu).latest("data_time").followers
+
+    class Meta:
+        model = Tweet
+        fields = [
+            'id',
+            'post_time',
+            'data_time',
+            'like',
+            'rt',
+            'reply',
+            'quote',
+            'media',
+            'followers'
+        ]
 
 
 # class StatSerializer(serializers.Serializer):

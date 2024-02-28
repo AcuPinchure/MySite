@@ -20,7 +20,6 @@ import { CompactContainer } from "../layout";
  * @prop {string} idName - seiyuu id name
  * @prop {boolean} active - is service active
  * @prop {number} interval - interval between posts
- * @prop {function} handleApply - callback function when apply button is clicked
  * @returns 
  */
 function ServiceConfig(props) {

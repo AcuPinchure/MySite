@@ -6,7 +6,9 @@ import { useLocation, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import store from "../store";
-import { setLeftActive } from "../store/layout_slice";
+import { setLeftActive, setRightActive } from "../store/layout_slice";
+
+import PropTypes from 'prop-types';
 
 
 function LeftSideBar(props) {
@@ -17,6 +19,9 @@ function LeftSideBar(props) {
         </div>
     )
 }
+LeftSideBar.propTypes = {
+    isActive: PropTypes.bool.isRequired
+}
 
 function SideBarTitle() {
     return (
@@ -26,7 +31,7 @@ function SideBarTitle() {
 
 
 function NaviMenu() {
-    const location = useLocation();
+    const path_name = useLocation().pathname;
     const history = useHistory();
 
     const showAdminMenu = useSelector(state => state.LayoutSlice.showAdminMenu);
@@ -34,6 +39,7 @@ function NaviMenu() {
     function handleItemClick(path) {
         history.push(path);
         store.dispatch(setLeftActive(false));
+        store.dispatch(setRightActive(false));
     }
 
     return (
@@ -42,25 +48,25 @@ function NaviMenu() {
                 <Icon name="home"></Icon>
                 About
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/bot/stats/")} onClick={() => handleItemClick("/bot/stats/")}>
+            <Menu.Item active={path_name.startsWith("/bot/stats/")} onClick={() => handleItemClick("/bot/stats/")}>
                 <Icon name="chart bar"></Icon>
                 Statistics
             </Menu.Item>
-            <Menu.Item active={location.pathname.startsWith("/bot/status/")} onClick={() => handleItemClick("/bot/status/")}>
+            <Menu.Item active={path_name.startsWith("/bot/status/")} onClick={() => handleItemClick("/bot/status/")}>
                 <Icon name="signal"></Icon>
                 Service Status
             </Menu.Item>
             {showAdminMenu ?
                 <>
-                    <Menu.Item active={location.pathname.startsWith("/bot/config/")} onClick={() => handleItemClick("/bot/config/")}>
+                    <Menu.Item active={path_name.startsWith("/bot/config/")} onClick={() => handleItemClick("/bot/config/")}>
                         <Icon name="cogs"></Icon>
                         Service Config
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/library/")} onClick={() => handleItemClick("/bot/library/")}>
+                    <Menu.Item active={path_name.startsWith("/bot/library/")} onClick={() => handleItemClick("/bot/library/")}>
                         <Icon name="images outline"></Icon>
                         Image Library
                     </Menu.Item>
-                    <Menu.Item active={location.pathname.startsWith("/bot/logs/")} onClick={() => handleItemClick("/bot/logs/")}>
+                    <Menu.Item active={path_name.startsWith("/bot/logs/")} onClick={() => handleItemClick("/bot/logs/")}>
                         <Icon name="clock outline"></Icon>
                         Logs
                     </Menu.Item>
@@ -82,15 +88,38 @@ function RightSideBar(props) {
 
     return (
         <div className={`bot stats right sidebar ${props.isActive ? "active" : ""}`}>
-            <div className="bot stats right sidebar_close" onClick={() => props.setSideActive('right', false)}>
-                <Icon name="angle right" size="large"></Icon>
-            </div>
-            <Divider className="bot stats sidebar_close"></Divider>
             {props.children}
         </div>
+    )
+}
+RightSideBar.propTypes = {
+    isActive: PropTypes.bool.isRequired
+}
+
+
+function SideBarDimmer() {
+
+    const layout_state = useSelector(state => state.LayoutSlice);
+
+    function handleDimmerClick() {
+        store.dispatch(setLeftActive(false));
+        store.dispatch(setRightActive(false));
+    }
+
+    return (
+        <>
+            <div
+                className={`bot stats left sidebar_overlay ${(layout_state.left_active && layout_state.view_width <= layout_state.responsive_width) ? "active" : ""}`}
+                onClick={handleDimmerClick}
+            ></div>
+            <div
+                className={`bot stats right sidebar_overlay ${layout_state.right_active ? "active" : ""}`}
+                onClick={handleDimmerClick}
+            ></div>
+        </>
     )
 }
 
 
 
-export { LeftSideBar, RightSideBar };
+export { LeftSideBar, RightSideBar, SideBarDimmer };

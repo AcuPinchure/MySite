@@ -16,11 +16,13 @@ from datetime import datetime, timedelta
 import pytz
 
 # models and query
-from .models import Seiyuu, Tweet, Followers
+from .models import Seiyuu, Tweet, Followers, Media
 from django.db.models import Avg, Count, Sum
 
 # serializers
-from .serializer import SeiyuuSerializer
+from .serializer import SeiyuuSerializer, MediaSerializer, TweetSerializer
+
+import math
 
 
 @api_view(['POST'])
@@ -397,6 +399,354 @@ def getRtDetail(request):
     return Response(json_data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def getServiceConfig(request):
+    """
+    load status of all seiyuu
+
+    [return]
+    seiyuu_id_name: seiyuu id_name
+    is_active: if the service is active
+    interval: time interval in hours
+    last_post_time: last post time
+    """
+
+    data = []
+
+    # get all seiyuu
+    seiyuu_list = Seiyuu.objects.filter(hidden=False).order_by("id")
+
+    return Response({
+        "status": True,
+        "data": SeiyuuSerializer(seiyuu_list, many=True).data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def updateServiceConfig(request, id_name):
+    """
+    update service config
+
+    [url params]
+    seiyuu_id_name: seiyuu_id_name
+
+    [body params]
+    is_active: if the service is active
+    interval: time interval in hours
+    """
+    # check login
+    if not request.user.is_authenticated:
+        return Response({"message": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not Seiyuu.objects.filter(id_name=id_name).exists():
+        return Response({"message": "Seiyuu not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Extract the data from the PUT request using request.data
+    serializer = SeiyuuSerializer(
+        data=request.data,
+        instance=Seiyuu.objects.get(id_name=id_name)
+    )
+    serializer.is_valid(raise_exception=True)
+
+    serializer.save()
+
+    return Response({"message": "Object updated successfully"}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def listImages(request):
+    """
+    list all images in the database
+
+    [url params]
+    seiyuu_id_name: seiyuu id_name
+    start_date: start date (tweet post time) of the searching interval
+    end_date: end date (tweet post time) of the searching interval
+    image_start_date: start date (image import time) of the searching interval
+    image_end_date: end date (image import time) of the searching interval
+    min_likes: minimum number of likes
+    max_likes: maximum number of likes
+    min_rts: minimum number of retweets
+    max_rts: maximum number of retweets
+    min_posts: minimum number of posts
+    max_posts: maximum number of posts
+    tweet_id: tweet id
+    page: page number
+    order_by: order by, default is "date", options: "date", "likes", "rts", "posts"
+    order: order, default is "desc", options: "asc", "desc"
+
+    [return]
+    count: total number of images
+    total_pages: total number of pages
+    data: list of images {
+        id: image id
+        file: image file
+        file_name: image file name
+        file_type: image file type
+        weight: image weight
+        seiyuu: seiyuu id_name
+    }
+    """
+    if not request.user.is_authenticated:
+        return Response({"message": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if request.query_params.get("tweet_id"):
+        the_tweet_query = Tweet.objects.filter(
+            id=request.query_params.get("tweet_id"))
+        if not the_tweet_query.exists():
+            return Response({"message": "Tweet not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        the_image = the_tweet_query.first().media
+
+        serializer = MediaSerializer(the_image, many=False)
+
+        return Response({
+            "count": 1,
+            "total_pages": 1,
+            "sort_by": "latest_post_time",
+            "order": "desc",
+            "page": 1,
+            "data": [serializer.data]
+        }, status=status.HTTP_200_OK)
+
+    filter_string_list = []
+
+    if request.query_params.get("seiyuu_id_name"):
+        filter_string_list.append(
+            f"""id_name = '{request.query_params.get("seiyuu_id_name")}'""")
+
+    if request.query_params.get("start_date"):
+        filter_string_list.append(
+            f"""latest_post_time >= '{request.query_params.get("start_date")}'""")
+
+    if request.query_params.get("end_date"):
+        filter_string_list.append(
+            f"""earliest_post_time <= '{request.query_params.get("end_date")}'""")
+
+    if request.query_params.get("min_likes"):
+        filter_string_list.append(
+            f"""likes >= {request.query_params.get("min_likes")}""")
+
+    if request.query_params.get("max_likes"):
+        filter_string_list.append(
+            f"""likes <= {request.query_params.get("max_likes")}""")
+
+    if request.query_params.get("min_rts"):
+        filter_string_list.append(
+            f"""rts >= {request.query_params.get("min_rts")}""")
+
+    if request.query_params.get("max_rts"):
+        filter_string_list.append(
+            f"""rts <= {request.query_params.get("max_rts")}""")
+
+    if request.query_params.get("min_posts"):
+        filter_string_list.append(
+            f"""posts >= {request.query_params.get("min_posts")}""")
+
+    if request.query_params.get("max_posts"):
+        filter_string_list.append(
+            f"""posts <= {request.query_params.get("max_posts")}""")
+
+    base_raw_query_command = f"""
+            SELECT
+                bot_media.id,
+                bot_media.file,
+                substr(substr(bot_media.file,20), instr(substr(bot_media.file,20), '/') + 1) AS file_name,
+                bot_media.file_type,
+                bot_media.weight,
+                bot_seiyuu.name AS seiyuu_name,
+                bot_seiyuu.screen_name AS seiyuu_screen_name,
+                bot_seiyuu.id_name AS seiyuu_id_name,
+                tweet_latest_time.post_time AS latest_post_time,
+                tweet_earliest_time.post_time AS earliest_post_time,
+                tweet_post_count.count AS posts,
+                tweet_like_count.count AS likes,
+                tweet_rt_count.count AS rts
+            FROM bot_media
+            JOIN bot_seiyuu ON bot_seiyuu.id = bot_media.seiyuu_id
+            JOIN 
+            (
+                SELECT
+                    media_id,
+                    MAX(post_time) AS post_time
+                FROM bot_tweet
+                WHERE data_time IS NOT NULL
+                GROUP BY media_id
+            )AS tweet_latest_time ON bot_media.id = tweet_latest_time.media_id
+            JOIN
+            (
+                SELECT
+                    media_id,
+                    MIN(post_time) AS post_time
+                FROM bot_tweet
+                WHERE data_time IS NOT NULL
+                GROUP BY media_id
+            ) AS tweet_earliest_time ON bot_media.id = tweet_earliest_time.media_id
+            JOIN
+            (
+                SELECT
+                    media_id, 
+                    COUNT(id) AS count
+                FROM bot_tweet
+                WHERE data_time IS NOT NULL
+                GROUP BY media_id
+            ) AS tweet_post_count ON bot_media.id = tweet_post_count.media_id
+            JOIN
+            (
+                SELECT
+                    media_id,
+                    MAX(bot_tweet."like") AS count
+                FROM bot_tweet
+                WHERE data_time IS NOT NULL
+                GROUP BY media_id
+            ) AS tweet_like_count ON bot_media.id = tweet_like_count.media_id
+            JOIN
+            (
+                SELECT
+                    media_id,
+                    MAX(bot_tweet.rt) AS count
+                FROM bot_tweet
+                WHERE data_time IS NOT NULL
+                GROUP BY media_id
+            ) AS tweet_rt_count ON bot_media.id = tweet_rt_count.media_id
+    """
+
+    if filter_string_list:
+        base_raw_query_command += " WHERE " + " AND ".join(filter_string_list)
+
+    base_image_query = Media.objects.raw(base_raw_query_command)
+
+    image_count = len(base_image_query)
+
+    sort_by = request.query_params.get("sort_by", None)
+    order = request.query_params.get("order", None)
+
+    if not sort_by in ["latest_post_time", "earliest_post_time", "likes", "rts", "posts"]:
+        sort_by = "latest_post_time"
+    if not order in ["asc", "desc"]:
+        order = "desc"
+
+    raw_query_command_with_order = f"""
+        {base_raw_query_command}
+        ORDER BY {sort_by} {order.upper()}
+    """
+
+    image_query = Media.objects.raw(raw_query_command_with_order)
+
+    page = request.query_params.get("page", None)
+
+    try:
+        page = int(page)
+    except:
+        page = 1
+
+    page_size = 20
+
+    total_pages = math.ceil(image_count / page_size) or 1
+
+    page = min(page, total_pages)
+
+    paginated_serializer = MediaSerializer(
+        image_query[(page-1)*page_size:page*page_size], many=True)
+
+    return Response({
+        "count": image_count,
+        "total_pages": total_pages,
+        "sort_by": sort_by,
+        "order": order,
+        "page": page,
+        "data": paginated_serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def getImageDetail(request, pk):
+    """
+    get image detail for dashboard, when user clicks the image data block
+
+    [url params]
+    id: image id
+
+    [return]
+    {
+        id: image id
+        file: image file
+        file_name: image file name
+        file_type: image file type
+        weight: image weight
+        total_weight: total weight of all images
+        seiyuu: seiyuu id_name
+        posts: total number of posts
+        likes: total number of likes
+        rts: total number of retweets
+        tweets: [
+            {
+                id: tweet id
+                post_time: tweet post time
+                like: number of likes
+                rt: number of retweets
+                followers: number of followers
+            }
+        ]
+    }
+    """
+    if not request.user.is_authenticated:
+        return Response({"message": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not Media.objects.filter(pk=pk).exists():
+        return Response({"message": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    the_image = Media.objects.get(pk=pk)
+    serializer = MediaSerializer(the_image, many=False)
+
+    tweet_query = Tweet.objects.filter(media=the_image).order_by("post_time")
+    tweet_serializer = TweetSerializer(tweet_query, many=True)
+
+    return Response({
+        **serializer.data,
+        "tweets": tweet_serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def setImageWeight(request, pk):
+    """
+    update image weight
+
+    [url params]
+    pk: image id
+
+    [body params]
+    weight: image weight
+    """
+    if not request.user.is_authenticated:
+        return Response({"message": "Not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if not Media.objects.filter(pk=pk).exists():
+        return Response({"message": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Extract the data from the PUT request using request.data
+    data = request.data
+
+    weight = data.get('weight', None)
+    if not weight:
+        return Response({"message": "Weight not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        weight = float(weight)
+    except:
+        return Response({"message": "Weight has incorrect format"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update the fields of the object with the data from the request
+    the_image = Media.objects.get(pk=pk)
+    the_image.weight = weight
+
+    # Save the updated object to the database
+    the_image.save()
+
+    return Response({"message": "Object updated successfully"}, status=status.HTTP_200_OK)
+
+
 ########### local api ############
 
 
@@ -495,54 +845,3 @@ def setFollowers(request):
         return Response({"message": "Object create successfully"}, status=status.HTTP_200_OK)
     else:
         return Response({"message": "Not allowed host name"}, status=status.HTTP_403_FORBIDDEN)
-
-
-@api_view(['GET'])
-def getServiceConfig(request):
-    """
-    load status of all seiyuu
-
-    [return]
-    seiyuu_id_name: seiyuu id_name
-    is_active: if the service is active
-    interval: time interval in hours
-    last_post_time: last post time
-    """
-
-    data = []
-
-    # get all seiyuu
-    seiyuu_list = Seiyuu.objects.filter(hidden=False).order_by("id")
-
-    return Response({
-        "status": True,
-        "data": SeiyuuSerializer(seiyuu_list, many=True).data
-    }, status=status.HTTP_200_OK)
-
-
-@api_view(['PUT'])
-def updateServiceConfig(request, id_name):
-    """
-    update service config
-
-    [url params]
-    seiyuu_id_name: seiyuu_id_name
-
-    [body params]
-    is_active: if the service is active
-    interval: time interval in hours
-    """
-
-    if not Seiyuu.objects.filter(id_name=id_name).exists():
-        return Response({"message": "Seiyuu not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    # Extract the data from the PUT request using request.data
-    serializer = SeiyuuSerializer(
-        data=request.data,
-        instance=Seiyuu.objects.get(id_name=id_name)
-    )
-    serializer.is_valid(raise_exception=True)
-
-    serializer.save()
-
-    return Response({"message": "Object updated successfully"}, status=status.HTTP_200_OK)

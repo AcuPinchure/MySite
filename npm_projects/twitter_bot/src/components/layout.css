@@ -24,6 +24,7 @@
     padding-top: 0rem;
     height: 100vh;
     transition: left ease 0.3s, right ease 0.3s;
+    overflow-y: auto;
 }
 
 
@@ -41,7 +42,8 @@
     width: var(--bar-width);
     padding-top: 1rem;
     z-index: 150;
-    top: 0;
+    top: 3.8rem;
+    height: calc(100vh - 3.8rem);
     right: calc(-1*var(--bar-width));
     background-color: rgb(240, 240, 240);
 }
@@ -50,7 +52,6 @@
 }
 .bot.stats.sidebar_overlay {
     position: fixed;
-    top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -61,6 +62,13 @@
 .bot.stats.sidebar_overlay.active {
     background-color: rgba(0, 0, 0, 0.3);
     z-index: 140;
+}
+
+.bot.stats.left.sidebar_overlay {
+    top: 0;
+}
+.bot.stats.right.sidebar_overlay {
+    top: 3.8rem;
 }
 
 
@@ -104,11 +112,12 @@
 
 .bot.stats.title.bar {
     display: block;
-    z-index: 200;
+    z-index: 2;
     position: fixed;
     top: 0;
     left: 0;
     padding: 0.7rem;
+    height: 3.8rem;
     background-color: white;
     width: 100vw;
     transition: margin ease 0.3s, width ease 0.3s;

@@ -4,6 +4,7 @@ import StatsSlice from "./stats_slice";
 import StatusSlice from "./status_slice";
 import ImageSlice from "./image_slice";
 import LayoutSlice from "./layout_slice";
+import LibrarySlice from "./library_slice";
 
 
 const store = configureStore({
@@ -11,7 +12,8 @@ const store = configureStore({
         StatsSlice,
         StatusSlice,
         ImageSlice,
-        LayoutSlice
+        LayoutSlice,
+        LibrarySlice
     },
     devTools: window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 });
