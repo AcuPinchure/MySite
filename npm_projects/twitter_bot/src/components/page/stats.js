@@ -9,10 +9,11 @@ import { useSelector } from "react-redux";
 import { setStatsOption, setSummary, setFollowers, setLikesDetail, setPostsDetail, setRtsDetail } from "../../store/stats_slice";
 import { setRightActive } from "../../store/layout_slice";
 
-
 import Chart from "react-apexcharts";
 
 import PropTypes from 'prop-types';
+import { setActiveTab, setFilterOptions, setLibraryLoading } from "../../store/library_slice";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 
 
@@ -29,6 +30,10 @@ import PropTypes from 'prop-types';
 function StatsDetailModal(props) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const show_admin_menu = useSelector(state => state.LayoutSlice.showAdminMenu);
+
+    const history = useHistory();
 
     let display_tweets = [];
 
@@ -99,6 +104,18 @@ function StatsDetailModal(props) {
         </Table.Row>
     ))
 
+    function handleToLibrary(tweet_id) {
+        if (!show_admin_menu) {
+            window.location.href = "/bot/login/";
+        };
+        store.dispatch(setFilterOptions({
+            "tweet_id": tweet_id
+        }));
+        store.dispatch(setActiveTab("tweet_id"));
+        store.dispatch(setLibraryLoading(true));
+        history.push("/bot/library/");
+    }
+
 
     return (
         <Modal
@@ -122,6 +139,12 @@ function StatsDetailModal(props) {
                             <Segment key={index} style={{ "maxWidth": "550px", "margin": "1rem auto" }}>
                                 <Label color='red' size="large" ribbon># {index + 1}</Label>
                                 <Tweet id={tweet_id}></Tweet>
+                                {
+                                    show_admin_menu
+                                    &&
+                                    <Button fluid onClick={() => handleToLibrary(tweet_id)}>
+                                        View This Image In Library
+                                    </Button>}
                             </Segment>
                         ))}
                     </>
@@ -369,18 +392,11 @@ function Stats() {
 }
 
 
-/**
- * 
- * @param {object} props see prop
- * @prop {function} handleSideActive - The function to handle the side bar active 
- * @prop {object} crossData - The cross data
- * @returns JSX
- */
-function StatsOptions(props) {
-    const curr_time = new Date();
-    const curr_date = curr_time.toISOString().split("T")[0];
-    const prev_time = new Date(curr_time.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const prev_date = prev_time.toISOString().split("T")[0];
+function StatsOptions() {
+    const curr_date = new Date();
+    const curr_date_str = curr_date.toISOString().split("T")[0];
+    const prev_date = new Date(curr_date.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const prev_date_str = prev_date.toISOString().split("T")[0];
 
     const stats_options = useSelector(state => state.StatsSlice.stats_options);
 
@@ -392,12 +408,13 @@ function StatsOptions(props) {
 
     useEffect(() => {
         if (stats_options.seiyuu_list.length === 0) return;
+        if (stats_options.seiyuu_id_name && stats_options.start_date && stats_options.end_date) return;
         store.dispatch(setStatsOption({
             "seiyuu_id_name": stats_options.seiyuu_list[0].id_name,
-            "start_date": prev_date,
-            "end_date": curr_date
+            "start_date": prev_date_str,
+            "end_date": curr_date_str
         }));
-    }, [stats_options.seiyuu_list, prev_date, curr_date]);
+    }, [stats_options.seiyuu_list]);
 
     useEffect(() => {
         if (stats_options.seiyuu_id_name && stats_options.start_date && stats_options.end_date) {
@@ -443,15 +460,27 @@ function StatsOptions(props) {
                     <Menu.Item key={item.id_name} data-seiyuu={item.id_name} active={statsOptionLocal.seiyuu_id_name === item.id_name} onClick={handleSelectSeiyuu}>{item.name}</Menu.Item>
                 ))}
             </Menu>
-            <h3>Data Interval</h3>
             <Form>
-                <Form.Input label="Start Date" control="input" type="date" value={statsOptionLocal.start_date} onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "start_date": e.target.value }))}></Form.Input>
-                <Form.Input label="End Date" control="input" type="date" value={statsOptionLocal.end_date} onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "end_date": e.target.value }))}></Form.Input>
+                <h3>Data Interval</h3>
+                <Form.Input
+                    label="Start Date"
+                    control="input"
+                    type="date"
+                    max={stats_options.end_date || undefined}
+                    value={statsOptionLocal.start_date}
+                    onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "start_date": e.target.value }))}
+                />
+                <Form.Input
+                    label="End Date"
+                    control="input"
+                    type="date"
+                    min={stats_options.start_date || prev_date_str}
+                    value={statsOptionLocal.end_date}
+                    onChange={(e) => setStatsOptionLocal(prev => ({ ...prev, "end_date": e.target.value }))}
+                />
+                <Button primary fluid onClick={handleApply}>Apply</Button>
+                <h3>Interval Preset</h3>
                 <Form.Field>
-                    <Button fluid onClick={handleApply}>Apply</Button>
-                </Form.Field>
-                <Form.Field>
-                    <label>Date Preset</label>
                     <Dropdown fluid className="icon" text="Select Preset" button labeled icon="wait">
                         <Dropdown.Menu>
                             {

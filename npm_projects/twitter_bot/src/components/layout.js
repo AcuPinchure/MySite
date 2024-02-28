@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from "react";
 import './layout.css';
 import { Grid, Icon } from "semantic-ui-react";
-import { LeftSideBar, RightSideBar } from "./sidebar";
+import { LeftSideBar, RightSideBar, SideBarDimmer } from "./sidebar";
 import { useLocation } from "react-router-dom";
 
 import PropTypes from 'prop-types';
 
 import store from "../store";
 import { useSelector } from "react-redux";
-import { setLeftActive, setRightActive, setViewWidth } from "../store/layout_slice";
+import { setLeftActive, setRightActive } from "../store/layout_slice";
 
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+
+import About from './page/about';
+import { Stats, StatsOptions } from "./page/stats";
+import Login from './page/login';
+import ConfigPage from './page/service_config';
+import StatusPage from './page/service_status';
+import { LibraryOptions, ImageLibrary } from './page/library';
+import LogPage from "./page/logs";
 
 
 function CompactContainer(props) {
@@ -50,7 +60,7 @@ function getTitle(pathname) {
 }
 
 function TitleBar(props) {
-    const location = useLocation();
+    const path_name = useLocation().pathname;
 
     function handleSideActive(side, active) {
         if (side === "left") {
@@ -70,7 +80,7 @@ function TitleBar(props) {
                     </div> : null}
                 </Grid.Column>
                 <Grid.Column width={12} textAlign="center">
-                    {getTitle(location.pathname)}
+                    {getTitle(path_name)}
                 </Grid.Column>
                 <Grid.Column width={2} textAlign="right">
                     {props.hasOptions ?
@@ -90,51 +100,39 @@ TitleBar.propTypes = {
     hasOptions: PropTypes.bool
 }
 
-function BotLayout(props) {
+
+
+function BotLayout() {
 
     const layout_state = useSelector(state => state.LayoutSlice);
 
-    // const layout_state = {
-    //     view_width: useSelector(state => state.LayoutSlice.view_width),
-    //     responsive_width: useSelector(state => state.LayoutSlice.responsive_width)
-    // };
-    // const left_active = useSelector(state => state.LayoutSlice.left_active);
-    // const right_active = useSelector(state => state.LayoutSlice.right_active);
-
-
-    useEffect(() => {
-
-        function updateViewWidth() {
-            store.dispatch(setViewWidth(window.innerWidth));
-        }
-
-        // Attach the event listener to update viewWidth when the window is resized
-        window.addEventListener('resize', updateViewWidth);
-
-        // Clean up the event listener when the component unmounts
-        return () => {
-            window.removeEventListener('resize', updateViewWidth);
-        };
-    }, []);
+    const path_name = useLocation().pathname;
 
 
     return (
         <>
-            <TitleBar leftActive={layout_state.left_active && layout_state.view_width > layout_state.responsive_width} rightActive={layout_state.right_active} hasLeftIcon={layout_state.view_width <= layout_state.responsive_width} hasOptions={props.rightBarOptions ? true : false} />
-            <LeftSideBar isActive={layout_state.left_active}></LeftSideBar>
+            <Route exact path="/bot/" component={About} />
+            {path_name !== "/bot/" && <>
+                <TitleBar
+                    leftActive={layout_state.left_active && layout_state.view_width > layout_state.responsive_width}
+                    rightActive={layout_state.right_active}
+                    hasLeftIcon={layout_state.view_width <= layout_state.responsive_width}
+                    hasOptions={["/bot/stats/", "/bot/library/"].includes(path_name)}
+                />
+                <LeftSideBar isActive={layout_state.left_active} />
+            </>}
             <RightSideBar isActive={layout_state.right_active}>
-                {props.rightBarOptions}
+                <Route path="/bot/stats/" component={StatsOptions} />
+                <Route path="/bot/library/" component={LibraryOptions} />
             </RightSideBar>
-            <div
-                className={`bot stats sidebar_overlay ${(layout_state.right_active || (layout_state.left_active && layout_state.view_width <= layout_state.responsive_width)) ? "active" : ""}`}
-                style={layout_state.left_active && layout_state.view_width <= layout_state.responsive_width ? { zIndex: 200 } : null}
-                onClick={() => {
-                    store.dispatch(setLeftActive(false));
-                    store.dispatch(setRightActive(false));
-                }}
-            ></div>
+            <SideBarDimmer />
             <div className={`bot stats content ${layout_state.left_active && layout_state.view_width > layout_state.responsive_width ? "left_active" : ""} ${layout_state.right_active ? "right_active" : ""}`}>
-                {props.children}
+                <Route path="/bot/stats/" component={Stats} />
+                <Route path="/bot/login/" component={Login} />
+                <Route path="/bot/status/" component={StatusPage} />
+                <Route path="/bot/config/" component={ConfigPage} />
+                <Route path="/bot/library/" component={ImageLibrary} />
+                <Route path="/bot/logs/" component={LogPage} />
             </div>
         </>
     )
@@ -144,5 +142,4 @@ BotLayout.propTypes = {
 }
 
 export default BotLayout;
-
 export { CompactContainer };

@@ -26,6 +26,12 @@ config_endpoints = [
          api_views.updateServiceConfig, name="update_config"),
 ]
 
+image_api_endpoints = [
+    path('list/', api_views.listImages, name="list_images"),
+    path('get/<int:pk>/', api_views.getImageDetail, name="get_image"),
+    path('setWeight/', api_views.setImageWeight, name="set_image_weight"),
+]
+
 api_endpoints = [
     path('getStats/', api_views.getStats, name="get_stats"),
     path('detailStats/', include(detail_stats_api_endpoints)),
@@ -33,6 +39,7 @@ api_endpoints = [
          name="load_default_stats"),
     path('config/', include(config_endpoints)),
     path('tweet/', include(tweet_api_endpoints)),
+    path('image/', include(image_api_endpoints)),
     path('followers/', include(followers_api_endpoints)),
     path('testLogin/', api_views.testLogin, name="test_login"),
     path('testAuth/', api_views.testAuth, name="test_auth"),
