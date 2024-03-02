@@ -1,0 +1,12 @@
+.bot.card-image-wrapper {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bot.card-image-wrapper .image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

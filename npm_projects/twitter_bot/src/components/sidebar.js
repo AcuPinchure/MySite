@@ -34,7 +34,7 @@ function NaviMenu() {
     const path_name = useLocation().pathname;
     const history = useHistory();
 
-    const showAdminMenu = useSelector(state => state.LayoutSlice.showAdminMenu);
+    const show_admin_menu = useSelector(state => state.LayoutSlice.show_admin_menu);
 
     function handleItemClick(path) {
         history.push(path);
@@ -56,7 +56,7 @@ function NaviMenu() {
                 <Icon name="signal"></Icon>
                 Service Status
             </Menu.Item>
-            {showAdminMenu ?
+            {show_admin_menu ?
                 <>
                     <Menu.Item active={path_name.startsWith("/bot/config/")} onClick={() => handleItemClick("/bot/config/")}>
                         <Icon name="cogs"></Icon>

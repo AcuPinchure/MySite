@@ -7,7 +7,7 @@ const LayoutSlice = createSlice({
         right_active: false,
         view_width: window.innerWidth,
         responsive_width: 1000,
-        showAdminMenu: false
+        show_admin_menu: false
     },
     reducers: {
         setLeftActive: (state, action) => {
@@ -28,7 +28,7 @@ const LayoutSlice = createSlice({
             }
         },
         setShowAdminMenu: (state, action) => {
-            state.showAdminMenu = action.payload;
+            state.show_admin_menu = action.payload;
         }
     },
 });

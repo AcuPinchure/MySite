@@ -29,7 +29,7 @@ config_endpoints = [
 image_api_endpoints = [
     path('list/', api_views.listImages, name="list_images"),
     path('get/<int:pk>/', api_views.getImageDetail, name="get_image"),
-    path('setWeight/', api_views.setImageWeight, name="set_image_weight"),
+    path('setWeight/<int:pk>/', api_views.setImageWeight, name="set_image_weight"),
 ]
 
 api_endpoints = [

@@ -45,7 +45,7 @@ class SeiyuuSerializer(serializers.ModelSerializer):
 class MediaSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     file = serializers.URLField(read_only=True, source='file.url')
-    file_name = serializers.SerializerMethodField()
+    file_name = serializers.CharField()
     file_type = serializers.CharField(read_only=True)
     total_weight = serializers.SerializerMethodField()
     seiyuu_name = serializers.CharField(read_only=True, source='seiyuu.name')
@@ -53,24 +53,24 @@ class MediaSerializer(serializers.ModelSerializer):
         read_only=True, source='seiyuu.screen_name')
     seiyuu_id_name = serializers.CharField(
         read_only=True, source='seiyuu.id_name')
-    posts = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-    rts = serializers.SerializerMethodField()
+    posts = serializers.IntegerField()
+    likes = serializers.IntegerField()
+    rts = serializers.IntegerField()
 
     def get_total_weight(self, obj):
         return Media.objects.filter(seiyuu=obj.seiyuu).aggregate(Sum('weight'))['weight__sum']
 
-    def get_file_name(self, obj):
-        return obj.file.name.split('/')[-1]
+    # def get_file_name(self, obj):
+    #     return obj.file.name.split('/')[-1]
 
-    def get_posts(self, obj):
-        return obj.tweet_set.count()
+    # def get_posts(self, obj):
+    #     return obj.tweet_set.count()
 
-    def get_likes(self, obj):
-        return obj.tweet_set.aggregate(Sum('like'))['like__sum']
+    # def get_likes(self, obj):
+    #     return obj.tweet_set.aggregate(Sum('like'))['like__sum']
 
-    def get_rts(self, obj):
-        return obj.tweet_set.aggregate(Sum('rt'))['rt__sum']
+    # def get_rts(self, obj):
+    #     return obj.tweet_set.aggregate(Sum('rt'))['rt__sum']
 
     class Meta:
         model = Media
