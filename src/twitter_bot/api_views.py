@@ -497,6 +497,13 @@ def listImages(request):
             return Response({"message": "Tweet not found"}, status=status.HTTP_404_NOT_FOUND)
 
         the_image = the_tweet_query.first().media
+        image_tweet_set_query = Tweet.objects.filter(media=the_image)
+        the_image.file_name = the_image.file.name.split('/')[-1]
+        the_image.posts = image_tweet_set_query.count()
+        the_image.likes = image_tweet_set_query.aggregate(
+            max_likes=Max('like'))['max_likes'] or 0
+        the_image.rts = image_tweet_set_query.aggregate(
+            max_rts=Max('rt'))['max_rts'] or 0
 
         serializer = MediaSerializer(the_image, many=False)
 
