@@ -17,7 +17,7 @@ import pytz
 
 # models and query
 from .models import Seiyuu, Tweet, Followers, Media
-from django.db.models import Avg, Count, Sum
+from django.db.models import Avg, Count, Sum, Max
 
 # serializers
 from .serializer import SeiyuuSerializer, MediaSerializer, TweetSerializer
@@ -697,13 +697,18 @@ def getImageDetail(request, pk):
         return Response({"message": "Image not found"}, status=status.HTTP_404_NOT_FOUND)
 
     the_image = Media.objects.get(pk=pk)
-    serializer = MediaSerializer(the_image, many=False)
+    the_image.file_name = the_image.file.name.split('/')[-1]
 
     tweet_query = Tweet.objects.filter(media=the_image).order_by("post_time")
+    the_image.posts = tweet_query.count()
+    the_image.likes = tweet_query.aggregate(max_likes=Max('like'))['max_likes']
+    the_image.rts = tweet_query.aggregate(max_rts=Max('rt'))['max_rts']
+
+    image_serializer = MediaSerializer(the_image, many=False)
     tweet_serializer = TweetSerializer(tweet_query, many=True)
 
     return Response({
-        **serializer.data,
+        **image_serializer.data,
         "tweets": tweet_serializer.data
     }, status=status.HTTP_200_OK)
 

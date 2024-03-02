@@ -9,6 +9,8 @@ import PropTypes from 'prop-types';
 import { setRightActive } from "../../store/layout_slice";
 import Cookies from "js-cookie";
 
+import "./library.css";
+
 
 
 /**
@@ -173,6 +175,7 @@ function ImageDetailModal(props) {
                             <Form.Button
                                 width={8}
                                 fluid
+                                disabled={weightLocal == imageData.weight}
                                 onClick={handleCancel}
                             >Cancel</Form.Button>
                         </Form.Group>
@@ -254,16 +257,18 @@ function ImageCard(props) {
                 setOpen={setOpenModal}
             />
             <Card link onClick={() => setOpenModal(true)}>
-                {
-                    props.imageType === "video/mp4"
-                        ?
-                        <Image as="video" width="100%" controls>
-                            <source src={props.image.replace("data/media/", "")} type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </Image>
-                        :
-                        <Image src={props.image.replace("data/media/", "")} wrapped ui={false} />
-                }
+                <div className="bot card-image-wrapper">
+                    {
+                        props.imageType === "video/mp4"
+                            ?
+                            <Image as="video" controls>
+                                <source src={props.image.replace("data/media/", "")} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </Image>
+                            :
+                            <Image src={props.image.replace("data/media/", "")} ui={false} />
+                    }
+                </div>
                 <Card.Content>
                     <Card.Header>
                         <p style={{ textOverflow: "ellipsis", overflow: "hidden" }}>{props.name}</p>
@@ -314,6 +319,9 @@ function ImageLibrary() {
     const display_options = useSelector(state => state.LibrarySlice.display_options);
     const search_data = useSelector(state => state.LibrarySlice.filter_options);
     const active_tab = useSelector(state => state.LibrarySlice.active_tab);
+
+    const view_width = useSelector(state => state.LayoutSlice.view_width);
+    const responsive_width = useSelector(state => state.LayoutSlice.responsive_width);
 
     function handlePageChange(e, { activePage }) {
         store.dispatch(setPageOptions({ page: activePage }));
@@ -386,7 +394,7 @@ function ImageLibrary() {
                         query_results.length > 0 ?
                             <>
                                 <h2>Search Results</h2>
-                                <Menu text style={{ overflowX: "auto" }}>
+                                <Menu text vertical={view_width <= responsive_width} style={{ overflowX: "auto" }}>
                                     <Menu.Item header>Sort By</Menu.Item>
                                     {display_options.sort_options.map(option => (
                                         <Menu.Item
@@ -406,19 +414,24 @@ function ImageLibrary() {
                                 {
                                     display_options.total_pages > 1
                                     &&
-                                    <p>
+                                    <div style={{
+                                        textAlign: view_width <= responsive_width ? "center" : "left",
+                                        marginTop: "1rem",
+                                        marginBottom: "1rem"
+                                    }}>
                                         <Pagination
+                                            size="mini"
                                             activePage={display_options.page}
                                             totalPages={display_options.total_pages}
                                             onPageChange={handlePageChange}
                                             firstItem={null}
                                             lastItem={null}
-                                            boundaryRange={1}
+                                            boundaryRange={2}
                                             siblingRange={0}
                                         />
-                                    </p>
+                                    </div>
                                 }
-                                <Card.Group itemsPerRow={4} doubling>
+                                <Card.Group itemsPerRow={3} stackable>
                                     {query_results.map(image => (
                                         <ImageCard
                                             key={image.id}
@@ -434,21 +447,25 @@ function ImageLibrary() {
                                         />
                                     ))}
                                 </Card.Group>
-                                <br />
                                 {
                                     display_options.total_pages > 1
                                     &&
-                                    <p>
+                                    <div style={{
+                                        textAlign: view_width <= responsive_width ? "center" : "left",
+                                        marginTop: "1rem",
+                                        marginBottom: "1rem"
+                                    }}>
                                         <Pagination
+                                            size="mini"
                                             activePage={display_options.page}
                                             totalPages={display_options.total_pages}
                                             onPageChange={handlePageChange}
                                             firstItem={null}
                                             lastItem={null}
-                                            boundaryRange={0}
-                                            siblingRange={1}
+                                            boundaryRange={2}
+                                            siblingRange={0}
                                         />
-                                    </p>
+                                    </div>
                                 }
 
                             </>
@@ -456,7 +473,7 @@ function ImageLibrary() {
                             <Message
                                 icon="search"
                                 header="No Results"
-                                content="Please refine your search criteria."
+                                content="Current search returned no results. Please try again with different search parameters."
                             />
                     )
 
