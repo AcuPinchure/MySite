@@ -167,9 +167,9 @@ function Footer() {
         <div className="bot about footer">
             <p className="bot about feature title">Stay Tuned</p>
             <p className="bot about feature description">
-                Our service currently owns 4 accounts, click the avatar to view them on Twitter.
+                Lovelive Seiyuu Bot currently has 3 accounts, click the avatar to view them on Twitter.
             </p>
-            <Grid doubling columns={4} stackable className="bot about twitter_link_group">
+            <Grid doubling columns={3} stackable className="bot about twitter_link_group">
                 <Grid.Column>
                     <TwitterLink name="前田佳織里" image={KaorinLink} link="https://twitter.com/kaorin__bot"></TwitterLink>
                 </Grid.Column>
@@ -179,9 +179,9 @@ function Footer() {
                 <Grid.Column>
                     <TwitterLink name="田中ちえ美" image={ChemiLink} link="https://twitter.com/chiemi__bot"></TwitterLink>
                 </Grid.Column>
-                <Grid.Column>
+                {/* <Grid.Column>
                     <TwitterLink name="月音こな" image={KonachiLink} link="https://twitter.com/konachi__bot"></TwitterLink>
-                </Grid.Column>
+                </Grid.Column> */}
             </Grid>
             <div className="bot about footer_bottom">
                 <p>
@@ -231,6 +231,14 @@ function About() {
         };
     }, []);
 
+    function scrollToPageFooter() {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            left: 0,
+            behavior: "smooth",
+        });
+    }
+
     return (
         <>
             <TopMenu inverted={scrollDistance < 200}></TopMenu>
@@ -243,7 +251,7 @@ function About() {
                     <FeatureSection imageSide="left" image={<ImageSlider images={[Slide1, Slide2, Slide3, Slide4]} interval={2}></ImageSlider>}>
                         <p className="bot about feature title">Discover Random Surprise</p>
                         <p className="bot about feature description">
-                            Our bot randomly picks images of your favorite seiyuu and posts them on twitter. You'll never miss that perfect profile pic, moments or meme!
+                            Lovelive Seiyuu Bot is <a onClick={scrollToPageFooter} style={{ cursor: "pointer" }}>a series of bot accounts</a> randomly picks Lovelive seiyuu images and posts them on twitter. You'll never miss that perfect profile pic, moments or meme!
                         </p>
                         <FeatureDetailModal triggerText="Learn more about how we collect images" title="How do we collect images?">
                             <p>All images and clips are collected from the following source.</p>
@@ -277,51 +285,10 @@ function About() {
                         <p className="bot about feature description">
                             You'll get a regular dose of joy when your favorite seiyuu pops up in your feed. It's a great way to stay connected to your “oshi”!
                         </p>
-                        <FeatureDetailModal triggerText="See posts interval of each account" title="Service status">
-                            <Table basic="very" celled>
-                                <Table.Header>
-                                    <Table.Row>
-                                        <Table.HeaderCell>Account</Table.HeaderCell>
-                                        <Table.HeaderCell>Status</Table.HeaderCell>
-                                        <Table.HeaderCell>Interval</Table.HeaderCell>
-                                    </Table.Row>
-                                </Table.Header>
-                                <Table.Body>
-                                    <Table.Row>
-                                        <Table.Cell>前田佳織里</Table.Cell>
-                                        <Table.Cell>
-                                            <Icon name="check" color="green"></Icon>
-                                            Online
-                                        </Table.Cell>
-                                        <Table.Cell>1 hour</Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell>鬼頭明里</Table.Cell>
-                                        <Table.Cell>
-                                            <Icon name="check" color="green"></Icon>
-                                            Online
-                                        </Table.Cell>
-                                        <Table.Cell>1 hour</Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell>田中ちえ美</Table.Cell>
-                                        <Table.Cell>
-                                            <Icon name="check" color="green"></Icon>
-                                            Online
-                                        </Table.Cell>
-                                        <Table.Cell>1 hour</Table.Cell>
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell>月音こな</Table.Cell>
-                                        <Table.Cell>
-                                            <Icon name="x" color="red"></Icon>
-                                            Offline
-                                        </Table.Cell>
-                                        <Table.Cell>-</Table.Cell>
-                                    </Table.Row>
-                                </Table.Body>
-                            </Table>
-                        </FeatureDetailModal>
+                        <a style={{ cursor: "pointer" }} href="/bot/status/">
+                            See posts interval of each account
+                            <Icon name="external" style={{ paddingLeft: "0.5rem" }}></Icon>
+                        </a>
                     </FeatureSection>
                     <Divider></Divider>
                     <FeatureSection imageSide="right" image={<Image src={Motion} style={{ width: "30rem" }} centered></Image>}>

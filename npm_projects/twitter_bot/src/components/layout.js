@@ -108,32 +108,38 @@ function BotLayout() {
 
     const path_name = useLocation().pathname;
 
+    console.log(path_name);
+
 
     return (
         <>
             <Route exact path="/bot/" component={About} />
-            {path_name !== "/bot/" && <>
-                <TitleBar
-                    leftActive={layout_state.left_active && layout_state.view_width > layout_state.responsive_width}
-                    rightActive={layout_state.right_active}
-                    hasLeftIcon={layout_state.view_width <= layout_state.responsive_width}
-                    hasOptions={["/bot/stats/", "/bot/library/"].includes(path_name)}
-                />
-                <LeftSideBar isActive={layout_state.left_active} />
-            </>}
-            <RightSideBar isActive={layout_state.right_active}>
-                <Route path="/bot/stats/" component={StatsOptions} />
-                <Route path="/bot/library/" component={LibraryOptions} />
-            </RightSideBar>
-            <SideBarDimmer />
-            <div className={`bot stats content ${layout_state.left_active && layout_state.view_width > layout_state.responsive_width ? "left_active" : ""} ${layout_state.right_active ? "right_active" : ""}`}>
-                <Route path="/bot/stats/" component={Stats} />
-                <Route path="/bot/login/" component={Login} />
-                <Route path="/bot/status/" component={StatusPage} />
-                <Route path="/bot/config/" component={ConfigPage} />
-                <Route path="/bot/library/" component={ImageLibrary} />
-                <Route path="/bot/logs/" component={LogPage} />
-            </div>
+            {
+                path_name !== "/bot/"
+                &&
+                <>
+                    <TitleBar
+                        leftActive={layout_state.left_active && layout_state.view_width > layout_state.responsive_width}
+                        rightActive={layout_state.right_active}
+                        hasLeftIcon={layout_state.view_width <= layout_state.responsive_width}
+                        hasOptions={["/bot/stats/", "/bot/library/"].includes(path_name)}
+                    />
+                    <LeftSideBar isActive={layout_state.left_active} />
+                    <RightSideBar isActive={layout_state.right_active}>
+                        <Route path="/bot/stats/" component={StatsOptions} />
+                        <Route path="/bot/library/" component={LibraryOptions} />
+                    </RightSideBar>
+                    <SideBarDimmer />
+                    <div className={`bot stats content ${layout_state.left_active && layout_state.view_width > layout_state.responsive_width ? "left_active" : ""} ${layout_state.right_active ? "right_active" : ""}`}>
+                        <Route path="/bot/stats/" component={Stats} />
+                        <Route path="/bot/login/" component={Login} />
+                        <Route path="/bot/status/" component={StatusPage} />
+                        <Route path="/bot/config/" component={ConfigPage} />
+                        <Route path="/bot/library/" component={ImageLibrary} />
+                        <Route path="/bot/logs/" component={LogPage} />
+                    </div>
+                </>
+            }
         </>
     )
 }

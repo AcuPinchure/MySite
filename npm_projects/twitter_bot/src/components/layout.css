@@ -22,7 +22,7 @@
     width: var(--bar-width);
     padding: 1rem;
     padding-top: 0rem;
-    height: 100vh;
+    height: 100dvh;
     transition: left ease 0.3s, right ease 0.3s;
     overflow-y: auto;
 }

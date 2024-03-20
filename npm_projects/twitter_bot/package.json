@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development ./src/index.js --output-path ../../src/static/twitter_bot --watch",
-    "build": "webpack --mode production ./src/index.js --output-path ../../src/static/twitter_bot"
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
