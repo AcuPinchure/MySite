@@ -43,7 +43,7 @@
     padding-top: 1rem;
     z-index: 150;
     top: 3.8rem;
-    height: calc(100vh - 3.8rem);
+    height: calc(100dvh - 3.8rem);
     right: calc(-1*var(--bar-width));
     background-color: rgb(240, 240, 240);
 }
