@@ -31,7 +31,7 @@ function StatsDetailModal(props) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const show_admin_menu = useSelector(state => state.LayoutSlice.showAdminMenu);
+    const show_admin_menu = useSelector(state => state.LayoutSlice.show_admin_menu);
 
     const history = useHistory();
 
