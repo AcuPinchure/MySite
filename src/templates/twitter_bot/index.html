@@ -128,12 +128,11 @@
     </script> {% endcomment %}
 
     {% load static %}
-    <script src="{% static 'twitter_bot/main.js' %}?date=20240303"></script>
+    <!--main-->
+    <script src="/static/twitter_bot/main.{{main_hash}}.js"></script>
+    <!--vendor-->
+    <script src="/static/twitter_bot/vendors.{{vendor_hash}}.js"></script>
 
-    <script>
-        const local_storage = window.localStorage;
-        local_storage.setItem('csrf_token', '{{ csrf_token }}');
-    </script>
 </body>
 
 </html>

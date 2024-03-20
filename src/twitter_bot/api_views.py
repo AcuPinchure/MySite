@@ -577,7 +577,6 @@ def listImages(request):
                     media_id,
                     MAX(post_time) AS post_time
                 FROM bot_tweet
-                WHERE data_time IS NOT NULL
                 GROUP BY media_id
             )AS tweet_latest_time ON bot_media.id = tweet_latest_time.media_id
             JOIN
@@ -586,7 +585,6 @@ def listImages(request):
                     media_id,
                     MIN(post_time) AS post_time
                 FROM bot_tweet
-                WHERE data_time IS NOT NULL
                 GROUP BY media_id
             ) AS tweet_earliest_time ON bot_media.id = tweet_earliest_time.media_id
             JOIN
@@ -595,7 +593,6 @@ def listImages(request):
                     media_id, 
                     COUNT(id) AS count
                 FROM bot_tweet
-                WHERE data_time IS NOT NULL
                 GROUP BY media_id
             ) AS tweet_post_count ON bot_media.id = tweet_post_count.media_id
             JOIN
@@ -604,7 +601,6 @@ def listImages(request):
                     media_id,
                     MAX(bot_tweet."like") AS count
                 FROM bot_tweet
-                WHERE data_time IS NOT NULL
                 GROUP BY media_id
             ) AS tweet_like_count ON bot_media.id = tweet_like_count.media_id
             JOIN
@@ -613,7 +609,6 @@ def listImages(request):
                     media_id,
                     MAX(bot_tweet.rt) AS count
                 FROM bot_tweet
-                WHERE data_time IS NOT NULL
                 GROUP BY media_id
             ) AS tweet_rt_count ON bot_media.id = tweet_rt_count.media_id
     """

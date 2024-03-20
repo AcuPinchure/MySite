@@ -417,7 +417,7 @@ function ImageLibrary() {
                                     <div style={{
                                         textAlign: view_width <= responsive_width ? "center" : "left",
                                         marginTop: "1rem",
-                                        marginBottom: "1rem"
+                                        marginBottom: view_width <= responsive_width ? "2rem" : "1rem"
                                     }}>
                                         <Pagination
                                             size="mini"
