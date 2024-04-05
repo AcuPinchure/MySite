@@ -3,7 +3,7 @@ from twitter_bot.models import Tweet, Media
 import tweepy
 import os
 from django.utils.timezone import now
-from random import choice
+from random import choices
 from django.core.management.base import BaseCommand
 from pathlib import Path
 from twitter_bot.models import Seiyuu
@@ -19,7 +19,8 @@ def post_once(the_seiyuu_instance: Seiyuu):
 
     media_q = Media.objects.filter(seiyuu=the_seiyuu_instance)
     media_pks = media_q.values_list('pk', flat=True)
-    random_pk = choice(media_pks)
+    media_weights = media_q.values_list('weight', flat=True)
+    random_pk = choices(media_pks, media_weights)[0]
     random_media = media_q.get(pk=random_pk)
     random_file_path = random_media.file.name.replace("\\", "/")
 
