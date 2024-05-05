@@ -10,4 +10,5 @@ from rest_framework.permissions import IsAuthenticated
 
 
 def notFound(request):
+    return redirect('bot:about')
     return render(request, 'local_auth/not_found.html')

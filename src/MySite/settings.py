@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
+    # 'corsheaders',
     'local_auth',
     'twitter_bot',
     'main',
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    # "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,7 +146,7 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#LOGIN_URL = '/logistics/login/'
+# LOGIN_URL = '/logistics/login/'
 
 
 REST_FRAMEWORK = {
@@ -155,6 +155,17 @@ REST_FRAMEWORK = {
     ]
 }
 
+"""
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://acupinchure.ddns.net",
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "https://acupinchure.ddns.net",
+]
+
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+"""
